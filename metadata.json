@@ -1,0 +1,5 @@
+{
+  "name": "Class Presence Manager",
+  "description": "An application to manage presence, schedules, and activities for children's classes, acting as a helpful bot for organization.",
+  "requestFramePermissions": []
+}
