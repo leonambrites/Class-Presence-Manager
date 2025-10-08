@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Student, Volunteer, ScheduleEntry, Topic, StudentType, Attendance as AttendanceType } from './types';
 import Header from './components/Header';
 import Dashboard from './components/Dashboard';
@@ -8,53 +8,16 @@ import Students from './components/Students';
 import Schedule from './components/Schedule';
 import Topics from './components/Topics';
 import Dismissal from './components/Dismissal';
+import { INITIAL_STUDENTS, INITIAL_VOLUNTEERS, INITIAL_SCHEDULE, INITIAL_TOPICS } from './constants';
 
 const App: React.FC = () => {
   const [view, setView] = useState<View>(View.Dashboard);
-  const [students, setStudents] = useState<Student[]>([]);
-  const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
-  const [schedule, setSchedule] = useState<ScheduleEntry[]>([]);
-  const [topics, setTopics] = useState<Topic[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [students, setStudents] = useState<Student[]>(INITIAL_STUDENTS);
+  const [volunteers, setVolunteers] = useState<Volunteer[]>(INITIAL_VOLUNTEERS);
+  const [schedule, setSchedule] = useState<ScheduleEntry[]>(INITIAL_SCHEDULE);
+  const [topics, setTopics] = useState<Topic[]>(INITIAL_TOPICS);
   const [notification, setNotification] = useState<string | null>(null);
   const [selectedClass, setSelectedClass] = useState<string>('All');
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [studentsRes, volunteersRes, scheduleRes, topicsRes] = await Promise.all([
-          fetch('/data/students.json'),
-          fetch('/data/volunteers.json'),
-          fetch('/data/schedule.json'),
-          fetch('/data/topics.json')
-        ]);
-
-        if (!studentsRes.ok || !volunteersRes.ok || !scheduleRes.ok || !topicsRes.ok) {
-            throw new Error('Falha ao carregar os dados do servidor.');
-        }
-
-        const studentsData = await studentsRes.json();
-        const volunteersData = await volunteersRes.json();
-        const scheduleData = await scheduleRes.json();
-        const topicsData = await topicsRes.json();
-
-        setStudents(studentsData);
-        setVolunteers(volunteersData);
-        setSchedule(scheduleData);
-        setTopics(topicsData);
-        
-      } catch (e: any) {
-        setError(e.message);
-        console.error("Failed to load data:", e);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
 
   const showNotification = (message: string) => {
     setNotification(message);
@@ -225,25 +188,6 @@ const App: React.FC = () => {
         return <Dashboard students={students} selectedClass={selectedClass} onClassChange={setSelectedClass} />;
     }
   };
-
-  if (loading) {
-    return (
-        <div className="flex justify-center items-center h-screen bg-brand-light">
-            <div className="text-xl font-semibold text-brand-dark">Carregando dados...</div>
-        </div>
-    );
-  }
-
-  if (error) {
-    return (
-        <div className="flex justify-center items-center h-screen bg-brand-light">
-            <div className="text-xl font-semibold text-brand-red text-center p-4">
-                <p>Ocorreu um erro ao carregar os dados.</p>
-                <p className="text-sm mt-2">{error}</p>
-            </div>
-        </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-brand-light font-sans">
