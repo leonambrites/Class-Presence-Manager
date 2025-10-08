@@ -8,6 +8,7 @@ export interface Attendance {
   date: string;
   present: boolean;
   dismissedBy?: string | null;
+  day?: 'Sunday' | 'Wednesday';
 }
 
 export interface Student {

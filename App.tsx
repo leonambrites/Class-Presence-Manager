@@ -63,16 +63,30 @@ const App: React.FC = () => {
     }, 3000);
   };
 
+  const getDayOfWeek = (dateString: string): 'Sunday' | 'Wednesday' | null => {
+    const date = new Date(dateString + 'T00:00:00');
+    const dayIndex = date.getDay();
+    if (dayIndex === 0) return 'Sunday';
+    if (dayIndex === 3) return 'Wednesday';
+    return null;
+  };
+
   const handleMarkPresence = useCallback((studentId: string, date: string) => {
+    const dayOfWeek = getDayOfWeek(date);
+    if (!dayOfWeek) {
+      showNotification("A presença só pode ser marcada em Domingos ou Quartas-feiras.");
+      return;
+    }
+
     setStudents(prevStudents => {
       return prevStudents.map(student => {
         if (student.id === studentId) {
           const attendanceIndex = student.attendance.findIndex(a => a.date === date);
           const newAttendance: AttendanceType[] = [...student.attendance];
           if (attendanceIndex > -1) {
-            newAttendance[attendanceIndex] = { ...newAttendance[attendanceIndex], present: true };
+            newAttendance[attendanceIndex] = { ...newAttendance[attendanceIndex], present: true, day: dayOfWeek };
           } else {
-            newAttendance.push({ date: date, present: true, dismissedBy: null });
+            newAttendance.push({ date: date, present: true, dismissedBy: null, day: dayOfWeek });
           }
           showNotification(`Presença de ${student.name} marcada!`);
           return { ...student, attendance: newAttendance };
@@ -119,6 +133,10 @@ const App: React.FC = () => {
   };
   
   const handleAddVisitor = (formData: { name: string; class: string; age: number; motherName: string; phone: string }, date: string) => {
+      if (!getDayOfWeek(date)) {
+        showNotification("Novos visitantes só podem ser adicionados em dias de aula (Domingo ou Quarta).");
+        return;
+      }
       const newId = String(Date.now());
       const newStudent: Student = {
         id: newId,

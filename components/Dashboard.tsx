@@ -22,6 +22,14 @@ const ClassStatCard: React.FC<{ title: string; value: number; color: string }> =
     </div>
 );
 
+const getDayFromDate = (dateString: string): 'Sunday' | 'Wednesday' | null => {
+    const d = new Date(dateString + 'T00:00:00');
+    const dayIndex = d.getDay();
+    if (dayIndex === 0) return 'Sunday';
+    if (dayIndex === 3) return 'Wednesday';
+    return null;
+}
+
 const DailyView: React.FC<DashboardProps & { date: string; setDate: (date: string) => void }> = ({ students, selectedClass, onClassChange, date, setDate }) => {
     const studentsToDisplay = selectedClass === 'All' 
     ? students 
@@ -42,6 +50,13 @@ const DailyView: React.FC<DashboardProps & { date: string; setDate: (date: strin
     ).length;
   };
   const classColors = ['bg-red-400', 'bg-orange-400', 'bg-amber-400', 'bg-lime-500', 'bg-cyan-500', 'bg-violet-500'];
+
+  const selectedDay = useMemo(() => {
+    const day = getDayFromDate(date);
+    if (day === 'Sunday') return { name: 'Domingo', important: true };
+    if (day === 'Wednesday') return { name: 'Quarta-feira', important: false };
+    return { name: '', important: false };
+  }, [date]);
 
     return (
         <div>
@@ -92,7 +107,14 @@ const DailyView: React.FC<DashboardProps & { date: string; setDate: (date: strin
             )}
 
             <div className="mt-12 bg-white p-6 rounded-xl shadow-lg">
-                <h3 className="text-2xl font-bold text-brand-dark mb-4">Alunos Presentes em {new Date(date + 'T00:00:00').toLocaleDateString('pt-BR')}</h3>
+                <h3 className="text-2xl font-bold text-brand-dark mb-4">
+                    Alunos Presentes em {new Date(date + 'T00:00:00').toLocaleDateString('pt-BR')}
+                    {selectedDay.name && (
+                         <span className={`ml-3 text-lg font-semibold px-3 py-1 rounded-full ${selectedDay.important ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'}`}>
+                            {selectedDay.name}{selectedDay.important && ' (Principal)'}
+                        </span>
+                    )}
+                </h3>
                  {presentStudents.length > 0 ? (
                 <ul className="divide-y divide-gray-200">
                     {presentStudents.map(student => (
@@ -120,6 +142,7 @@ const DailyView: React.FC<DashboardProps & { date: string; setDate: (date: strin
 const MonthlyView: React.FC<DashboardProps> = ({ students, selectedClass, onClassChange }) => {
     const [month, setMonth] = useState(new Date().getMonth() + 1);
     const [year, setYear] = useState(new Date().getFullYear());
+    const [dayTypeFilter, setDayTypeFilter] = useState<'All' | 'Sunday' | 'Wednesday'>('All');
 
     const yearOptions = useMemo(() => {
         const allYears = new Set(students.flatMap(s => s.attendance.map(a => new Date(a.date).getFullYear())));
@@ -139,7 +162,11 @@ const MonthlyView: React.FC<DashboardProps> = ({ students, selectedClass, onClas
             let presenceCountInMonth = 0;
             student.attendance.forEach(att => {
                 const attDate = new Date(att.date + 'T00:00:00');
-                if (attDate.getFullYear() === year && attDate.getMonth() + 1 === month) {
+                // Handle legacy data by deriving day from date if not present
+                const day = att.day || getDayFromDate(att.date);
+                const dayFilterMatch = dayTypeFilter === 'All' || day === dayTypeFilter;
+
+                if (attDate.getFullYear() === year && attDate.getMonth() + 1 === month && dayFilterMatch) {
                     if (att.present) {
                         stats.totalPresences++;
                         stats.serviceDays.add(att.date);
@@ -155,11 +182,19 @@ const MonthlyView: React.FC<DashboardProps> = ({ students, selectedClass, onClas
 
         return stats;
 
-    }, [students, selectedClass, month, year]);
+    }, [students, selectedClass, month, year, dayTypeFilter]);
 
     const numServiceDays = monthlyStats.serviceDays.size;
     const averageDailyAttendance = numServiceDays > 0 ? (monthlyStats.totalPresences / numServiceDays).toFixed(1) : 0;
     const studentAttendanceList = Array.from(monthlyStats.studentCounts.values()).sort((a, b) => a.name.localeCompare(b.name));
+
+    const monthTitle = useMemo(() => {
+        switch(dayTypeFilter) {
+            case 'Sunday': return 'em Domingos';
+            case 'Wednesday': return 'em Quartas';
+            default: return 'no Mês';
+        }
+    }, [dayTypeFilter]);
 
     return (
         <div>
@@ -186,9 +221,16 @@ const MonthlyView: React.FC<DashboardProps> = ({ students, selectedClass, onClas
                     </select>
                 </div>
             </div>
+            <div className="flex justify-center mb-6">
+                 <div className="flex bg-gray-200 rounded-lg p-1">
+                    <button onClick={() => setDayTypeFilter('All')} className={`px-3 py-1 text-sm font-semibold rounded-md transition-colors ${dayTypeFilter === 'All' ? 'bg-white text-brand-blue shadow' : 'text-gray-600'}`}>Todos</button>
+                    <button onClick={() => setDayTypeFilter('Sunday')} className={`px-3 py-1 text-sm font-semibold rounded-md transition-colors ${dayTypeFilter === 'Sunday' ? 'bg-white text-brand-purple shadow' : 'text-gray-600'}`}>Domingos</button>
+                    <button onClick={() => setDayTypeFilter('Wednesday')} className={`px-3 py-1 text-sm font-semibold rounded-md transition-colors ${dayTypeFilter === 'Wednesday' ? 'bg-white text-brand-blue shadow' : 'text-gray-600'}`}>Quartas</button>
+                </div>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-                <StatCard title="Total de Presenças no Mês" value={monthlyStats.totalPresences} color="bg-brand-purple" />
+                <StatCard title={`Presenças ${monthTitle}`} value={monthlyStats.totalPresences} color="bg-brand-purple" />
                 <StatCard title="Média Diária" value={averageDailyAttendance} color="bg-brand-red" />
                 <StatCard title="Alunos Únicos" value={monthlyStats.uniqueAttendees.size} color="bg-brand-green" />
             </div>
