@@ -1,4 +1,5 @@
-import React, { useState, useCallback, useEffect } from 'react';
+
+import React, { useState, useCallback } from 'react';
 import { View, Student, Volunteer, ScheduleEntry, Topic, StudentType, Attendance as AttendanceType } from './types';
 import Header from './components/Header';
 import Dashboard from './components/Dashboard';
@@ -7,41 +8,16 @@ import Students from './components/Students';
 import Schedule from './components/Schedule';
 import Topics from './components/Topics';
 import Dismissal from './components/Dismissal';
+import { INITIAL_STUDENTS, INITIAL_VOLUNTEERS, INITIAL_SCHEDULE, INITIAL_TOPICS } from './constants';
 
 const App: React.FC = () => {
   const [view, setView] = useState<View>(View.Dashboard);
-  const [students, setStudents] = useState<Student[]>([]);
-  const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
-  const [schedule, setSchedule] = useState<ScheduleEntry[]>([]);
-  const [topics, setTopics] = useState<Topic[]>([]);
-  
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
+  const [students, setStudents] = useState<Student[]>(INITIAL_STUDENTS);
+  const [volunteers, setVolunteers] = useState<Volunteer[]>(INITIAL_VOLUNTEERS);
+  const [schedule, setSchedule] = useState<ScheduleEntry[]>(INITIAL_SCHEDULE);
+  const [topics, setTopics] = useState<Topic[]>(INITIAL_TOPICS);
   const [notification, setNotification] = useState<string | null>(null);
   const [selectedClass, setSelectedClass] = useState<string>('All');
-
-  const fetchData = useCallback(async () => {
-    try {
-      const response = await fetch('/api/data');
-      if (!response.ok) {
-        throw new Error('Failed to fetch data from server.');
-      }
-      const data = await response.json();
-      setStudents(data.students || []);
-      setVolunteers(data.volunteers || []);
-      setSchedule(data.schedule || []);
-      setTopics(data.topics || []);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unknown error occurred.');
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
 
   const showNotification = (message: string) => {
     setNotification(message);
@@ -58,177 +34,143 @@ const App: React.FC = () => {
     return null;
   };
 
-  const handleMarkPresence = useCallback(async (studentId: string, date: string) => {
+  const handleMarkPresence = useCallback((studentId: string, date: string) => {
     const dayOfWeek = getDayOfWeek(date);
     if (!dayOfWeek) {
       showNotification("A presença só pode ser marcada em Domingos ou Quartas-feiras.");
       return;
     }
 
-    try {
-        const res = await fetch('/api/attendance', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ studentId, date, present: true, day: dayOfWeek })
-        });
-        if (!res.ok) throw new Error('API error on marking presence');
-        const student = students.find(s => s.id === studentId);
-        showNotification(`Presença de ${student?.name} marcada!`);
-        fetchData();
-    } catch (e) {
-        console.error(e);
-        showNotification('Erro ao marcar presença.');
-    }
-  }, [students, fetchData]);
+    setStudents(prevStudents => {
+      return prevStudents.map(student => {
+        if (student.id === studentId) {
+          const attendanceIndex = student.attendance.findIndex(a => a.date === date);
+          const newAttendance: AttendanceType[] = [...student.attendance];
+          if (attendanceIndex > -1) {
+            newAttendance[attendanceIndex] = { ...newAttendance[attendanceIndex], present: true, day: dayOfWeek };
+          } else {
+            newAttendance.push({ date: date, present: true, dismissedBy: null, day: dayOfWeek });
+          }
+          showNotification(`Presença de ${student.name} marcada!`);
+          return { ...student, attendance: newAttendance };
+        }
+        return student;
+      });
+    });
+  }, []);
 
-  const handleUnmarkPresence = useCallback(async (studentId: string, date: string) => {
-    const dayOfWeek = getDayOfWeek(date);
-    try {
-        const res = await fetch('/api/attendance', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ studentId, date, present: false, day: dayOfWeek })
-        });
-        if (!res.ok) throw new Error('API error on unmarking presence');
-        const student = students.find(s => s.id === studentId);
-        showNotification(`Presença de ${student?.name} desmarcada.`);
-        fetchData();
-    } catch (e) {
-        console.error(e);
-        showNotification('Erro ao desmarcar presença.');
-    }
-  }, [students, fetchData]);
-  
-  const handleAddMember = async (formData: { name: string; class: string; age: number; motherName: string; phone: string }) => {
-    const newStudent = { id: String(Date.now()), ...formData, type: StudentType.Membro };
-    try {
-        const res = await fetch('/api/students', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(newStudent)
-        });
-        if (!res.ok) throw new Error('API error on adding member');
-        showNotification(`${formData.name} foi adicionado como Membro.`);
-        fetchData();
-    } catch (e) {
-        console.error(e);
-        showNotification('Erro ao adicionar membro.');
-    }
+  const handleUnmarkPresence = useCallback((studentId: string, date: string) => {
+    setStudents(prevStudents => {
+      return prevStudents.map(student => {
+        if (student.id === studentId) {
+          const newAttendance = student.attendance.map(att => {
+            if (att.date === date) {
+              // Also clear dismissal info if unmarking presence
+              return { ...att, present: false, dismissedBy: null };
+            }
+            return att;
+          });
+          showNotification(`Presença de ${student.name} desmarcada.`);
+          return { ...student, attendance: newAttendance };
+        }
+        return student;
+      });
+    });
+  }, []);
+
+  const handleAddStudent = useCallback((formData: { name: string; class: string; age: number; motherName: string; phone: string }, type: StudentType) => {
+    setStudents(prevStudents => {
+        const newStudent: Student = {
+            id: String(Date.now()),
+            ...formData,
+            type,
+            attendance: []
+        };
+        showNotification(`${formData.name} foi adicionado como ${type}.`);
+        return [...prevStudents, newStudent];
+    });
+  }, []);
+
+  const handleAddMember = (formData: { name: string; class: string; age: number; motherName: string; phone: string }) => {
+    handleAddStudent(formData, StudentType.Membro);
   };
   
-  const handleAddVisitor = async (formData: { name: string; class: string; age: number; motherName: string; phone: string }, date: string) => {
-      const dayOfWeek = getDayOfWeek(date);
-      if (!dayOfWeek) {
+  const handleAddVisitor = (formData: { name: string; class: string; age: number; motherName: string; phone: string }, date: string) => {
+      if (!getDayOfWeek(date)) {
         showNotification("Novos visitantes só podem ser adicionados em dias de aula (Domingo ou Quarta).");
         return;
       }
       const newId = String(Date.now());
-      const newStudentData = { id: newId, ...formData, type: StudentType.Visitante };
-      
-      try {
-        const createRes = await fetch('/api/students', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(newStudentData),
-        });
-        if (!createRes.ok) throw new Error('Failed to add visitor');
-
-        await handleMarkPresence(newId, date);
-        showNotification(`${formData.name} foi adicionado como Visitante e sua presença foi marcada.`);
-        // fetchData is called inside handleMarkPresence
-    } catch (err) {
-        showNotification('Erro ao adicionar visitante.');
-        console.error(err);
-    }
+      const newStudent: Student = {
+        id: newId,
+        ...formData,
+        type: StudentType.Visitante,
+        attendance: []
+    };
+    setStudents(prev => [...prev, newStudent]);
+    // Automatically mark presence for the new visitor on the selected date
+    setTimeout(() => handleMarkPresence(newId, date), 100);
+    showNotification(`${formData.name} foi adicionado como Visitante e sua presença foi marcada.`);
   };
 
-  const handleEditStudent = useCallback(async (updatedStudent: Student) => {
-    try {
-        const res = await fetch(`/api/students/${updatedStudent.id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(updatedStudent)
-        });
-        if (!res.ok) throw new Error('API error on editing student');
-        showNotification(`${updatedStudent.name} foi atualizado com sucesso.`);
-        fetchData();
-    } catch (e) {
-        console.error(e);
-        showNotification('Erro ao editar aluno.');
-    }
-  }, [fetchData]);
+  const handleEditStudent = useCallback((updatedStudent: Student) => {
+    setStudents(prev => prev.map(s => (s.id === updatedStudent.id ? updatedStudent : s)));
+    showNotification(`${updatedStudent.name} foi atualizado com sucesso.`);
+  }, []);
 
-  const handleDeleteStudent = useCallback(async (studentId: string) => {
-    const studentName = students.find(s => s.id === studentId)?.name || 'Aluno';
-    try {
-        const res = await fetch(`/api/students/${studentId}`, { method: 'DELETE' });
-        if (!res.ok) throw new Error('API error on deleting student');
-        showNotification(`${studentName} foi excluído.`);
-        fetchData();
-    } catch (e) {
-        console.error(e);
-        showNotification('Erro ao excluir aluno.');
+  const handleDeleteStudent = useCallback((studentId: string) => {
+    let studentName = '';
+    setStudents(prev => {
+        const studentToDelete = prev.find(s => s.id === studentId);
+        if (studentToDelete) {
+            studentName = studentToDelete.name;
+        }
+        return prev.filter(s => s.id !== studentId)
+    });
+    if (studentName) {
+      showNotification(`${studentName} foi excluído.`);
     }
-  }, [students, fetchData]);
+  }, []);
 
-  const handleMakeMember = useCallback(async (studentId: string) => {
-    const studentName = students.find(s => s.id === studentId)?.name || 'Visitante';
-    try {
-        const res = await fetch(`/api/students/${studentId}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ type: StudentType.Membro })
-        });
-        if (!res.ok) throw new Error('API error on making member');
+  const handleMakeMember = useCallback((studentId: string) => {
+    let studentName = '';
+    setStudents(prev => prev.map(s => {
+        if (s.id === studentId) {
+            studentName = s.name;
+            return { ...s, type: StudentType.Membro };
+        }
+        return s;
+    }));
+    if (studentName) {
         showNotification(`${studentName} agora é um membro!`);
-        fetchData();
-    } catch (e) {
-        console.error(e);
-        showNotification('Erro ao tornar membro.');
     }
-  }, [students, fetchData]);
+  }, []);
 
-  const handleAddTopic = useCallback(async (date: string, title: string, description: string) => {
-    try {
-        const res = await fetch('/api/topics', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ date, title, description })
-        });
-        if (!res.ok) throw new Error('API error on adding topic');
-        showNotification(`Assunto "${title}" registrado com sucesso.`);
-        fetchData();
-    } catch (e) {
-        console.error(e);
-        showNotification('Erro ao registrar assunto.');
-    }
-  }, [fetchData]);
+  const handleAddTopic = useCallback((date: string, title: string, description: string) => {
+    const newTopic: Topic = { date, title, description };
+    setTopics(prev => [newTopic, ...prev]);
+    showNotification(`Assunto "${title}" registrado com sucesso.`);
+  }, []);
 
-  const handleDismiss = useCallback(async (studentId: string, responsibleName: string, date: string) => {
-    try {
-        const res = await fetch('/api/dismissal', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ studentId, responsibleName, date })
+  const handleDismiss = useCallback((studentId: string, responsibleName: string, date: string) => {
+    setStudents(prevStudents => {
+        return prevStudents.map(student => {
+            if (student.id === studentId) {
+                const newAttendance = student.attendance.map(att => {
+                    if (att.date === date) {
+                        return { ...att, dismissedBy: responsibleName };
+                    }
+                    return att;
+                });
+                showNotification(`Saída de ${student.name} registrada para ${responsibleName}.`);
+                return { ...student, attendance: newAttendance };
+            }
+            return student;
         });
-        if (!res.ok) throw new Error('API error on dismissal');
-        const student = students.find(s => s.id === studentId);
-        showNotification(`Saída de ${student?.name} registrada para ${responsibleName}.`);
-        fetchData();
-    } catch (e) {
-        console.error(e);
-        showNotification('Erro ao registrar saída.');
-    }
-  }, [students, fetchData]);
+    });
+  }, []);
 
   const renderView = () => {
-    if (isLoading) {
-        return <div className="flex justify-center items-center h-64"><div className="text-xl font-semibold text-gray-600">Carregando dados...</div></div>;
-    }
-    if (error) {
-        return <div className="flex justify-center items-center h-64"><div className="text-xl font-semibold text-red-600">Erro: {error}</div></div>;
-    }
-
     switch (view) {
       case View.Dashboard:
         return <Dashboard students={students} selectedClass={selectedClass} onClassChange={setSelectedClass} />;
