@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { Student, StudentType } from '../types';
 import StudentForm from './StudentForm';
@@ -9,7 +10,7 @@ interface AttendanceProps {
   students: Student[];
   onMarkPresence: (studentId: string, date: string) => void;
   onUnmarkPresence: (studentId: string, date: string) => void;
-  onAddVisitor: (formData: { name: string; class: string; age: number; motherName: string; phone: string }, date: string) => void;
+  onAddVisitor: (formData: { name: string; class: string; age: number; motherName: string; phone: string; birthday: string }, date: string) => void;
   selectedClass: string;
   onClassChange: (className: string) => void;
 }
@@ -27,7 +28,12 @@ const Attendance: React.FC<AttendanceProps> = ({ students, onMarkPresence, onUnm
   const [searchTerm, setSearchTerm] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [historyModalOpen, setHistoryModalOpen] = useState(false);
-  const [selectedStudentForHistory, setSelectedStudentForHistory] = useState<Student | null>(null);
+  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
+
+  // Derive the selected student from the current students prop to ensure we always have the latest data (e.g., after marking presence)
+  const selectedStudentForHistory = useMemo(() => 
+    students.find(s => s.id === selectedStudentId) || null
+  , [students, selectedStudentId]);
 
   const studentsForClass = selectedClass === 'All'
     ? students
@@ -52,19 +58,19 @@ const Attendance: React.FC<AttendanceProps> = ({ students, onMarkPresence, onUnm
     return <span className="text-gray-500">Ausente</span>;
   };
 
-  const handleAddVisitorSubmit = (formData: { name: string; class: string; age: number; motherName: string; phone: string }) => {
+  const handleAddVisitorSubmit = (formData: { name: string; class: string; age: number; motherName: string; phone: string; birthday: string }) => {
     onAddVisitor(formData, date);
     setActiveTab('Membro'); // Switch back to member tab after adding
   };
   
-  const handleViewHistory = (student: Student) => {
-    setSelectedStudentForHistory(student);
+  const handleViewHistory = (studentId: string) => {
+    setSelectedStudentId(studentId);
     setHistoryModalOpen(true);
   };
 
   const handleCloseHistoryModal = () => {
     setHistoryModalOpen(false);
-    setSelectedStudentForHistory(null);
+    setSelectedStudentId(null);
   };
   
   const selectedDay = useMemo(() => {
@@ -144,7 +150,7 @@ const Attendance: React.FC<AttendanceProps> = ({ students, onMarkPresence, onUnm
                         <p className="text-sm text-gray-500">{student.age} anos</p>
                     </div>
                     <div className="flex items-center space-x-2">
-                        <button onClick={() => handleViewHistory(student)} className="text-gray-500 hover:text-brand-blue p-1 rounded-full" title="Ver Histórico">
+                        <button onClick={() => handleViewHistory(student.id)} className="text-gray-500 hover:text-brand-blue p-1 rounded-full" title="Ver Histórico">
                             <CalendarIcon className="h-5 w-5" />
                         </button>
                         <div className="w-20 text-center">{getStudentStatus(student)}</div>
@@ -189,7 +195,7 @@ const Attendance: React.FC<AttendanceProps> = ({ students, onMarkPresence, onUnm
                                       <p className="text-sm text-gray-500">{visitor.class} - {visitor.age} anos</p>
                                   </div>
                                    <div className="flex items-center space-x-2">
-                                      <button onClick={() => handleViewHistory(visitor)} className="text-gray-500 hover:text-brand-blue p-1 rounded-full" title="Ver Histórico">
+                                      <button onClick={() => handleViewHistory(visitor.id)} className="text-gray-500 hover:text-brand-blue p-1 rounded-full" title="Ver Histórico">
                                           <CalendarIcon className="h-5 w-5" />
                                       </button>
                                       <div className="w-20 text-center">{getStudentStatus(visitor)}</div>

@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { Student, StudentType } from '../types';
 import { CLASS_NAMES } from '../constants';
@@ -6,6 +7,7 @@ interface DashboardProps {
   students: Student[];
   selectedClass: string;
   onClassChange: (className: string) => void;
+  onSaveData?: () => void;
 }
 
 const StatCard: React.FC<{ title: string; value: number | string; color: string }> = ({ title, value, color }) => (
@@ -143,6 +145,9 @@ const MonthlyView: React.FC<DashboardProps> = ({ students, selectedClass, onClas
     const [month, setMonth] = useState(new Date().getMonth() + 1);
     const [year, setYear] = useState(new Date().getFullYear());
     const [dayTypeFilter, setDayTypeFilter] = useState<'All' | 'Sunday' | 'Wednesday'>('All');
+    
+    // Sort Configuration State
+    const [sortConfig, setSortConfig] = useState<{ key: 'name' | 'class' | 'count', direction: 'asc' | 'desc' }>({ key: 'name', direction: 'asc' });
 
     const yearOptions = useMemo(() => {
         const allYears = new Set(students.flatMap(s => s.attendance.map(a => new Date(a.date).getFullYear())));
@@ -186,7 +191,40 @@ const MonthlyView: React.FC<DashboardProps> = ({ students, selectedClass, onClas
 
     const numServiceDays = monthlyStats.serviceDays.size;
     const averageDailyAttendance = numServiceDays > 0 ? (monthlyStats.totalPresences / numServiceDays).toFixed(1) : 0;
-    const studentAttendanceList = Array.from(monthlyStats.studentCounts.values()).sort((a, b) => a.name.localeCompare(b.name));
+    
+    const handleSort = (key: 'name' | 'class' | 'count') => {
+        setSortConfig(current => ({
+            key,
+            direction: current.key === key && current.direction === 'asc' ? 'desc' : 'asc'
+        }));
+    };
+
+    const studentAttendanceList = useMemo(() => {
+        const list = Array.from(monthlyStats.studentCounts.values());
+        return list.sort((a, b) => {
+            const directionMultiplier = sortConfig.direction === 'asc' ? 1 : -1;
+
+            if (sortConfig.key === 'name') {
+                return a.name.localeCompare(b.name) * directionMultiplier;
+            } else if (sortConfig.key === 'class') {
+                // Sort by predefined class order
+                const indexA = CLASS_NAMES.indexOf(a.class);
+                const indexB = CLASS_NAMES.indexOf(b.class);
+                // Handle cases where class might not be in CLASS_NAMES (put at end)
+                const valA = indexA === -1 ? 999 : indexA;
+                const valB = indexB === -1 ? 999 : indexB;
+                
+                if (valA !== valB) {
+                    return (valA - valB) * directionMultiplier;
+                }
+                // Fallback to name sort if same class
+                return a.name.localeCompare(b.name);
+            } else {
+                // Count sort
+                return (a.count - b.count) * directionMultiplier;
+            }
+        });
+    }, [monthlyStats, sortConfig]);
 
     const monthTitle = useMemo(() => {
         switch(dayTypeFilter) {
@@ -195,6 +233,11 @@ const MonthlyView: React.FC<DashboardProps> = ({ students, selectedClass, onClas
             default: return 'no Mês';
         }
     }, [dayTypeFilter]);
+
+    const SortIndicator = ({ active, direction }: { active: boolean, direction: 'asc' | 'desc' }) => {
+        if (!active) return <span className="ml-1 text-gray-400 opacity-0 group-hover:opacity-50">↕</span>;
+        return <span className="ml-1 text-brand-blue">{direction === 'asc' ? '▲' : '▼'}</span>;
+    };
 
     return (
         <div>
@@ -241,9 +284,24 @@ const MonthlyView: React.FC<DashboardProps> = ({ students, selectedClass, onClas
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                             <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aluno</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Turma</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dias Presente</th>
+                                <th 
+                                    onClick={() => handleSort('name')} 
+                                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 group select-none transition-colors"
+                                >
+                                    Aluno <SortIndicator active={sortConfig.key === 'name'} direction={sortConfig.direction} />
+                                </th>
+                                <th 
+                                    onClick={() => handleSort('class')} 
+                                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 group select-none transition-colors"
+                                >
+                                    Turma <SortIndicator active={sortConfig.key === 'class'} direction={sortConfig.direction} />
+                                </th>
+                                <th 
+                                    onClick={() => handleSort('count')} 
+                                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 group select-none transition-colors"
+                                >
+                                    Dias Presente <SortIndicator active={sortConfig.key === 'count'} direction={sortConfig.direction} />
+                                </th>
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
@@ -283,6 +341,40 @@ const Dashboard: React.FC<DashboardProps> = (props) => {
         </div>
 
         {viewMode === 'daily' ? <DailyView {...props} date={dailyDate} setDate={setDailyDate} /> : <MonthlyView {...props} />}
+        
+        {/* Footer Actions */}
+        <div className="mt-12 border-t pt-8 flex flex-col sm:flex-row justify-end gap-4 items-center">
+            {props.onSaveData && (
+                <button 
+                    onClick={props.onSaveData}
+                    className="w-full sm:w-auto px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition shadow-sm font-semibold flex items-center justify-center gap-2"
+                >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                    Salvar Dados na Planilha
+                </button>
+            )}
+
+            <button 
+                onClick={async () => {
+                    if(window.confirm("ATENÇÃO: Isso apagará TODOS os dados da planilha e restaurará os dados originais de fábrica (arquivo constants.ts). Tem certeza absoluta?")) {
+                        try {
+                            const res = await fetch('/api/seed', { method: 'POST' });
+                            if(res.ok) {
+                                alert("Dados restaurados com sucesso! A página será recarregada.");
+                                window.location.reload();
+                            } else {
+                                alert("Erro ao restaurar dados.");
+                            }
+                        } catch(e) {
+                            alert("Erro de conexão.");
+                        }
+                    }
+                }}
+                className="text-sm text-red-500 hover:text-red-700 hover:underline"
+            >
+                Restaurar Dados de Fábrica
+            </button>
+        </div>
     </div>
   );
 };
