@@ -1,44 +1,21 @@
-
 import { google } from "googleapis";
 import { JWT } from "google-auth-library";
 
 // Configurações do Google Sheets
-const SPREADSHEET_ID = "1qVVTuMrqDMPveb8royYJrvbw-FUq9TkwO833_QxuEXk";
+const SPREADSHEET_ID = process.env.SPREADSHEET_ID;
 const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
 
 // Variáveis de ambiente com chaves fornecidas
-const GOOGLE_SERVICE_ACCOUNT_EMAIL = "bot-google-sheets@bot-kids-mananciais.iam.gserviceaccount.com";
-const GOOGLE_SERVICE_ACCOUNT_KEY = `-----BEGIN PRIVATE KEY-----
-MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDLHj+MSBxq79TI
-luMteKHHaubEyhICa5RuJ4HHrCtroyvMZK9cBM9bwENdA/2mBjWvYiFfr06ixYLK
-yyOHBxRQUlaoivjjzZNbiMJpEVXZI03kieHdb8HtV9zXX1PPHkAGnkHx+MgTx+mb
-7gxqKZZrM9rXuefegKYp7bs16wfUOj6mVKh9UbSIAiH4bFyQJflOaxz7zLKM+Liq
-GcR0rZfXHDwW84EeNBzWXyhyQ8I2ZHCBGK5xCMyt/3K+sn7G3JA2k7AEHwbj7ZeS
-PupzlKX4ss0SIwUdSLpO07qaN7hqUFifcF5PL7+XpJN7QImhA60FVsNV0LKg6cQ8
-gBSCaRYxAgMBAAECggEASR3s40ssC6Sk1MZYJgy4M+h8BNf2zq86QcLv+Vg1Uyxs
-Pkn6RCYpHM6jkS64FpVCqw0olWCubnKqB+VDNz6ppdZWAprwSFS+2GLtFNRcMmt+
-hSfLSiKKTS1lPpQ+v56Ujq1WcMvM/i3nHq39AxRQZOvIOgLegF6QMiS1UQ33hgID
-T2mPgdveDsxy1hVaw/IYyoUTWdbmJtNMJl8QZZgwb3Z5xGzWGVfTLftE0+PI7ckU
-YEoFD5IOY1LzTGZvFWtxZ0nJ2CH8RYY1xdneTffdJzZL4f1TSQK6rQJAWdMJ4P8H
-21iF/UNt7xhi6UunM0saiUXZlEMFgwpFCidfGpaHbwKBgQDmuaLoD5i/24SX5R4W
-AX8pSOFV1foBEL8+1LV3i9mXEdRtRp1GvZ0Hj4T2IzBh+dW1rRUFr3Z3JwLzVKJT
-NfV++y+BTP/ajq4aKWhZ1uq2TI/ISyDbTVDS+gSAUxvBO6qYYQLchZDtejZHVhhP
-Dzn5QkId1ggkMxb7u5035IiLvwKBgQDhXmmiZfh1d4OSPZ+/0stUjbPcZUjWb+ik
-9H6y6oD1CeUH4z0g6aIFYxUs/tQgElh7aKbqCXdQjD15b9QBRNyCxzbrhOMg0G1v
-z+W/65bipP9EjwCWPxYRg22Ac+ZCi2lOFVnpRL2p44C2Trj8bgH1IGdUf3e3VSIq
-X21M+6iaDwKBgGatJBcbocF3wkkKeFoYrmtD+KuHPuusdT9Tz7H0tY9qKtu6ehFa
-HoCX2PbkcAqZ8QYZkWpnTFP4M3LwLhDTyX2J8PkcuBueNVKFLOAWKXuZFL9w151g
-ieBpzQkCcy6KDAAl4+0ZL4bPRUp3wPel8gm/98ZpUlQxvD+onW2bMTznAoGBALS8
-kJ6qhF1AIYYQYaLmnCYNFic0GvvN95cCdPFrW0woSULQHF/evg7v7TWOj/PAgrFF
-tkaOnN89+LcA1dbGsMk4lnS+t5/DR2CaK7iEaRcOF6GVxXS41yvoaNLRH+JSB3uV
-Z+vJMwmh58FM1NGsL2m0OOns58dhQOsWaIOKdyZFAoGBAMs8foLD6DC+PbJO+Yym
-igkSrQAYVfOGwsgT+QUs0X7jzcebImRVJ98NorKryk0QdHDjEDfFkgROgcCHvxp2
-ovSWpZhIPOfCs0ZpQJmHlhrGdbmdfykpxgfzJKTfRbWWApGbtuUFm63Ya5itvHHF
-WmDAvmOL+iH9TPuQComeLF7U
------END PRIVATE KEY-----`;
+const GOOGLE_SERVICE_ACCOUNT_EMAIL = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
+const GOOGLE_SERVICE_ACCOUNT_KEY = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
+
+
 
 // Autenticação
 function getSheetsClient() {
+  if (!SPREADSHEET_ID || !GOOGLE_SERVICE_ACCOUNT_EMAIL || !GOOGLE_SERVICE_ACCOUNT_KEY) {
+    throw new Error("Google Sheets credentials not configured. Please set SPREADSHEET_ID, GOOGLE_SERVICE_ACCOUNT_EMAIL, and GOOGLE_SERVICE_ACCOUNT_KEY environment variables.");
+  }
   const client = new JWT({
     email: GOOGLE_SERVICE_ACCOUNT_EMAIL,
     key: GOOGLE_SERVICE_ACCOUNT_KEY.replace(/\\n/g, '\n'), // Ensure newlines are correctly interpreted
