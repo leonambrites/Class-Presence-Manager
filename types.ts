@@ -19,6 +19,7 @@ export interface Student {
   motherName: string;
   phone: string;
   type: StudentType;
+  birthday?: string;
   attendance: Attendance[];
 }
 

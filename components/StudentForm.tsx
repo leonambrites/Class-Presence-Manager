@@ -4,7 +4,7 @@ import { CLASS_NAMES } from '../constants';
 import { Student } from '../types';
 
 interface StudentFormProps {
-  onSubmit: (formData: { name: string; class: string; age: number; motherName: string; phone: string }) => void;
+  onSubmit: (formData: { name: string; class: string; age: number; motherName: string; phone: string; birthday: string }) => void;
   onCancel: () => void;
   initialData?: Partial<Student> | null;
 }
@@ -15,6 +15,7 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
   const [age, setAge] = useState('');
   const [motherName, setMotherName] = useState('');
   const [phone, setPhone] = useState('');
+  const [birthday, setBirthday] = useState('');
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -24,23 +25,26 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
       setAge(initialData.age ? String(initialData.age) : '');
       setMotherName(initialData.motherName || '');
       setPhone(initialData.phone || '');
+      setBirthday(initialData.birthday || '');
     } else {
         setName('');
         setStudentClass(CLASS_NAMES[0]);
         setAge('');
         setMotherName('');
         setPhone('');
+        setBirthday('');
     }
   }, [initialData]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !studentClass || !age || !motherName || !phone) {
-      setError('Todos os campos são obrigatórios.');
-      return;
+      setError('Todos os campos são obrigatórios (exceto data de nascimento).');
+      // Relax validation for legacy support, but require core fields
+      if(!name || !age) return; 
     }
     setError('');
-    onSubmit({ name, class: studentClass, age: parseInt(age, 10), motherName, phone });
+    onSubmit({ name, class: studentClass, age: parseInt(age, 10), motherName, phone, birthday });
   };
 
   return (
@@ -48,7 +52,7 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
       {error && <p className="text-red-500 text-sm">{error}</p>}
       <div>
         <label className="block text-sm font-medium text-gray-700">Nome do Aluno</label>
-        <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-blue focus:border-brand-blue sm:text-sm" />
+        <input type="text" value={name} onChange={(e) => setName(e.target.value)} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-blue focus:border-brand-blue sm:text-sm" />
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
@@ -61,16 +65,20 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">Idade</label>
-          <input type="number" value={age} onChange={(e) => setAge(e.target.value)} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-blue focus:border-brand-blue sm:text-sm" />
+          <input type="number" value={age} onChange={(e) => setAge(e.target.value)} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-blue focus:border-brand-blue sm:text-sm" />
         </div>
       </div>
       <div>
+        <label className="block text-sm font-medium text-gray-700">Data de Nascimento</label>
+        <input type="date" value={birthday} onChange={(e) => setBirthday(e.target.value)} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-blue focus:border-brand-blue sm:text-sm" />
+      </div>
+      <div>
         <label className="block text-sm font-medium text-gray-700">Nome da Mãe</label>
-        <input type="text" value={motherName} onChange={(e) => setMotherName(e.target.value)} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-blue focus:border-brand-blue sm:text-sm" />
+        <input type="text" value={motherName} onChange={(e) => setMotherName(e.target.value)} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-blue focus:border-brand-blue sm:text-sm" />
       </div>
       <div>
         <label className="block text-sm font-medium text-gray-700">Telefone</label>
-        <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-blue focus:border-brand-blue sm:text-sm" />
+        <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-blue focus:border-brand-blue sm:text-sm" />
       </div>
       <div className="flex justify-end space-x-3 pt-4">
         <button type="button" onClick={onCancel} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition">Cancelar</button>

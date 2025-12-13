@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Student, StudentType } from '../types';
 import Modal from './Modal';
@@ -7,7 +8,7 @@ import { CLASS_NAMES } from '../constants';
 
 interface StudentsProps {
   students: Student[];
-  onAddStudent: (formData: { name: string; class: string; age: number; motherName: string; phone: string }) => void;
+  onAddStudent: (formData: { name: string; class: string; age: number; motherName: string; phone: string; birthday: string }) => void;
   onEditStudent: (student: Student) => void;
   onDeleteStudent: (studentId: string) => void;
   onMakeMember: (studentId: string) => void;
@@ -50,7 +51,7 @@ const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStude
     }
   };
 
-  const handleFormSubmit = (formData: { name: string; class: string; age: number; motherName: string; phone: string }) => {
+  const handleFormSubmit = (formData: { name: string; class: string; age: number; motherName: string; phone: string; birthday: string }) => {
     if (editingStudent) {
       onEditStudent({ ...editingStudent, ...formData });
     } else {
@@ -124,7 +125,10 @@ const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStude
                     <td className="px-6 py-4 whitespace-nowrap">
                         <button onClick={() => handleOpenEditModal(student)} className="text-left hover:text-brand-blue transition-colors">
                             <div className="text-sm font-medium text-gray-900">{student.name}</div>
-                            <div className="text-sm text-gray-500">{student.age} anos</div>
+                            <div className="text-sm text-gray-500">
+                                {student.age} anos
+                                {student.birthday && <span className="ml-1 text-xs text-gray-400">({new Date(student.birthday).toLocaleDateString('pt-BR')})</span>}
+                            </div>
                         </button>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.class}</td>
@@ -160,7 +164,10 @@ const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStude
                     <div className="flex justify-between items-start">
                         <button onClick={() => handleOpenEditModal(student)} className="text-left">
                             <p className="text-lg font-bold text-gray-900 hover:text-brand-blue transition-colors">{student.name}</p>
-                            <p className="text-sm text-gray-500">{student.age} anos</p>
+                            <p className="text-sm text-gray-500">
+                                {student.age} anos
+                                {student.birthday && <span className="ml-1 text-xs">({new Date(student.birthday).toLocaleDateString('pt-BR')})</span>}
+                            </p>
                         </button>
                         {student.attendance.some(a => a.date === today && a.present) ? 
                             <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Presente</span> :
