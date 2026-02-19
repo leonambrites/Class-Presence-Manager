@@ -1,5 +1,5 @@
 import express from 'express';
-import { googleSheetsService } from './googleSheetsService';
+import { sqliteService } from './sqliteService';
 import { INITIAL_STUDENTS, INITIAL_VOLUNTEERS, INITIAL_SCHEDULE, INITIAL_TOPICS } from '../constants';
 
 const app = express();
@@ -10,10 +10,10 @@ app.use(express.json({ limit: '10mb' }) as any); // Increased limit for full dat
 // GET all data
 app.get('/api/data', async (req, res) => {
     try {
-        const data = await googleSheetsService.getAllData();
+        const data = await sqliteService.getAllData();
         res.json(data);
     } catch (error) {
-        console.error("Error fetching data from Sheets:", error);
+        console.error("Error fetching data from SQLite:", error);
         res.status(500).json({ error: "Failed to fetch data" });
     }
 });
@@ -22,7 +22,7 @@ app.get('/api/data', async (req, res) => {
 app.post('/api/attendance', async (req, res) => {
     const { studentId, date, present, day } = req.body;
     try {
-        await googleSheetsService.updateAttendance(studentId, date, present, day);
+        await sqliteService.updateAttendance(studentId, date, present, day);
         res.status(200).json({ message: 'Attendance updated' });
     } catch (error) {
         console.error("Error updating attendance:", error);
@@ -34,7 +34,7 @@ app.post('/api/attendance', async (req, res) => {
 app.post('/api/dismissal', async (req, res) => {
     const { studentId, responsibleName, date } = req.body;
     try {
-        await googleSheetsService.updateDismissal(studentId, date, responsibleName);
+        await sqliteService.updateDismissal(studentId, date, responsibleName);
         res.status(200).json({ message: 'Dismissal updated' });
     } catch (error) {
         console.error("Error recording dismissal:", error);
@@ -48,8 +48,8 @@ app.post('/api/students', async (req, res) => {
     try {
         // Ensure ID exists if not passed
         if (!newStudent.id) newStudent.id = Date.now().toString();
-        
-        await googleSheetsService.addStudent(newStudent);
+
+        await sqliteService.addStudent(newStudent);
         res.status(201).json({ message: 'Student created' });
     } catch (error) {
         console.error("Error adding student:", error);
@@ -62,21 +62,21 @@ app.put('/api/students/:id', async (req, res) => {
     const { id } = req.params;
     try {
         const payload = req.body;
-        
+
         // Se for um update parcial (ex: só type), precisamos dos dados originais
-        const needsMerge = !payload.name || !payload.class; 
-        
+        const needsMerge = !payload.name || !payload.class;
+
         let finalData = payload;
 
         if (needsMerge) {
-            const allData = await googleSheetsService.getAllData();
+            const allData = await sqliteService.getAllData();
             const currentStudent = allData.students.find((s: any) => s.id === id);
             if (!currentStudent) return res.status(404).json({ error: 'Student not found' });
-            
+
             finalData = { ...currentStudent, ...payload };
         }
 
-        await googleSheetsService.updateStudent(id, finalData);
+        await sqliteService.updateStudent(id, finalData);
         res.status(200).json({ message: 'Student updated' });
     } catch (error) {
         console.error("Error updating student:", error);
@@ -88,7 +88,7 @@ app.put('/api/students/:id', async (req, res) => {
 app.delete('/api/students/:id', async (req, res) => {
     const { id } = req.params;
     try {
-        await googleSheetsService.deleteStudent(id);
+        await sqliteService.deleteStudent(id);
         res.status(200).json({ message: 'Student deleted' });
     } catch (error) {
         console.error("Error deleting student:", error);
@@ -100,7 +100,7 @@ app.delete('/api/students/:id', async (req, res) => {
 app.post('/api/topics', async (req, res) => {
     const { date, title, description } = req.body;
     try {
-        await googleSheetsService.addTopic(date, title, description);
+        await sqliteService.addTopic(date, title, description);
         res.status(201).json({ message: 'Topic created' });
     } catch (error) {
         console.error("Error adding topic:", error);
@@ -112,18 +112,18 @@ app.post('/api/topics', async (req, res) => {
 app.post('/api/save-all', async (req, res) => {
     try {
         const { students, volunteers, schedule, topics } = req.body;
-        
+
         if (!students || !volunteers || !schedule || !topics) {
-             return res.status(400).json({ error: "Missing data fields" });
+            return res.status(400).json({ error: "Missing data fields" });
         }
 
-        await googleSheetsService.seedDatabase({
+        await sqliteService.seedDatabase({
             students,
             volunteers,
             schedule,
             topics
         });
-        res.status(200).json({ message: "Data saved successfully to Google Sheets." });
+        res.status(200).json({ message: "Data saved successfully to SQLite." });
     } catch (error) {
         console.error("Save all error:", error);
         res.status(500).json({ error: "Failed to save data" });
@@ -133,7 +133,7 @@ app.post('/api/save-all', async (req, res) => {
 // Seed Database from Constants
 app.post('/api/seed', async (req, res) => {
     try {
-        await googleSheetsService.seedDatabase({
+        await sqliteService.seedDatabase({
             students: INITIAL_STUDENTS,
             volunteers: INITIAL_VOLUNTEERS,
             schedule: INITIAL_SCHEDULE,
@@ -145,5 +145,13 @@ app.post('/api/seed', async (req, res) => {
         res.status(500).json({ error: "Failed to seed database" });
     }
 });
+
+// Standalone Server Support
+if (require.main === module) {
+    const port = process.env.PORT || 3000;
+    app.listen(port, () => {
+        console.log(`API Server running on port ${port}`);
+    });
+}
 
 export default app;

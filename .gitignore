@@ -22,3 +22,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Parcel cache
+.parcel-cache
+.parcel-cache/
+
+# SQLite Database
+database.sqlite
+database.sqlite-shm
+database.sqlite-wal
