@@ -1,6 +1,10 @@
 import express from 'express';
 import { dbService } from './dbService';
 import { INITIAL_STUDENTS, INITIAL_VOLUNTEERS, INITIAL_SCHEDULE, INITIAL_TOPICS } from '../constants';
+import { initDb } from './database';
+
+// Initialize the database schema for Vercel/Neon if tables do not exist
+initDb().catch(console.error);
 
 const app = express();
 app.use(express.json({ limit: '10mb' }) as any); // Increased limit for full data sync
