@@ -1,4 +1,8 @@
-import { sql } from '@vercel/postgres';
+import { neon } from '@neondatabase/serverless';
+import dotenv from 'dotenv';
+
+dotenv.config();
+const sql = neon(process.env.DATABASE_URL!);
 import { DataPayload } from './googleSheetsService';
 
 const getTimestamp = () => new Date().toISOString();
@@ -12,10 +16,10 @@ export const dbService = {
         const scheduleData = await sql`SELECT * FROM schedule`;
         const topicsData = await sql`SELECT * FROM topics`;
 
-        const formattedStudents = studentsData.rows.map((s: any) => ({
+        const formattedStudents = studentsData.map((s: any) => ({
             ...s,
             age: s.age ? Number(s.age) : 0,
-            attendance: attendanceData.rows
+            attendance: attendanceData
                 .filter((a: any) => String(a.student_id) === String(s.id))
                 .map((a: any) => ({
                     date: a.date,
@@ -25,18 +29,18 @@ export const dbService = {
                 }))
         }));
 
-        const formattedVolunteers = volunteersData.rows.map((v: any) => ({
+        const formattedVolunteers = volunteersData.map((v: any) => ({
             ...v,
             id: String(v.id)
         }));
 
-        const formattedSchedule = scheduleData.rows.map((s: any) => ({
+        const formattedSchedule = scheduleData.map((s: any) => ({
             ...s,
             id: String(s.id),
             ministerIds: s.ministerids ? s.ministerids.split(',') : (s.ministerIds ? s.ministerIds.split(',') : [])
         }));
 
-        const formattedTopics = topicsData.rows.map((t: any) => ({
+        const formattedTopics = topicsData.map((t: any) => ({
             ...t,
             id: String(t.id)
         }));
@@ -66,19 +70,20 @@ export const dbService = {
             SET name = ${data.name}, class = ${data.class}, age = ${data.age}, motherName = ${data.motherName}, 
                 phone = ${data.phone}, type = ${data.type}, birthday = ${data.birthday}, updated_at = ${getTimestamp()}
             WHERE id = ${String(id)}
+            RETURNING id
         `;
-        if (result.rowCount === 0) throw new Error("Student not found");
+        if (result.length === 0) throw new Error("Student not found");
     },
 
     async deleteStudent(id: string) {
-        const result = await sql`DELETE FROM students WHERE id = ${String(id)}`;
-        if (result.rowCount === 0) throw new Error("Student not found");
+        const result = await sql`DELETE FROM students WHERE id = ${String(id)} RETURNING id`;
+        if (result.length === 0) throw new Error("Student not found");
     },
 
     async updateAttendance(studentId: string, date: string, present: boolean, day: string) {
         const existing = await sql`SELECT id FROM attendance WHERE student_id = ${studentId} AND date = ${date}`;
 
-        if (existing.rowCount && existing.rowCount > 0) {
+        if (existing.length > 0) {
             await sql`
                 UPDATE attendance 
                 SET present = ${present}, day = ${day}, dismissed_by = ${present ? null : undefined}
@@ -102,8 +107,9 @@ export const dbService = {
             UPDATE attendance 
             SET dismissed_by = ${responsibleName}
             WHERE student_id = ${studentId} AND date = ${date}
+            RETURNING id
         `;
-        if (result.rowCount === 0) throw new Error("Attendance record not found to dismiss");
+        if (result.length === 0) throw new Error("Attendance record not found to dismiss");
     },
 
     async addTopic(date: string, title: string, description: string) {
@@ -123,13 +129,14 @@ export const dbService = {
     async updateVolunteer(id: string, name: string) {
         const result = await sql`
             UPDATE volunteers SET name = ${name} WHERE id = ${String(id)}
+            RETURNING id
         `;
-        if (result.rowCount === 0) throw new Error("Volunteer not found");
+        if (result.length === 0) throw new Error("Volunteer not found");
     },
 
     async deleteVolunteer(id: string) {
-        const result = await sql`DELETE FROM volunteers WHERE id = ${String(id)}`;
-        if (result.rowCount === 0) throw new Error("Volunteer not found");
+        const result = await sql`DELETE FROM volunteers WHERE id = ${String(id)} RETURNING id`;
+        if (result.length === 0) throw new Error("Volunteer not found");
     },
 
     async addSchedule(schedule: any) {
@@ -150,13 +157,14 @@ export const dbService = {
             SET date = ${schedule.date}, className = ${schedule.className}, supervisorId = ${schedule.supervisorId}, 
                 deskId = ${schedule.deskId}, coordinatorId = ${schedule.coordinatorId}, ministerIds = ${ministerIdsStr}
             WHERE id = ${String(id)}
+            RETURNING id
         `;
-        if (result.rowCount === 0) throw new Error("Schedule not found");
+        if (result.length === 0) throw new Error("Schedule not found");
     },
 
     async deleteSchedule(id: string) {
-        const result = await sql`DELETE FROM schedule WHERE id = ${String(id)}`;
-        if (result.rowCount === 0) throw new Error("Schedule not found");
+        const result = await sql`DELETE FROM schedule WHERE id = ${String(id)} RETURNING id`;
+        if (result.length === 0) throw new Error("Schedule not found");
     },
 
     async seedDatabase(payload: any) {
