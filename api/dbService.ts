@@ -2,7 +2,13 @@ import { neon } from '@neondatabase/serverless';
 import dotenv from 'dotenv';
 
 dotenv.config();
-const sql = neon(process.env.DATABASE_URL!);
+
+const getSql = () => {
+    if (!process.env.DATABASE_URL) {
+        throw new Error("DATABASE_URL environment variable is missing.");
+    }
+    return neon(process.env.DATABASE_URL);
+};
 import { DataPayload } from './googleSheetsService';
 
 const getTimestamp = () => new Date().toISOString();
@@ -10,6 +16,7 @@ const getTimestamp = () => new Date().toISOString();
 export const dbService = {
     // Ler todos os dados
     async getAllData(): Promise<DataPayload> {
+        const sql = getSql();
         const studentsData = await sql`SELECT * FROM students`;
         const attendanceData = await sql`SELECT * FROM attendance`;
         const volunteersData = await sql`SELECT * FROM volunteers`;
@@ -54,6 +61,7 @@ export const dbService = {
     },
 
     async addStudent(student: any) {
+        const sql = getSql();
         await sql`
             INSERT INTO students (id, name, class, age, motherName, phone, type, birthday, created_at, updated_at)
             VALUES (
@@ -65,6 +73,7 @@ export const dbService = {
     },
 
     async updateStudent(id: string, data: any) {
+        const sql = getSql();
         const result = await sql`
             UPDATE students
             SET name = ${data.name}, class = ${data.class}, age = ${data.age}, motherName = ${data.motherName}, 
@@ -76,11 +85,13 @@ export const dbService = {
     },
 
     async deleteStudent(id: string) {
+        const sql = getSql();
         const result = await sql`DELETE FROM students WHERE id = ${String(id)} RETURNING id`;
         if (result.length === 0) throw new Error("Student not found");
     },
 
     async updateAttendance(studentId: string, date: string, present: boolean, day: string) {
+        const sql = getSql();
         const existing = await sql`SELECT id FROM attendance WHERE student_id = ${studentId} AND date = ${date}`;
 
         if (existing.length > 0) {
@@ -103,6 +114,7 @@ export const dbService = {
     },
 
     async updateDismissal(studentId: string, date: string, responsibleName: string) {
+        const sql = getSql();
         const result = await sql`
             UPDATE attendance 
             SET dismissed_by = ${responsibleName}
@@ -113,6 +125,7 @@ export const dbService = {
     },
 
     async addTopic(date: string, title: string, description: string) {
+        const sql = getSql();
         await sql`
             INSERT INTO topics (id, date, title, description, created_at)
             VALUES (${String(Date.now())}, ${date}, ${title}, ${description}, ${getTimestamp()})
@@ -120,6 +133,7 @@ export const dbService = {
     },
 
     async addVolunteer(name: string) {
+        const sql = getSql();
         await sql`
             INSERT INTO volunteers (id, name, created_at)
             VALUES (${String(Date.now())}, ${name}, ${getTimestamp()})
@@ -127,6 +141,7 @@ export const dbService = {
     },
 
     async updateVolunteer(id: string, name: string) {
+        const sql = getSql();
         const result = await sql`
             UPDATE volunteers SET name = ${name} WHERE id = ${String(id)}
             RETURNING id
@@ -135,11 +150,13 @@ export const dbService = {
     },
 
     async deleteVolunteer(id: string) {
+        const sql = getSql();
         const result = await sql`DELETE FROM volunteers WHERE id = ${String(id)} RETURNING id`;
         if (result.length === 0) throw new Error("Volunteer not found");
     },
 
     async addSchedule(schedule: any) {
+        const sql = getSql();
         const ministerIdsStr = Array.isArray(schedule.ministerIds) ? schedule.ministerIds.join(',') : schedule.ministerIds;
         await sql`
             INSERT INTO schedule (id, date, className, supervisorId, deskId, coordinatorId, ministerIds, created_at)
@@ -151,6 +168,7 @@ export const dbService = {
     },
 
     async updateSchedule(id: string, schedule: any) {
+        const sql = getSql();
         const ministerIdsStr = Array.isArray(schedule.ministerIds) ? schedule.ministerIds.join(',') : schedule.ministerIds;
         const result = await sql`
             UPDATE schedule
@@ -163,11 +181,13 @@ export const dbService = {
     },
 
     async deleteSchedule(id: string) {
+        const sql = getSql();
         const result = await sql`DELETE FROM schedule WHERE id = ${String(id)} RETURNING id`;
         if (result.length === 0) throw new Error("Schedule not found");
     },
 
     async seedDatabase(payload: any) {
+        const sql = getSql();
         try {
             await sql`DELETE FROM attendance`;
             await sql`DELETE FROM students`;
