@@ -219,11 +219,22 @@ app.post('/api/seed', async (req, res) => {
 });
 
 // Standalone Server Support
-if (require.main === module) {
+if (typeof require !== 'undefined' && require.main === module) {
     const port = process.env.PORT || 3000;
     app.listen(port, () => {
         console.log(`API Server running on port ${port}`);
     });
+} else if (process.env.NODE_ENV !== 'production') {
+    // Fallback for local testing if ESM
+    const port = process.env.PORT || 3000;
+    if (typeof process !== 'undefined' && process.argv[1] && process.argv[1].includes('index.ts')) {
+        app.listen(port, () => {
+            console.log(`API Server running on port ${port}`);
+        });
+    }
 }
 
 export default app;
+if (typeof module !== 'undefined') {
+    module.exports = app;
+}
