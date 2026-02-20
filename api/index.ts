@@ -1,5 +1,5 @@
 import express from 'express';
-import { sqliteService } from './sqliteService';
+import { dbService } from './dbService';
 import { INITIAL_STUDENTS, INITIAL_VOLUNTEERS, INITIAL_SCHEDULE, INITIAL_TOPICS } from '../constants';
 
 const app = express();
@@ -10,7 +10,7 @@ app.use(express.json({ limit: '10mb' }) as any); // Increased limit for full dat
 // GET all data
 app.get('/api/data', async (req, res) => {
     try {
-        const data = await sqliteService.getAllData();
+        const data = await dbService.getAllData();
         res.json(data);
     } catch (error) {
         console.error("Error fetching data from SQLite:", error);
@@ -22,7 +22,7 @@ app.get('/api/data', async (req, res) => {
 app.post('/api/attendance', async (req, res) => {
     const { studentId, date, present, day } = req.body;
     try {
-        await sqliteService.updateAttendance(studentId, date, present, day);
+        await dbService.updateAttendance(studentId, date, present, day);
         res.status(200).json({ message: 'Attendance updated' });
     } catch (error) {
         console.error("Error updating attendance:", error);
@@ -34,7 +34,7 @@ app.post('/api/attendance', async (req, res) => {
 app.post('/api/dismissal', async (req, res) => {
     const { studentId, responsibleName, date } = req.body;
     try {
-        await sqliteService.updateDismissal(studentId, date, responsibleName);
+        await dbService.updateDismissal(studentId, date, responsibleName);
         res.status(200).json({ message: 'Dismissal updated' });
     } catch (error) {
         console.error("Error recording dismissal:", error);
@@ -49,7 +49,7 @@ app.post('/api/students', async (req, res) => {
         // Ensure ID exists if not passed
         if (!newStudent.id) newStudent.id = Date.now().toString();
 
-        await sqliteService.addStudent(newStudent);
+        await dbService.addStudent(newStudent);
         res.status(201).json({ message: 'Student created' });
     } catch (error) {
         console.error("Error adding student:", error);
@@ -69,14 +69,14 @@ app.put('/api/students/:id', async (req, res) => {
         let finalData = payload;
 
         if (needsMerge) {
-            const allData = await sqliteService.getAllData();
+            const allData = await dbService.getAllData();
             const currentStudent = allData.students.find((s: any) => s.id === id);
             if (!currentStudent) return res.status(404).json({ error: 'Student not found' });
 
             finalData = { ...currentStudent, ...payload };
         }
 
-        await sqliteService.updateStudent(id, finalData);
+        await dbService.updateStudent(id, finalData);
         res.status(200).json({ message: 'Student updated' });
     } catch (error) {
         console.error("Error updating student:", error);
@@ -88,7 +88,7 @@ app.put('/api/students/:id', async (req, res) => {
 app.delete('/api/students/:id', async (req, res) => {
     const { id } = req.params;
     try {
-        await sqliteService.deleteStudent(id);
+        await dbService.deleteStudent(id);
         res.status(200).json({ message: 'Student deleted' });
     } catch (error) {
         console.error("Error deleting student:", error);
@@ -100,11 +100,79 @@ app.delete('/api/students/:id', async (req, res) => {
 app.post('/api/topics', async (req, res) => {
     const { date, title, description } = req.body;
     try {
-        await sqliteService.addTopic(date, title, description);
+        await dbService.addTopic(date, title, description);
         res.status(201).json({ message: 'Topic created' });
     } catch (error) {
         console.error("Error adding topic:", error);
         res.status(500).json({ error: "Failed to create topic" });
+    }
+});
+
+// --- Volunteers CRUD ---
+app.post('/api/volunteers', async (req, res) => {
+    try {
+        const { name } = req.body;
+        await dbService.addVolunteer(name);
+        res.status(201).json({ message: 'Volunteer created' });
+    } catch (error) {
+        console.error("Error adding volunteer:", error);
+        res.status(500).json({ error: "Failed to create volunteer" });
+    }
+});
+
+app.put('/api/volunteers/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name } = req.body;
+        await dbService.updateVolunteer(id, name);
+        res.status(200).json({ message: 'Volunteer updated' });
+    } catch (error) {
+        console.error("Error updating volunteer:", error);
+        res.status(500).json({ error: "Failed to update volunteer" });
+    }
+});
+
+app.delete('/api/volunteers/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        await dbService.deleteVolunteer(id);
+        res.status(200).json({ message: 'Volunteer deleted' });
+    } catch (error) {
+        console.error("Error deleting volunteer:", error);
+        res.status(500).json({ error: "Failed to delete volunteer" });
+    }
+});
+
+// --- Schedule CRUD ---
+app.post('/api/schedule', async (req, res) => {
+    try {
+        await dbService.addSchedule(req.body);
+        res.status(201).json({ message: 'Schedule created' });
+    } catch (error) {
+        console.error("Error adding schedule:", error);
+        res.status(500).json({ error: "Failed to create schedule" });
+    }
+});
+
+app.put('/api/schedule/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        await dbService.updateSchedule(id, req.body);
+        res.status(200).json({ message: 'Schedule updated' });
+    } catch (error) {
+        console.error("Error updating schedule:", error);
+        res.status(500).json({ error: "Failed to update schedule" });
+    }
+});
+
+app.delete('/api/schedule/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        await dbService.deleteSchedule(id);
+        res.status(200).json({ message: 'Schedule deleted' });
+    } catch (error) {
+        console.error("Error deleting schedule:", error);
+        res.status(500).json({ error: "Failed to delete schedule" });
     }
 });
 
@@ -117,7 +185,7 @@ app.post('/api/save-all', async (req, res) => {
             return res.status(400).json({ error: "Missing data fields" });
         }
 
-        await sqliteService.seedDatabase({
+        await dbService.seedDatabase({
             students,
             volunteers,
             schedule,
@@ -133,7 +201,7 @@ app.post('/api/save-all', async (req, res) => {
 // Seed Database from Constants
 app.post('/api/seed', async (req, res) => {
     try {
-        await sqliteService.seedDatabase({
+        await dbService.seedDatabase({
             students: INITIAL_STUDENTS,
             volunteers: INITIAL_VOLUNTEERS,
             schedule: INITIAL_SCHEDULE,

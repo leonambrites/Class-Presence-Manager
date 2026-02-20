@@ -29,6 +29,7 @@ export interface Volunteer {
 }
 
 export interface ScheduleEntry {
+  id: string;
   date: string;
   className: string;
   supervisorId: string | null;
@@ -48,6 +49,7 @@ export enum View {
   Attendance = 'Presença',
   Students = 'Alunos',
   Schedule = 'Escala',
+  Volunteers = 'Voluntários',
   Topics = 'Assuntos',
   Dismissal = 'Saída',
 }
