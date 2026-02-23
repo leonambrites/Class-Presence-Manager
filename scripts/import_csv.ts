@@ -40,8 +40,9 @@ const importStudents = async () => {
     console.log('Lendo dados do arquivo CSV...');
 
     fs.createReadStream(csvFilePath)
-        .pipe(csv({ separator: ',' })) // Pode precisar ser ';' se o Excel estiver em português BR
+        .pipe(csv({ separator: ';', mapHeaders: ({ header }) => header.trim().replace(/^[\uFEFF\u200B]+/, '') }))
         .on('data', (row: CsvRow) => {
+            console.log("Raw Row data:", JSON.stringify(row));
             // Ignora linhas totalmente vazias
             if (!row.NOME || row.NOME.trim() === '') return;
 
