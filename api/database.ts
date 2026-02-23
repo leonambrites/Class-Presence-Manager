@@ -38,6 +38,7 @@ export const initDb = async () => {
                 present BOOLEAN DEFAULT FALSE,
                 day TEXT,
                 dismissed_by TEXT,
+                daily_code INTEGER,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY(student_id) REFERENCES students(id) ON DELETE CASCADE
             )
@@ -62,6 +63,13 @@ export const initDb = async () => {
             await sql`ALTER TABLE volunteers ADD COLUMN team TEXT`;
         } catch (e) {
             // Columns likely already exist
+        }
+
+        // Migration for existing Attendance table
+        try {
+            await sql`ALTER TABLE attendance ADD COLUMN daily_code INTEGER`;
+        } catch (e) {
+            // Column likely already exists
         }
 
         // Schedule Table
