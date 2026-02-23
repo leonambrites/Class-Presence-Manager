@@ -48,9 +48,21 @@ export const initDb = async () => {
             CREATE TABLE IF NOT EXISTS volunteers (
                 id VARCHAR(255) PRIMARY KEY,
                 name TEXT NOT NULL,
+                class TEXT,
+                phone TEXT,
+                team TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `;
+
+        // Migration for existing Volunteers table
+        try {
+            await sql`ALTER TABLE volunteers ADD COLUMN class TEXT`;
+            await sql`ALTER TABLE volunteers ADD COLUMN phone TEXT`;
+            await sql`ALTER TABLE volunteers ADD COLUMN team TEXT`;
+        } catch (e) {
+            // Columns likely already exist
+        }
 
         // Schedule Table
         await sql`

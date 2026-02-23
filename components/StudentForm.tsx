@@ -1,7 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { CLASS_NAMES } from '../constants';
 import { Student } from '../types';
+import { calculateAge } from '../utils';
 
 interface StudentFormProps {
   onSubmit: (formData: { name: string; class: string; age: number; motherName: string; phone: string; birthday: string }) => void;
@@ -12,7 +12,6 @@ interface StudentFormProps {
 const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialData }) => {
   const [name, setName] = useState('');
   const [studentClass, setStudentClass] = useState(CLASS_NAMES[0]);
-  const [age, setAge] = useState('');
   const [motherName, setMotherName] = useState('');
   const [phone, setPhone] = useState('');
   const [birthday, setBirthday] = useState('');
@@ -22,29 +21,30 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
     if (initialData) {
       setName(initialData.name || '');
       setStudentClass(initialData.class || CLASS_NAMES[0]);
-      setAge(initialData.age ? String(initialData.age) : '');
       setMotherName(initialData.motherName || '');
       setPhone(initialData.phone || '');
       setBirthday(initialData.birthday || '');
     } else {
-        setName('');
-        setStudentClass(CLASS_NAMES[0]);
-        setAge('');
-        setMotherName('');
-        setPhone('');
-        setBirthday('');
+      setName('');
+      setStudentClass(CLASS_NAMES[0]);
+      setMotherName('');
+      setPhone('');
+      setBirthday('');
     }
   }, [initialData]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !studentClass || !age || !motherName || !phone) {
-      setError('Todos os campos são obrigatórios (exceto data de nascimento).');
-      // Relax validation for legacy support, but require core fields
-      if(!name || !age) return; 
+    if (!name || !studentClass || !motherName || !phone || !birthday) {
+      setError('Todos os campos são obrigatórios.');
+      if (!name || !birthday) return;
     }
     setError('');
-    onSubmit({ name, class: studentClass, age: parseInt(age, 10), motherName, phone, birthday });
+
+    // Calculate age based on birthday
+    const calculatedAge = parseInt(String(calculateAge(birthday, initialData?.age || 0)), 10);
+
+    onSubmit({ name, class: studentClass, age: calculatedAge, motherName, phone, birthday });
   };
 
   return (
@@ -59,18 +59,14 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
           <label className="block text-sm font-medium text-gray-700">Turma</label>
           <select value={studentClass} onChange={(e) => setStudentClass(e.target.value)} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-blue focus:border-brand-blue sm:text-sm">
             {CLASS_NAMES.map(className => (
-                <option key={className} value={className}>{className}</option>
+              <option key={className} value={className}>{className}</option>
             ))}
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Idade</label>
-          <input type="number" value={age} onChange={(e) => setAge(e.target.value)} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-blue focus:border-brand-blue sm:text-sm" />
+          <label className="block text-sm font-medium text-gray-700">Data de Nascimento</label>
+          <input type="date" value={birthday} onChange={(e) => setBirthday(e.target.value)} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-blue focus:border-brand-blue sm:text-sm" />
         </div>
-      </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Data de Nascimento</label>
-        <input type="date" value={birthday} onChange={(e) => setBirthday(e.target.value)} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-blue focus:border-brand-blue sm:text-sm" />
       </div>
       <div>
         <label className="block text-sm font-medium text-gray-700">Nome da Mãe</label>

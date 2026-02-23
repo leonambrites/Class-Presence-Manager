@@ -115,8 +115,7 @@ app.post('/api/topics', async (req, res) => {
 // --- Volunteers CRUD ---
 app.post('/api/volunteers', async (req, res) => {
     try {
-        const { name } = req.body;
-        await dbService.addVolunteer(name);
+        await dbService.addVolunteer(req.body);
         res.status(201).json({ message: 'Volunteer created' });
     } catch (error) {
         console.error("Error adding volunteer:", error);
@@ -127,8 +126,7 @@ app.post('/api/volunteers', async (req, res) => {
 app.put('/api/volunteers/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const { name } = req.body;
-        await dbService.updateVolunteer(id, name);
+        await dbService.updateVolunteer(id, req.body);
         res.status(200).json({ message: 'Volunteer updated' });
     } catch (error) {
         console.error("Error updating volunteer:", error);

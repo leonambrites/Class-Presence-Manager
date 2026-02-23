@@ -26,6 +26,9 @@ export interface Student {
 export interface Volunteer {
   id: string;
   name: string;
+  class?: string;
+  phone?: string;
+  team?: string;
 }
 
 export interface ScheduleEntry {
