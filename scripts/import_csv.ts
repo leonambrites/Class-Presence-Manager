@@ -55,17 +55,26 @@ const importStudents = async () => {
             const hasAllergy = !isNoAllergy;
             const allergyDescription = hasAllergy ? alergiaStr : '';
 
+            const age = parseInt(row.ID, 10) || 0;
+            let calculatedClass = '';
+            if (age < 2) calculatedClass = 'Maternal';
+            else if (age < 4) calculatedClass = '2 a 3 anos';
+            else if (age < 6) calculatedClass = '4 a 5 anos';
+            else if (age < 8) calculatedClass = '6 a 7 anos';
+            else if (age < 11) calculatedClass = '8 a 10 anos';
+            else calculatedClass = 'Seeds';
+
             const student = {
                 id: String(Date.now() + Math.floor(Math.random() * 10000)), // Unique ID 
                 name: row.NOME.trim(),
                 birthday: parseDate(row.DN),
-                age: parseInt(row.ID, 10) || 0,
+                age: age,
                 type: type,
                 motherName: row.RESP ? row.RESP.trim() : '',
                 phone: row.TEL ? row.TEL.trim() : '',
                 hasAllergy: hasAllergy,
                 allergyDescription: allergyDescription,
-                class: row.TURMA ? row.TURMA.trim() : ''
+                class: calculatedClass
             };
 
             studentsToInsert.push(student);
