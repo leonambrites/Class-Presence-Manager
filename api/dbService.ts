@@ -32,7 +32,8 @@ export const dbService = {
                     date: a.date,
                     present: a.present,
                     day: a.day,
-                    dismissedBy: a.dismissed_by
+                    dismissedBy: a.dismissed_by,
+                    dailyCode: a.daily_code ? Number(a.daily_code) : undefined
                 }))
         }));
 
@@ -93,7 +94,7 @@ export const dbService = {
         if (result.length === 0) throw new Error("Student not found");
     },
 
-    async updateAttendance(studentId: string, date: string, present: boolean, day: string) {
+    async updateAttendance(studentId: string, date: string, present: boolean, day: string, dailyCode?: number) {
         const sql = getSql();
         const existing = await sql`SELECT id FROM attendance WHERE student_id = ${studentId} AND date = ${date}`;
 
@@ -109,8 +110,8 @@ export const dbService = {
         } else {
             if (present) {
                 await sql`
-                    INSERT INTO attendance (id, student_id, date, present, day, dismissed_by, created_at)
-                    VALUES (${String(Date.now())}, ${studentId}, ${date}, ${present}, ${day}, NULL, ${getTimestamp()})
+                    INSERT INTO attendance (id, student_id, date, present, day, dismissed_by, daily_code, created_at)
+                    VALUES (${String(Date.now())}, ${studentId}, ${date}, ${present}, ${day}, NULL, ${dailyCode || null}, ${getTimestamp()})
                 `;
             }
         }

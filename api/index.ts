@@ -24,9 +24,9 @@ app.get('/api/data', async (req, res) => {
 
 // Mark/Unmark Presence
 app.post('/api/attendance', async (req, res) => {
-    const { studentId, date, present, day } = req.body;
+    const { studentId, date, present, day, dailyCode } = req.body;
     try {
-        await dbService.updateAttendance(studentId, date, present, day);
+        await dbService.updateAttendance(studentId, date, present, day, dailyCode);
         res.status(200).json({ message: 'Attendance updated' });
     } catch (error) {
         console.error("Error updating attendance:", error);

@@ -120,18 +120,28 @@ const DailyView: React.FC<DashboardProps & { date: string; setDate: (date: strin
                 </h3>
                 {presentStudents.length > 0 ? (
                     <ul className="divide-y divide-gray-200">
-                        {presentStudents.map(student => (
-                            <li key={student.id} className="py-4 flex justify-between items-center">
-                                <div>
-                                    <p className="text-lg font-medium text-gray-900">{student.name}</p>
-                                    <p className="text-sm text-gray-500">{student.class} - {calculateAge(student.birthday, student.age)} anos</p>
-                                </div>
-                                <span className={`px-3 py-1 text-sm font-semibold rounded-full ${student.type === StudentType.Membro ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                                    }`}>
-                                    {student.type}
-                                </span>
-                            </li>
-                        ))}
+                        {presentStudents.map(student => {
+                            const att = student.attendance.find(a => a.date === date);
+                            const displayCode = att?.dailyCode || '-';
+                            return (
+                                <li key={student.id} className="py-4 flex justify-between items-center bg-gray-50 hover:bg-gray-100 px-4 rounded-lg my-1 transition-colors">
+                                    <div className="flex items-center gap-4">
+                                        <div className="flex flex-col items-center justify-center bg-brand-blue text-white rounded-md p-2 min-w-14">
+                                            <span className="text-xs font-semibold uppercase opacity-80">Cód</span>
+                                            <span className="font-bold text-lg">{displayCode}</span>
+                                        </div>
+                                        <div>
+                                            <p className="text-lg font-medium text-gray-900">{student.name}</p>
+                                            <p className="text-sm text-gray-500">{student.class} - {calculateAge(student.birthday, student.age)} anos</p>
+                                        </div>
+                                    </div>
+                                    <span className={`px-3 py-1 text-sm font-semibold rounded-full ${student.type === StudentType.Membro ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                                        }`}>
+                                        {student.type}
+                                    </span>
+                                </li>
+                            );
+                        })}
                     </ul>
                 ) : (
                     <p className="text-center text-gray-500 py-8">Nenhum aluno presente na data selecionada.</p>

@@ -131,6 +131,42 @@ const App: React.FC = () => {
         return null;
     };
 
+    const getBaseCodeForClass = (className: string) => {
+        switch (className) {
+            case 'Maternal': return 100;
+            case '2 a 3 anos': return 200;
+            case '4 a 5 anos': return 300;
+            case '6 a 7 anos': return 400;
+            case '8 a 10 anos': return 500;
+            case 'Seeds': return 600;
+            default: return 900;
+        }
+    };
+
+    const calculateDailyCode = (studentId: string | null, studentClass: string, date: string, currentStudents: Student[]) => {
+        if (studentId) {
+            const st = currentStudents.find(s => s.id === studentId);
+            if (st) {
+                const existingAtt = st.attendance.find(a => a.date === date && a.dailyCode);
+                if (existingAtt && existingAtt.dailyCode) return existingAtt.dailyCode;
+            }
+        }
+
+        const baseCode = getBaseCodeForClass(studentClass);
+        let maxExistingCode = baseCode;
+
+        currentStudents.forEach(s => {
+            if (s.class === studentClass) {
+                const att = s.attendance.find(a => a.date === date && a.dailyCode);
+                if (att && att.dailyCode && att.dailyCode > maxExistingCode) {
+                    maxExistingCode = att.dailyCode;
+                }
+            }
+        });
+
+        return maxExistingCode + 1;
+    };
+
     const handleMarkPresence = useCallback(async (studentId: string, date: string) => {
         const dayOfWeek = getDayOfWeek(date);
         if (!dayOfWeek) {
@@ -138,11 +174,15 @@ const App: React.FC = () => {
             return;
         }
 
+        let assignedCode: number | undefined;
+
         const updatedStudents = students.map(s => {
             if (s.id === studentId) {
+                assignedCode = calculateDailyCode(studentId, s.class, date, students);
+
                 const exists = s.attendance.find(a => a.date === date);
-                if (exists) return { ...s, attendance: s.attendance.map(a => a.date === date ? { ...a, present: true, day: dayOfWeek } : a) };
-                return { ...s, attendance: [...s.attendance, { date, present: true, day: dayOfWeek }] };
+                if (exists) return { ...s, attendance: s.attendance.map(a => a.date === date ? { ...a, present: true, day: dayOfWeek, dailyCode: assignedCode } : a) };
+                return { ...s, attendance: [...s.attendance, { date, present: true, day: dayOfWeek, dailyCode: assignedCode }] };
             }
             return s;
         });
@@ -155,7 +195,7 @@ const App: React.FC = () => {
                 await fetch('/api/attendance', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ studentId, date, present: true, day: dayOfWeek })
+                    body: JSON.stringify({ studentId, date, present: true, day: dayOfWeek, dailyCode: assignedCode })
                 });
                 showNotification(`Presença marcada!`);
             } catch (e) {
@@ -233,11 +273,13 @@ const App: React.FC = () => {
             return;
         }
 
+        const dailyCode = calculateDailyCode(null, formData.class, date, students);
+
         const newStudent = {
             id: String(Date.now()),
             ...formData,
             type: StudentType.Visitante,
-            attendance: [{ date, present: true, day: dayOfWeek }]
+            attendance: [{ date, present: true, day: dayOfWeek, dailyCode }]
         };
 
         const updatedStudents = [...students, newStudent];
