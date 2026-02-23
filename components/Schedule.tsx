@@ -25,6 +25,19 @@ const ScheduleForm: React.FC<{
     const [deskId, setDeskId] = useState(initialData?.deskId || '');
     const [ministerIds, setMinisterIds] = useState<string[]>(initialData?.ministerIds || []);
 
+    const filteredVolunteers = volunteers.filter(v =>
+        v.class === className ||
+        !v.class ||
+        [supervisorId, coordinatorId, deskId, ...ministerIds].includes(v.id)
+    );
+
+    const handleSupervisorChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const newSupervisorId = e.target.value;
+        setSupervisorId(newSupervisorId);
+        // Auto-fill "Mesa" with the same ID as "Supervisora"
+        setDeskId(newSupervisorId);
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         onSave({
@@ -55,23 +68,23 @@ const ScheduleForm: React.FC<{
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Supervisora</label>
-                    <select value={supervisorId} onChange={e => setSupervisorId(e.target.value)} className="w-full p-2 border border-gray-300 rounded-md">
+                    <select value={supervisorId} onChange={handleSupervisorChange} className="w-full p-2 border border-gray-300 rounded-md">
                         <option value="">Nenhuma</option>
-                        {volunteers.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
+                        {filteredVolunteers.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
                     </select>
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Coordenadora</label>
                     <select value={coordinatorId} onChange={e => setCoordinatorId(e.target.value)} className="w-full p-2 border border-gray-300 rounded-md">
                         <option value="">Nenhuma</option>
-                        {volunteers.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
+                        {filteredVolunteers.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
                     </select>
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Mesa</label>
                     <select value={deskId} onChange={e => setDeskId(e.target.value)} className="w-full p-2 border border-gray-300 rounded-md">
                         <option value="">Nenhuma</option>
-                        {volunteers.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
+                        {filteredVolunteers.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
                     </select>
                 </div>
             </div>
@@ -79,7 +92,7 @@ const ScheduleForm: React.FC<{
             <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">Ministras</label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                    {volunteers.map(v => (
+                    {filteredVolunteers.map(v => (
                         <label key={v.id} className="flex items-center space-x-2 text-sm">
                             <input type="checkbox" checked={ministerIds.includes(v.id)} onChange={() => handleMinisterToggle(v.id)} className="rounded text-brand-blue focus:ring-brand-blue" />
                             <span>{v.name}</span>
