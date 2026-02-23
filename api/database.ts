@@ -24,6 +24,8 @@ export const initDb = async () => {
                 phone TEXT,
                 type TEXT,
                 birthday TEXT,
+                has_allergy BOOLEAN DEFAULT FALSE,
+                allergy_description TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
@@ -61,6 +63,14 @@ export const initDb = async () => {
             await sql`ALTER TABLE volunteers ADD COLUMN class TEXT`;
             await sql`ALTER TABLE volunteers ADD COLUMN phone TEXT`;
             await sql`ALTER TABLE volunteers ADD COLUMN team TEXT`;
+        } catch (e) {
+            // Columns likely already exist
+        }
+
+        // Migration for existing Students table (Allergies)
+        try {
+            await sql`ALTER TABLE students ADD COLUMN has_allergy BOOLEAN DEFAULT FALSE`;
+            await sql`ALTER TABLE students ADD COLUMN allergy_description TEXT`;
         } catch (e) {
             // Columns likely already exist
         }

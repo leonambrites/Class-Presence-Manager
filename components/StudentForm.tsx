@@ -4,7 +4,7 @@ import { Student } from '../types';
 import { calculateAge } from '../utils';
 
 interface StudentFormProps {
-  onSubmit: (formData: { name: string; class: string; age: number; motherName: string; phone: string; birthday: string }) => void;
+  onSubmit: (formData: { name: string; class: string; age: number; motherName: string; phone: string; birthday: string; hasAllergy?: boolean; allergyDescription?: string; }) => void;
   onCancel: () => void;
   initialData?: Partial<Student> | null;
 }
@@ -15,6 +15,8 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
   const [motherName, setMotherName] = useState('');
   const [phone, setPhone] = useState('');
   const [birthday, setBirthday] = useState('');
+  const [hasAllergy, setHasAllergy] = useState(false);
+  const [allergyDescription, setAllergyDescription] = useState('');
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -24,12 +26,16 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
       setMotherName(initialData.motherName || '');
       setPhone(initialData.phone || '');
       setBirthday(initialData.birthday || '');
+      setHasAllergy(initialData.hasAllergy || false);
+      setAllergyDescription(initialData.allergyDescription || '');
     } else {
       setName('');
       setStudentClass(CLASS_NAMES[0]);
       setMotherName('');
       setPhone('');
       setBirthday('');
+      setHasAllergy(false);
+      setAllergyDescription('');
     }
   }, [initialData]);
 
@@ -44,7 +50,16 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
     // Calculate age based on birthday
     const calculatedAge = parseInt(String(calculateAge(birthday, initialData?.age || 0)), 10);
 
-    onSubmit({ name, class: studentClass, age: calculatedAge, motherName, phone, birthday });
+    onSubmit({
+      name,
+      class: studentClass,
+      age: calculatedAge,
+      motherName,
+      phone,
+      birthday,
+      hasAllergy,
+      allergyDescription: hasAllergy ? allergyDescription : ''
+    });
   };
 
   return (
@@ -76,6 +91,33 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
         <label className="block text-sm font-medium text-gray-700">Telefone</label>
         <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-blue focus:border-brand-blue sm:text-sm" />
       </div>
+      <div className="bg-gray-50 p-4 rounded-md border border-gray-200">
+        <div className="flex items-center gap-3">
+          <input
+            type="checkbox"
+            id="hasAllergy"
+            checked={hasAllergy}
+            onChange={(e) => setHasAllergy(e.target.checked)}
+            className="w-5 h-5 text-brand-blue rounded focus:ring-brand-blue"
+          />
+          <label htmlFor="hasAllergy" className="text-sm font-semibold text-gray-800 cursor-pointer select-none">O aluno possui alguma alergia?</label>
+        </div>
+
+        {hasAllergy && (
+          <div className="mt-4 pl-8 border-l-2 border-brand-blue ml-2 transition-all">
+            <label className="block text-sm font-medium text-gray-700">Qual(ais)?</label>
+            <input
+              type="text"
+              value={allergyDescription}
+              onChange={(e) => setAllergyDescription(e.target.value)}
+              placeholder="Ex: Amendoim, Corante vermelho..."
+              required={hasAllergy}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-blue focus:border-brand-blue sm:text-sm"
+            />
+          </div>
+        )}
+      </div>
+
       <div className="flex justify-end space-x-3 pt-4">
         <button type="button" onClick={onCancel} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition">Cancelar</button>
         <button type="submit" className="px-4 py-2 bg-brand-blue text-white rounded-md hover:bg-blue-600 transition">Salvar</button>

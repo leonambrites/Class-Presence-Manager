@@ -116,6 +116,7 @@ const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStude
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Turma</th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contato (Mãe)</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Alergia</th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status Hoje</th>
                 <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
               </tr>
@@ -136,6 +137,13 @@ const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStude
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">{student.motherName}</div>
                     <div className="text-sm text-gray-500">{student.phone}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {student.hasAllergy ? (
+                      <span className="text-sm font-medium text-red-600 drop-shadow-sm">{student.allergyDescription}</span>
+                    ) : (
+                      <span className="text-sm text-gray-400">-</span>
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {student.attendance.some(a => a.date === today && a.present) ?
@@ -164,7 +172,12 @@ const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStude
             <div key={student.id} className="bg-gray-50 p-4 rounded-lg shadow">
               <div className="flex justify-between items-start">
                 <button onClick={() => handleOpenEditModal(student)} className="text-left">
-                  <p className="text-lg font-bold text-gray-900 hover:text-brand-blue transition-colors">{student.name}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-lg font-bold text-gray-900 hover:text-brand-blue transition-colors">{student.name}</p>
+                    {student.hasAllergy && (
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-700 tracking-wider">ALERGIA</span>
+                    )}
+                  </div>
                   <p className="text-sm text-gray-500">
                     {calculateAge(student.birthday, student.age)} anos
                     {student.birthday && <span className="ml-1 text-xs">({new Date(student.birthday).toLocaleDateString('pt-BR')})</span>}
@@ -179,6 +192,9 @@ const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStude
                 <p className="text-sm text-gray-600">Turma: <span className="font-medium text-gray-800">{student.class}</span></p>
                 <p className="text-sm text-gray-600">Mãe: <span className="font-medium text-gray-800">{student.motherName}</span></p>
                 <p className="text-sm text-gray-600">Tel: <span className="font-medium text-gray-800">{student.phone}</span></p>
+                {student.hasAllergy && (
+                  <p className="text-sm text-gray-600">Alergia: <span className="font-medium text-red-600">{student.allergyDescription}</span></p>
+                )}
               </div>
               <div className="flex justify-end items-center mt-3 border-t pt-3 space-x-4">
                 {activeTab === StudentType.Visitante && (

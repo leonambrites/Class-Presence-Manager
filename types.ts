@@ -22,6 +22,8 @@ export interface Student {
   type: StudentType;
   birthday?: string;
   attendance: Attendance[];
+  hasAllergy?: boolean;
+  allergyDescription?: string;
 }
 
 export interface Volunteer {
