@@ -377,8 +377,8 @@ const App: React.FC = () => {
         }
     }, [students, connectionStatus]);
 
-    const handleAddVolunteer = useCallback(async (name: string) => {
-        const newVolunteer = { id: String(Date.now()), name };
+    const handleAddVolunteer = useCallback(async (volunteerProps: Omit<Volunteer, 'id'>) => {
+        const newVolunteer: Volunteer = { id: String(Date.now()), ...volunteerProps };
         const updatedVolunteers = [...volunteers, newVolunteer];
         setVolunteers(updatedVolunteers);
         saveDataLocally('volunteers', updatedVolunteers);
@@ -388,9 +388,9 @@ const App: React.FC = () => {
                 await fetch('/api/volunteers', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name })
+                    body: JSON.stringify(volunteerProps)
                 });
-                showNotification(`Professor ${name} registrado.`);
+                showNotification(`Professor ${volunteerProps.name} registrado.`);
             } catch (e) {
                 setConnectionStatus('offline');
                 showNotification("Salvo localmente.");
@@ -400,8 +400,8 @@ const App: React.FC = () => {
         }
     }, [volunteers, connectionStatus]);
 
-    const handleEditVolunteer = useCallback(async (id: string, name: string) => {
-        const updatedVolunteers = volunteers.map(v => v.id === id ? { ...v, name } : v);
+    const handleEditVolunteer = useCallback(async (id: string, volunteerProps: Omit<Volunteer, 'id'>) => {
+        const updatedVolunteers = volunteers.map(v => v.id === id ? { ...v, ...volunteerProps } : v);
         setVolunteers(updatedVolunteers);
         saveDataLocally('volunteers', updatedVolunteers);
 
@@ -410,9 +410,9 @@ const App: React.FC = () => {
                 await fetch(`/api/volunteers/${id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name })
+                    body: JSON.stringify(volunteerProps)
                 });
-                showNotification(`Professor ${name} atualizado.`);
+                showNotification(`Professor ${volunteerProps.name} atualizado.`);
             } catch (e) {
                 setConnectionStatus('offline');
                 showNotification("Salvo localmente.");

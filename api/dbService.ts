@@ -38,7 +38,10 @@ export const dbService = {
 
         const formattedVolunteers = volunteersData.map((v: any) => ({
             ...v,
-            id: String(v.id)
+            id: String(v.id),
+            class: v.class || '',
+            phone: v.phone || '',
+            team: v.team || ''
         }));
 
         const formattedSchedule = scheduleData.map((s: any) => ({
@@ -132,18 +135,18 @@ export const dbService = {
         `;
     },
 
-    async addVolunteer(name: string) {
+    async addVolunteer(volunteer: any) {
         const sql = getSql();
         await sql`
-            INSERT INTO volunteers (id, name, created_at)
-            VALUES (${String(Date.now())}, ${name}, ${getTimestamp()})
+            INSERT INTO volunteers (id, name, class, phone, team, created_at)
+            VALUES (${String(Date.now())}, ${volunteer.name}, ${volunteer.class || ''}, ${volunteer.phone || ''}, ${volunteer.team || ''}, ${getTimestamp()})
         `;
     },
 
-    async updateVolunteer(id: string, name: string) {
+    async updateVolunteer(id: string, volunteer: any) {
         const sql = getSql();
         const result = await sql`
-            UPDATE volunteers SET name = ${name} WHERE id = ${String(id)}
+            UPDATE volunteers SET name = ${volunteer.name}, class = ${volunteer.class || ''}, phone = ${volunteer.phone || ''}, team = ${volunteer.team || ''} WHERE id = ${String(id)}
             RETURNING id
         `;
         if (result.length === 0) throw new Error("Volunteer not found");
@@ -228,8 +231,8 @@ export const dbService = {
 
             for (const v of payload.volunteers) {
                 await sql`
-                    INSERT INTO volunteers (id, name, created_at)
-                    VALUES (${String(v.id || Date.now())}, ${v.name}, ${getTimestamp()})
+                    INSERT INTO volunteers (id, name, class, phone, team, created_at)
+                    VALUES (${String(v.id || Date.now())}, ${v.name}, ${v.class || ''}, ${v.phone || ''}, ${v.team || ''}, ${getTimestamp()})
                 `;
             }
 

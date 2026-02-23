@@ -2,25 +2,26 @@
 import React, { useState, useMemo } from 'react';
 import { Student, StudentType } from '../types';
 import { CLASS_NAMES } from '../constants';
+import { calculateAge } from '../utils';
 
 interface DashboardProps {
-  students: Student[];
-  selectedClass: string;
-  onClassChange: (className: string) => void;
-  onSaveData?: () => void;
+    students: Student[];
+    selectedClass: string;
+    onClassChange: (className: string) => void;
+    onSaveData?: () => void;
 }
 
 const StatCard: React.FC<{ title: string; value: number | string; color: string }> = ({ title, value, color }) => (
-  <div className={`p-6 rounded-xl shadow-lg flex flex-col items-center justify-center ${color}`}>
-    <span className="text-5xl font-extrabold text-white">{value}</span>
-    <h3 className="text-xl font-semibold text-white mt-2 text-center">{title}</h3>
-  </div>
+    <div className={`p-6 rounded-xl shadow-lg flex flex-col items-center justify-center ${color}`}>
+        <span className="text-5xl font-extrabold text-white">{value}</span>
+        <h3 className="text-xl font-semibold text-white mt-2 text-center">{title}</h3>
+    </div>
 );
 
 const ClassStatCard: React.FC<{ title: string; value: number; color: string }> = ({ title, value, color }) => (
     <div className={`p-4 rounded-lg shadow-md flex flex-col items-center justify-center ${color}`}>
-      <span className="text-3xl font-bold text-white">{value}</span>
-      <h3 className="text-md font-semibold text-white mt-1 text-center">{title}</h3>
+        <span className="text-3xl font-bold text-white">{value}</span>
+        <h3 className="text-md font-semibold text-white mt-1 text-center">{title}</h3>
     </div>
 );
 
@@ -33,39 +34,39 @@ const getDayFromDate = (dateString: string): 'Sunday' | 'Wednesday' | null => {
 }
 
 const DailyView: React.FC<DashboardProps & { date: string; setDate: (date: string) => void }> = ({ students, selectedClass, onClassChange, date, setDate }) => {
-    const studentsToDisplay = selectedClass === 'All' 
-    ? students 
-    : students.filter(s => s.class === selectedClass);
+    const studentsToDisplay = selectedClass === 'All'
+        ? students
+        : students.filter(s => s.class === selectedClass);
 
-  const presentStudents = studentsToDisplay
-    .filter(s => s.attendance.some(a => a.date === date && a.present))
-    .sort((a, b) => a.name.localeCompare(b.name));
-  
-  const presentMembers = presentStudents.filter(s => s.type === StudentType.Membro).length;
-  const presentVisitors = presentStudents.filter(s => s.type === StudentType.Visitante).length;
-  const totalPresent = presentStudents.length;
+    const presentStudents = studentsToDisplay
+        .filter(s => s.attendance.some(a => a.date === date && a.present))
+        .sort((a, b) => a.name.localeCompare(b.name));
 
-  const getClassPresence = (className: string) => {
-    return students.filter(s => 
-        s.class === className && 
-        s.attendance.some(a => a.date === date && a.present)
-    ).length;
-  };
-  const classColors = ['bg-red-400', 'bg-orange-400', 'bg-amber-400', 'bg-lime-500', 'bg-cyan-500', 'bg-violet-500'];
+    const presentMembers = presentStudents.filter(s => s.type === StudentType.Membro).length;
+    const presentVisitors = presentStudents.filter(s => s.type === StudentType.Visitante).length;
+    const totalPresent = presentStudents.length;
 
-  const selectedDay = useMemo(() => {
-    const day = getDayFromDate(date);
-    if (day === 'Sunday') return { name: 'Domingo', important: true };
-    if (day === 'Wednesday') return { name: 'Quarta-feira', important: false };
-    return { name: '', important: false };
-  }, [date]);
+    const getClassPresence = (className: string) => {
+        return students.filter(s =>
+            s.class === className &&
+            s.attendance.some(a => a.date === date && a.present)
+        ).length;
+    };
+    const classColors = ['bg-red-400', 'bg-orange-400', 'bg-amber-400', 'bg-lime-500', 'bg-cyan-500', 'bg-violet-500'];
+
+    const selectedDay = useMemo(() => {
+        const day = getDayFromDate(date);
+        if (day === 'Sunday') return { name: 'Domingo', important: true };
+        if (day === 'Wednesday') return { name: 'Quarta-feira', important: false };
+        return { name: '', important: false };
+    }, [date]);
 
     return (
         <div>
             <div className="flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-center mb-6">
-                 <div>
+                <div>
                     <label htmlFor="date-select-dashboard" className="mr-2 text-sm font-medium text-gray-600">Data:</label>
-                    <input 
+                    <input
                         id="date-select-dashboard"
                         type="date"
                         value={date}
@@ -74,16 +75,16 @@ const DailyView: React.FC<DashboardProps & { date: string; setDate: (date: strin
                     />
                 </div>
                 <div className="flex items-center">
-                <label htmlFor="class-select-dashboard" className="mr-2 text-sm font-medium text-gray-600">Turma:</label>
-                <select
-                    id="class-select-dashboard"
-                    value={selectedClass}
-                    onChange={(e) => onClassChange(e.target.value)}
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand-blue focus:border-brand-blue block w-full sm:w-auto p-2"
-                >
-                    <option value="All">Todas as Turmas</option>
-                    {CLASS_NAMES.map(name => <option key={name} value={name}>{name}</option>)}
-                </select>
+                    <label htmlFor="class-select-dashboard" className="mr-2 text-sm font-medium text-gray-600">Turma:</label>
+                    <select
+                        id="class-select-dashboard"
+                        value={selectedClass}
+                        onChange={(e) => onClassChange(e.target.value)}
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand-blue focus:border-brand-blue block w-full sm:w-auto p-2"
+                    >
+                        <option value="All">Todas as Turmas</option>
+                        {CLASS_NAMES.map(name => <option key={name} value={name}>{name}</option>)}
+                    </select>
                 </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
@@ -97,7 +98,7 @@ const DailyView: React.FC<DashboardProps & { date: string; setDate: (date: strin
                     <h3 className="text-2xl font-bold text-brand-dark mb-4">Presença por Turma</h3>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                         {CLASS_NAMES.map((className, index) => (
-                            <ClassStatCard 
+                            <ClassStatCard
                                 key={className}
                                 title={className}
                                 value={getClassPresence(className)}
@@ -112,27 +113,26 @@ const DailyView: React.FC<DashboardProps & { date: string; setDate: (date: strin
                 <h3 className="text-2xl font-bold text-brand-dark mb-4">
                     Alunos Presentes em {new Date(date + 'T00:00:00').toLocaleDateString('pt-BR')}
                     {selectedDay.name && (
-                         <span className={`ml-3 text-lg font-semibold px-3 py-1 rounded-full ${selectedDay.important ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'}`}>
+                        <span className={`ml-3 text-lg font-semibold px-3 py-1 rounded-full ${selectedDay.important ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'}`}>
                             {selectedDay.name}{selectedDay.important && ' (Principal)'}
                         </span>
                     )}
                 </h3>
-                 {presentStudents.length > 0 ? (
-                <ul className="divide-y divide-gray-200">
-                    {presentStudents.map(student => (
-                    <li key={student.id} className="py-4 flex justify-between items-center">
-                        <div>
-                            <p className="text-lg font-medium text-gray-900">{student.name}</p>
-                            <p className="text-sm text-gray-500">{student.class} - {student.age} anos</p>
-                        </div>
-                        <span className={`px-3 py-1 text-sm font-semibold rounded-full ${
-                            student.type === StudentType.Membro ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                        }`}>
-                            {student.type}
-                        </span>
-                    </li>
-                    ))}
-                </ul>
+                {presentStudents.length > 0 ? (
+                    <ul className="divide-y divide-gray-200">
+                        {presentStudents.map(student => (
+                            <li key={student.id} className="py-4 flex justify-between items-center">
+                                <div>
+                                    <p className="text-lg font-medium text-gray-900">{student.name}</p>
+                                    <p className="text-sm text-gray-500">{student.class} - {calculateAge(student.birthday, student.age)} anos</p>
+                                </div>
+                                <span className={`px-3 py-1 text-sm font-semibold rounded-full ${student.type === StudentType.Membro ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                                    }`}>
+                                    {student.type}
+                                </span>
+                            </li>
+                        ))}
+                    </ul>
                 ) : (
                     <p className="text-center text-gray-500 py-8">Nenhum aluno presente na data selecionada.</p>
                 )}
@@ -145,7 +145,7 @@ const MonthlyView: React.FC<DashboardProps> = ({ students, selectedClass, onClas
     const [month, setMonth] = useState(new Date().getMonth() + 1);
     const [year, setYear] = useState(new Date().getFullYear());
     const [dayTypeFilter, setDayTypeFilter] = useState<'All' | 'Sunday' | 'Wednesday'>('All');
-    
+
     // Sort Configuration State
     const [sortConfig, setSortConfig] = useState<{ key: 'name' | 'class' | 'count', direction: 'asc' | 'desc' }>({ key: 'name', direction: 'asc' });
 
@@ -191,7 +191,7 @@ const MonthlyView: React.FC<DashboardProps> = ({ students, selectedClass, onClas
 
     const numServiceDays = monthlyStats.serviceDays.size;
     const averageDailyAttendance = numServiceDays > 0 ? (monthlyStats.totalPresences / numServiceDays).toFixed(1) : 0;
-    
+
     const handleSort = (key: 'name' | 'class' | 'count') => {
         setSortConfig(current => ({
             key,
@@ -213,7 +213,7 @@ const MonthlyView: React.FC<DashboardProps> = ({ students, selectedClass, onClas
                 // Handle cases where class might not be in CLASS_NAMES (put at end)
                 const valA = indexA === -1 ? 999 : indexA;
                 const valB = indexB === -1 ? 999 : indexB;
-                
+
                 if (valA !== valB) {
                     return (valA - valB) * directionMultiplier;
                 }
@@ -227,7 +227,7 @@ const MonthlyView: React.FC<DashboardProps> = ({ students, selectedClass, onClas
     }, [monthlyStats, sortConfig]);
 
     const monthTitle = useMemo(() => {
-        switch(dayTypeFilter) {
+        switch (dayTypeFilter) {
             case 'Sunday': return 'em Domingos';
             case 'Wednesday': return 'em Quartas';
             default: return 'no Mês';
@@ -243,13 +243,13 @@ const MonthlyView: React.FC<DashboardProps> = ({ students, selectedClass, onClas
         <div>
             <div className="flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-center mb-6">
                 <div className="flex items-center gap-4">
-                     <div>
+                    <div>
                         <label htmlFor="month-select" className="mr-2 text-sm font-medium text-gray-600">Mês:</label>
                         <select id="month-select" value={month} onChange={e => setMonth(Number(e.target.value))} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand-blue focus:border-brand-blue block p-2">
-                            {Array.from({length: 12}, (_, i) => <option key={i+1} value={i+1}>{new Date(0, i).toLocaleString('pt-BR', { month: 'long' })}</option>)}
+                            {Array.from({ length: 12 }, (_, i) => <option key={i + 1} value={i + 1}>{new Date(0, i).toLocaleString('pt-BR', { month: 'long' })}</option>)}
                         </select>
                     </div>
-                     <div>
+                    <div>
                         <label htmlFor="year-select" className="mr-2 text-sm font-medium text-gray-600">Ano:</label>
                         <select id="year-select" value={year} onChange={e => setYear(Number(e.target.value))} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand-blue focus:border-brand-blue block p-2">
                             {yearOptions.map(y => <option key={y} value={y}>{y}</option>)}
@@ -265,7 +265,7 @@ const MonthlyView: React.FC<DashboardProps> = ({ students, selectedClass, onClas
                 </div>
             </div>
             <div className="flex justify-center mb-6">
-                 <div className="flex bg-gray-200 rounded-lg p-1">
+                <div className="flex bg-gray-200 rounded-lg p-1">
                     <button onClick={() => setDayTypeFilter('All')} className={`px-3 py-1 text-sm font-semibold rounded-md transition-colors ${dayTypeFilter === 'All' ? 'bg-white text-brand-blue shadow' : 'text-gray-600'}`}>Todos</button>
                     <button onClick={() => setDayTypeFilter('Sunday')} className={`px-3 py-1 text-sm font-semibold rounded-md transition-colors ${dayTypeFilter === 'Sunday' ? 'bg-white text-brand-purple shadow' : 'text-gray-600'}`}>Domingos</button>
                     <button onClick={() => setDayTypeFilter('Wednesday')} className={`px-3 py-1 text-sm font-semibold rounded-md transition-colors ${dayTypeFilter === 'Wednesday' ? 'bg-white text-brand-blue shadow' : 'text-gray-600'}`}>Quartas</button>
@@ -284,20 +284,20 @@ const MonthlyView: React.FC<DashboardProps> = ({ students, selectedClass, onClas
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                             <tr>
-                                <th 
-                                    onClick={() => handleSort('name')} 
+                                <th
+                                    onClick={() => handleSort('name')}
                                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 group select-none transition-colors"
                                 >
                                     Aluno <SortIndicator active={sortConfig.key === 'name'} direction={sortConfig.direction} />
                                 </th>
-                                <th 
-                                    onClick={() => handleSort('class')} 
+                                <th
+                                    onClick={() => handleSort('class')}
                                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 group select-none transition-colors"
                                 >
                                     Turma <SortIndicator active={sortConfig.key === 'class'} direction={sortConfig.direction} />
                                 </th>
-                                <th 
-                                    onClick={() => handleSort('count')} 
+                                <th
+                                    onClick={() => handleSort('count')}
                                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 group select-none transition-colors"
                                 >
                                     Dias Presente <SortIndicator active={sortConfig.key === 'count'} direction={sortConfig.direction} />
@@ -323,60 +323,60 @@ const MonthlyView: React.FC<DashboardProps> = ({ students, selectedClass, onClas
 
 
 const Dashboard: React.FC<DashboardProps> = (props) => {
-  const [viewMode, setViewMode] = useState<'daily' | 'monthly'>('daily');
-  const [dailyDate, setDailyDate] = useState(new Date().toISOString().split('T')[0]);
+    const [viewMode, setViewMode] = useState<'daily' | 'monthly'>('daily');
+    const [dailyDate, setDailyDate] = useState(new Date().toISOString().split('T')[0]);
 
-  return (
-    <div className="p-4 md:p-8">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
-            <h2 className="text-3xl font-bold text-brand-dark mb-4 sm:mb-0">Dashboard</h2>
-             <div className="flex bg-gray-200 rounded-lg p-1">
-                <button onClick={() => setViewMode('daily')} className={`px-4 py-2 text-sm font-semibold rounded-md transition-colors ${viewMode === 'daily' ? 'bg-white text-brand-blue shadow' : 'text-gray-600'}`}>
-                    Visão Diária
-                </button>
-                <button onClick={() => setViewMode('monthly')} className={`px-4 py-2 text-sm font-semibold rounded-md transition-colors ${viewMode === 'monthly' ? 'bg-white text-brand-blue shadow' : 'text-gray-600'}`}>
-                    Visão Mensal
+    return (
+        <div className="p-4 md:p-8">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
+                <h2 className="text-3xl font-bold text-brand-dark mb-4 sm:mb-0">Dashboard</h2>
+                <div className="flex bg-gray-200 rounded-lg p-1">
+                    <button onClick={() => setViewMode('daily')} className={`px-4 py-2 text-sm font-semibold rounded-md transition-colors ${viewMode === 'daily' ? 'bg-white text-brand-blue shadow' : 'text-gray-600'}`}>
+                        Visão Diária
+                    </button>
+                    <button onClick={() => setViewMode('monthly')} className={`px-4 py-2 text-sm font-semibold rounded-md transition-colors ${viewMode === 'monthly' ? 'bg-white text-brand-blue shadow' : 'text-gray-600'}`}>
+                        Visão Mensal
+                    </button>
+                </div>
+            </div>
+
+            {viewMode === 'daily' ? <DailyView {...props} date={dailyDate} setDate={setDailyDate} /> : <MonthlyView {...props} />}
+
+            {/* Footer Actions */}
+            <div className="mt-12 border-t pt-8 flex flex-col sm:flex-row justify-end gap-4 items-center">
+                {props.onSaveData && (
+                    <button
+                        onClick={props.onSaveData}
+                        className="w-full sm:w-auto px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition shadow-sm font-semibold flex items-center justify-center gap-2"
+                    >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                        Salvar Dados na Planilha
+                    </button>
+                )}
+
+                <button
+                    onClick={async () => {
+                        if (window.confirm("ATENÇÃO: Isso apagará TODOS os dados da planilha e restaurará os dados originais de fábrica (arquivo constants.ts). Tem certeza absoluta?")) {
+                            try {
+                                const res = await fetch('/api/seed', { method: 'POST' });
+                                if (res.ok) {
+                                    alert("Dados restaurados com sucesso! A página será recarregada.");
+                                    window.location.reload();
+                                } else {
+                                    alert("Erro ao restaurar dados.");
+                                }
+                            } catch (e) {
+                                alert("Erro de conexão.");
+                            }
+                        }
+                    }}
+                    className="text-sm text-red-500 hover:text-red-700 hover:underline"
+                >
+                    Restaurar Dados de Fábrica
                 </button>
             </div>
         </div>
-
-        {viewMode === 'daily' ? <DailyView {...props} date={dailyDate} setDate={setDailyDate} /> : <MonthlyView {...props} />}
-        
-        {/* Footer Actions */}
-        <div className="mt-12 border-t pt-8 flex flex-col sm:flex-row justify-end gap-4 items-center">
-            {props.onSaveData && (
-                <button 
-                    onClick={props.onSaveData}
-                    className="w-full sm:w-auto px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition shadow-sm font-semibold flex items-center justify-center gap-2"
-                >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
-                    Salvar Dados na Planilha
-                </button>
-            )}
-
-            <button 
-                onClick={async () => {
-                    if(window.confirm("ATENÇÃO: Isso apagará TODOS os dados da planilha e restaurará os dados originais de fábrica (arquivo constants.ts). Tem certeza absoluta?")) {
-                        try {
-                            const res = await fetch('/api/seed', { method: 'POST' });
-                            if(res.ok) {
-                                alert("Dados restaurados com sucesso! A página será recarregada.");
-                                window.location.reload();
-                            } else {
-                                alert("Erro ao restaurar dados.");
-                            }
-                        } catch(e) {
-                            alert("Erro de conexão.");
-                        }
-                    }
-                }}
-                className="text-sm text-red-500 hover:text-red-700 hover:underline"
-            >
-                Restaurar Dados de Fábrica
-            </button>
-        </div>
-    </div>
-  );
+    );
 };
 
 export default Dashboard;
