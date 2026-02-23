@@ -26,6 +26,8 @@ export const dbService = {
         const formattedStudents = studentsData.map((s: any) => ({
             ...s,
             age: s.age ? Number(s.age) : 0,
+            hasAllergy: s.has_allergy,
+            allergyDescription: s.allergy_description || '',
             attendance: attendanceData
                 .filter((a: any) => String(a.student_id) === String(s.id))
                 .map((a: any) => ({

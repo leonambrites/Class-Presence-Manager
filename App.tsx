@@ -237,7 +237,7 @@ const App: React.FC = () => {
         }
     }, [students, connectionStatus]);
 
-    const handleAddMember = async (formData: { name: string; class: string; age: number; motherName: string; phone: string; birthday: string }) => {
+    const handleAddMember = async (formData: { name: string; class: string; age: number; motherName: string; phone: string; birthday: string, hasAllergy?: boolean, allergyDescription?: string }) => {
         const newStudent = {
             id: String(Date.now()),
             ...formData,
@@ -266,7 +266,7 @@ const App: React.FC = () => {
         }
     };
 
-    const handleAddVisitor = async (formData: { name: string; class: string; age: number; motherName: string; phone: string; birthday: string }, date: string) => {
+    const handleAddVisitor = async (formData: { name: string; class: string; age: number; motherName: string; phone: string; birthday: string, hasAllergy?: boolean, allergyDescription?: string }, date: string) => {
         const dayOfWeek = getDayOfWeek(date);
         if (!dayOfWeek) {
             showNotification("Novos visitantes só podem ser adicionados em dias de aula.");
