@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import crypto from 'crypto';
 import csv from 'csv-parser';
 import { dbService } from '../api/dbService';
 import { StudentType } from '../types';
@@ -65,7 +66,7 @@ const importStudents = async () => {
             else calculatedClass = 'Seeds';
 
             const student = {
-                id: String(Date.now() + Math.floor(Math.random() * 10000)), // Unique ID 
+                id: crypto.randomUUID(), // Unique ID 
                 name: row.NOME.trim(),
                 birthday: parseDate(row.DN),
                 age: age,

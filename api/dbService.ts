@@ -69,10 +69,11 @@ export const dbService = {
     async addStudent(student: any) {
         const sql = getSql();
         await sql`
-            INSERT INTO students (id, name, class, age, motherName, phone, type, birthday, created_at, updated_at)
+            INSERT INTO students (id, name, class, age, motherName, phone, type, birthday, has_allergy, allergy_description, created_at, updated_at)
             VALUES (
                 ${String(student.id)}, ${student.name}, ${student.class}, ${student.age}, 
                 ${student.motherName}, ${student.phone}, ${student.type}, ${student.birthday}, 
+                ${student.hasAllergy || false}, ${student.allergyDescription || ''},
                 ${getTimestamp()}, ${getTimestamp()}
             )
         `;
@@ -83,7 +84,9 @@ export const dbService = {
         const result = await sql`
             UPDATE students
             SET name = ${data.name}, class = ${data.class}, age = ${data.age}, motherName = ${data.motherName}, 
-                phone = ${data.phone}, type = ${data.type}, birthday = ${data.birthday}, updated_at = ${getTimestamp()}
+                phone = ${data.phone}, type = ${data.type}, birthday = ${data.birthday}, 
+                has_allergy = ${data.hasAllergy || false}, allergy_description = ${data.allergyDescription || ''}, 
+                updated_at = ${getTimestamp()}
             WHERE id = ${String(id)}
             RETURNING id
         `;
