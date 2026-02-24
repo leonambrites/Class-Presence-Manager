@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View } from '../types';
 import { DashboardIcon, CheckCircleIcon, UsersIcon, CalendarIcon, BookOpenIcon, LogOutIcon, UserPlusIcon } from './icons';
+import logoMundoKids from '../assets/logo-mundo-kids.png';
 
 interface HeaderProps {
     currentView: View;
@@ -61,7 +62,7 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate }) => {
                 <div className="flex justify-between items-center">
                     <div className="flex items-center gap-3">
                         <img
-                            src="/assets/logo-mundo-kids.png"
+                            src={logoMundoKids}
                             alt="Mundo Kids Logo"
                             className="h-10 w-auto object-contain"
                         />
