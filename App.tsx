@@ -635,12 +635,12 @@ const App: React.FC = () => {
                         connectionStatus === 'offline' ? 'Modo Local (Dados salvos no navegador)' : 'Desconectado'}
             </div>
 
-            <main className="container mx-auto">
+            <main className="container mx-auto pb-20 md:pb-4">
                 {renderView()}
             </main>
 
             {notification && (
-                <div className="fixed bottom-4 right-4 md:bottom-5 md:right-5 bg-brand-dark text-white py-2 px-4 rounded-lg shadow-lg animate-bounce z-50">
+                <div className="fixed bottom-20 right-4 md:bottom-5 md:right-5 bg-brand-dark text-white py-2 px-4 rounded-lg shadow-lg animate-bounce z-50">
                     {notification}
                 </div>
             )}
