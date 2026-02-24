@@ -25,6 +25,7 @@ export const dbService = {
 
         const formattedStudents = studentsData.map((s: any) => ({
             ...s,
+            motherName: s.mothername || s.motherName || '',
             age: s.age ? Number(s.age) : 0,
             hasAllergy: s.has_allergy,
             allergyDescription: s.allergy_description || '',
