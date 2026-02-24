@@ -25,8 +25,8 @@ const NavButton: React.FC<{
             onClick={() => onClick(view)}
             title={label}
             className={`flex items-center justify-center md:justify-start px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${isActive
-                    ? 'bg-brand-blue text-white shadow-sm'
-                    : 'text-gray-600 hover:bg-gray-200 hover:text-gray-800'
+                ? 'bg-brand-blue text-white shadow-sm'
+                : 'text-gray-600 hover:bg-gray-200 hover:text-gray-800'
                 } ${isMobile ? 'w-full' : ''}`}
         >
             {React.cloneElement(icon, { className: isMobile || label.length === 0 ? iconOnlyClassName : iconWithLabelClassName })}
@@ -59,9 +59,16 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate }) => {
         <header className="bg-white shadow-md sticky top-0 z-40">
             <div className="container mx-auto p-4">
                 <div className="flex justify-between items-center">
-                    <h1 className="text-xl sm:text-2xl font-bold text-brand-dark whitespace-nowrap">
-                        Gestão de Turmas
-                    </h1>
+                    <div className="flex items-center gap-3">
+                        <img
+                            src="/assets/logo-mundo-kids.png"
+                            alt="Mundo Kids Logo"
+                            className="h-10 w-auto object-contain"
+                        />
+                        <h1 className="text-xl sm:text-2xl font-bold text-brand-dark whitespace-nowrap">
+                            Gestão de Turmas
+                        </h1>
+                    </div>
 
                     {/* Desktop Nav */}
                     <div className="hidden md:flex items-center gap-4">
