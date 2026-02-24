@@ -75,7 +75,7 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate }) => {
                                 className="h-10 w-auto object-contain"
                             />
                             <h1 className="text-xl sm:text-2xl font-bold text-brand-dark whitespace-nowrap">
-                                Gestão de Turmas
+                                Gestão Mundo Kids
                             </h1>
                         </div>
 
