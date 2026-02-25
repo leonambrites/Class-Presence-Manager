@@ -43,7 +43,8 @@ const importVolunteers = async () => {
                 id: crypto.randomUUID(),
                 name: row.Nome.trim(),
                 class: row.Turma ? row.Turma.trim() : '',
-                team: row.Tipo ? row.Tipo.trim() : '', // 'Ministra' ou 'Coordenadora'
+                type: row.Tipo ? row.Tipo.trim() : '', // 'Ministra' ou 'Coordenadora'
+                team: row['Equipe | Supervisora'] ? row['Equipe | Supervisora'].trim() : '',
                 phone: row.Contato ? row.Contato.trim() : '',
             };
 
@@ -61,8 +62,8 @@ const importVolunteers = async () => {
                 let count = 0;
                 for (const vol of volunteersToInsert) {
                     await sql`
-                        INSERT INTO volunteers (id, name, class, phone, team, created_at)
-                        VALUES (${vol.id}, ${vol.name}, ${vol.class}, ${vol.phone}, ${vol.team}, ${new Date().toISOString()})
+                        INSERT INTO volunteers (id, name, class, phone, type, team, created_at)
+                        VALUES (${vol.id}, ${vol.name}, ${vol.class}, ${vol.phone}, ${vol.type}, ${vol.team}, ${new Date().toISOString()})
                     `;
                     count++;
                 }
