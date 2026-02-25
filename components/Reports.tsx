@@ -57,6 +57,9 @@ const Reports: React.FC<ReportsProps> = ({ students, volunteers, schedule }) => 
                 // Check if we should filter by class
                 if (selectedClass !== 'Todas' && selectedClass !== className) return;
 
+                // Find schedule for this class/date
+                const sched = schedule.find(s => s.date === date && s.className === className);
+
                 // Filter by selected volunteer (must be coordinator or minister)
                 const isSelectedVolunteerInSched = sched && (
                     sched.coordinatorId === selectedCoordinator ||
