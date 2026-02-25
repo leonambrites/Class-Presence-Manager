@@ -7,6 +7,7 @@ import Students from './components/Students';
 import Schedule from './components/Schedule';
 import Volunteers from './components/Volunteers';
 import Topics from './components/Topics';
+import Reports from './components/Reports';
 import Dismissal from './components/Dismissal';
 import {
     INITIAL_STUDENTS,
@@ -612,6 +613,8 @@ const App: React.FC = () => {
                 return <Volunteers volunteers={volunteers} onAddVolunteer={handleAddVolunteer} onEditVolunteer={handleEditVolunteer} onDeleteVolunteer={handleDeleteVolunteer} />;
             case View.Topics:
                 return <Topics topics={topics} onAddTopic={handleAddTopic} />;
+            case View.Reports:
+                return <Reports students={students} volunteers={volunteers} schedule={schedule} />;
             case View.Dismissal:
                 return <Dismissal students={students} onDismiss={handleDismiss} selectedClass={selectedClass} onClassChange={setSelectedClass} />;
             default:

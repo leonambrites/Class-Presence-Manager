@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View } from '../types';
-import { DashboardIcon, CheckCircleIcon, UsersIcon, CalendarIcon, BookOpenIcon, LogOutIcon, UserPlusIcon, MoreHorizontalIcon } from './icons';
+import { DashboardIcon, CheckCircleIcon, UsersIcon, CalendarIcon, BookOpenIcon, LogOutIcon, UserPlusIcon, MoreHorizontalIcon, FileTextIcon } from './icons';
 import { LOGO_URL } from '../constants';
 
 interface HeaderProps {
@@ -47,6 +47,7 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate }) => {
         { view: View.Volunteers, icon: <UserPlusIcon />, label: "Professores" },
         { view: View.Schedule, icon: <CalendarIcon />, label: "Escala" },
         { view: View.Topics, icon: <BookOpenIcon />, label: "Assuntos" },
+        { view: View.Reports, icon: <FileTextIcon />, label: "Relatórios" },
         { view: View.Dismissal, icon: <LogOutIcon />, label: "Saída" },
     ];
 
@@ -60,6 +61,7 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate }) => {
     const extraMobileItems = [
         { view: View.Volunteers, icon: <UserPlusIcon />, label: "Professores" },
         { view: View.Topics, icon: <BookOpenIcon />, label: "Assuntos" },
+        { view: View.Reports, icon: <FileTextIcon />, label: "Relatórios" },
         { view: View.Dismissal, icon: <LogOutIcon />, label: "Saída" },
     ];
 

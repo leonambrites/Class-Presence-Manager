@@ -59,4 +59,5 @@ export enum View {
   Volunteers = 'Voluntários',
   Topics = 'Assuntos',
   Dismissal = 'Saída',
+  Reports = 'Relatórios',
 }
