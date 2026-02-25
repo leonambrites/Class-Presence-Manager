@@ -29,10 +29,10 @@ const Reports: React.FC<ReportsProps> = ({ students, volunteers, schedule }) => 
     const [selectedClass, setSelectedClass] = useState('Todas');
     const [selectedCoordinator, setSelectedCoordinator] = useState('Todos');
 
-    // Extract volunteers who are Coordinators or Ministers based on their 'type' column
-    const filterVolunteers = useMemo(() => {
+    // Extract only volunteers who are strictly "Coordenadoras" based on their 'type' column
+    const coordinatorsList = useMemo(() => {
         return volunteers
-            .filter(v => v.type && (v.type.toLowerCase().includes('coordenadora') || v.type.toLowerCase().includes('ministra')))
+            .filter(v => v.type && v.type.toLowerCase().trim() === 'coordenadora')
             .map(v => ({ id: v.id, name: v.name }))
             .sort((a, b) => a.name.localeCompare(b.name));
     }, [volunteers]);
@@ -60,30 +60,19 @@ const Reports: React.FC<ReportsProps> = ({ students, volunteers, schedule }) => 
                 // Find schedule for this class/date
                 const sched = schedule.find(s => s.date === date && s.className === className);
 
-                // Filter by selected volunteer (must be coordinator or minister)
-                const isSelectedVolunteerInSched = sched && (
-                    sched.coordinatorId === selectedCoordinator ||
-                    (sched.ministerIds && sched.ministerIds.includes(selectedCoordinator))
-                );
+                // Identify the assigned coordinator for this class/date via schedule
+                let coordinatorId = sched?.coordinatorId || null;
+                let coordinatorObj = coordinatorId ? volunteers.find(v => v.id === coordinatorId) : null;
 
-                if (selectedCoordinator !== 'Todos' && !isSelectedVolunteerInSched) return;
-
-                // Build comma-separated list of assigned volunteers
-                const assignedVolunteers = [];
-                if (sched?.coordinatorId) {
-                    const c = volunteers.find(v => v.id === sched.coordinatorId);
-                    if (c) assignedVolunteers.push(`${c.name} (C)`);
-                }
-                if (sched?.ministerIds && sched.ministerIds.length > 0) {
-                    sched.ministerIds.forEach(mId => {
-                        const m = volunteers.find(v => v.id === mId);
-                        if (m) assignedVolunteers.push(`${m.name} (M)`);
-                    });
+                // If they exist but aren't typed as Coordenadora in the db, ignore them for this column
+                if (coordinatorObj && (!coordinatorObj.type || coordinatorObj.type.toLowerCase().trim() !== 'coordenadora')) {
+                    coordinatorObj = null;
                 }
 
-                const coordinatorName = assignedVolunteers.length > 0
-                    ? assignedVolunteers.join(', ')
-                    : 'Sem Voluntárias';
+                // Filter by the dropdown (which is populated only with 'Coordenadoras')
+                if (selectedCoordinator !== 'Todos' && coordinatorObj?.id !== selectedCoordinator) return;
+
+                const coordinatorName = coordinatorObj ? coordinatorObj.name : 'Sem Coordenadora';
 
                 // Calculate attendance
                 let membrosPresentes = 0;
@@ -207,14 +196,14 @@ const Reports: React.FC<ReportsProps> = ({ students, volunteers, schedule }) => 
                         </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Voluntária (Cargo)</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Coordenadora</label>
                         <select
                             value={selectedCoordinator}
                             onChange={(e) => setSelectedCoordinator(e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-blue focus:border-brand-blue sm:text-sm"
                         >
-                            <option value="Todos">Todas as Voluntárias</option>
-                            {filterVolunteers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                            <option value="Todos">Todas as Coordenadoras</option>
+                            {coordinatorsList.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                         </select>
                     </div>
                 </div>
@@ -244,7 +233,7 @@ const Reports: React.FC<ReportsProps> = ({ students, volunteers, schedule }) => 
                             <tr>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Turma</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Voluntárias</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Coordenadora</th>
                                 <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Membros</th>
                                 <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Visitantes</th>
                                 <th scope="col" className="px-6 py-3 text-center text-xs font-bold text-brand-dark uppercase tracking-wider">Total</th>
