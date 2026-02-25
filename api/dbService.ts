@@ -45,6 +45,7 @@ export const dbService = {
             id: String(v.id),
             class: v.class || '',
             phone: v.phone || '',
+            type: v.type || '',
             team: v.team || ''
         }));
 
@@ -145,15 +146,15 @@ export const dbService = {
     async addVolunteer(volunteer: any) {
         const sql = getSql();
         await sql`
-            INSERT INTO volunteers (id, name, class, phone, team, created_at)
-            VALUES (${String(Date.now())}, ${volunteer.name}, ${volunteer.class || ''}, ${volunteer.phone || ''}, ${volunteer.team || ''}, ${getTimestamp()})
+            INSERT INTO volunteers (id, name, class, phone, type, team, created_at)
+            VALUES (${String(Date.now())}, ${volunteer.name}, ${volunteer.class || ''}, ${volunteer.phone || ''}, ${volunteer.type || ''}, ${volunteer.team || ''}, ${getTimestamp()})
         `;
     },
 
     async updateVolunteer(id: string, volunteer: any) {
         const sql = getSql();
         const result = await sql`
-            UPDATE volunteers SET name = ${volunteer.name}, class = ${volunteer.class || ''}, phone = ${volunteer.phone || ''}, team = ${volunteer.team || ''} WHERE id = ${String(id)}
+            UPDATE volunteers SET name = ${volunteer.name}, class = ${volunteer.class || ''}, phone = ${volunteer.phone || ''}, type = ${volunteer.type || ''}, team = ${volunteer.team || ''} WHERE id = ${String(id)}
             RETURNING id
         `;
         if (result.length === 0) throw new Error("Volunteer not found");
@@ -238,8 +239,8 @@ export const dbService = {
 
             for (const v of payload.volunteers) {
                 await sql`
-                    INSERT INTO volunteers (id, name, class, phone, team, created_at)
-                    VALUES (${String(v.id || Date.now())}, ${v.name}, ${v.class || ''}, ${v.phone || ''}, ${v.team || ''}, ${getTimestamp()})
+                    INSERT INTO volunteers (id, name, class, phone, type, team, created_at)
+                    VALUES (${String(v.id || Date.now())}, ${v.name}, ${v.class || ''}, ${v.phone || ''}, ${v.type || ''}, ${v.team || ''}, ${getTimestamp()})
                 `;
             }
 

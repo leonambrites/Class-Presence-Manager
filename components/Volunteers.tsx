@@ -18,6 +18,7 @@ const Volunteers: React.FC<VolunteersProps> = ({ volunteers, onAddVolunteer, onE
     const [name, setName] = useState('');
     const [volunteerClass, setVolunteerClass] = useState(CLASS_NAMES[0]);
     const [phone, setPhone] = useState('');
+    const [type, setType] = useState('');
     const [team, setTeam] = useState('');
 
     const openAddModal = () => {
@@ -25,6 +26,7 @@ const Volunteers: React.FC<VolunteersProps> = ({ volunteers, onAddVolunteer, onE
         setName('');
         setVolunteerClass(CLASS_NAMES[0]);
         setPhone('');
+        setType('');
         setTeam('');
         setIsModalOpen(true);
     };
@@ -34,6 +36,7 @@ const Volunteers: React.FC<VolunteersProps> = ({ volunteers, onAddVolunteer, onE
         setName(volunteer.name);
         setVolunteerClass(volunteer.class || CLASS_NAMES[0]);
         setPhone(volunteer.phone || '');
+        setType(volunteer.type || '');
         setTeam(volunteer.team || '');
         setIsModalOpen(true);
     };
@@ -46,6 +49,7 @@ const Volunteers: React.FC<VolunteersProps> = ({ volunteers, onAddVolunteer, onE
             name,
             class: volunteerClass,
             phone,
+            type,
             team
         };
 
@@ -78,6 +82,7 @@ const Volunteers: React.FC<VolunteersProps> = ({ volunteers, onAddVolunteer, onE
                                 <tr>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome do Voluntário</th>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Turma</th>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Equipe (Supervisora)</th>
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contato</th>
                                     <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
@@ -91,6 +96,9 @@ const Volunteers: React.FC<VolunteersProps> = ({ volunteers, onAddVolunteer, onE
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             {v.class || '-'}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {v.type || '-'}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             {v.team || '-'}
@@ -121,6 +129,7 @@ const Volunteers: React.FC<VolunteersProps> = ({ volunteers, onAddVolunteer, onE
                                 <p className="text-lg font-bold text-gray-900">{v.name}</p>
                                 <div className="mt-4 border-t pt-3 space-y-1">
                                     <p className="text-sm text-gray-600">Turma: <span className="font-medium text-gray-800">{v.class || '-'}</span></p>
+                                    <p className="text-sm text-gray-600">Tipo: <span className="font-medium text-gray-800">{v.type || '-'}</span></p>
                                     <p className="text-sm text-gray-600">Equipe: <span className="font-medium text-gray-800">{v.team || '-'}</span></p>
                                     <p className="text-sm text-gray-600">Tel: <span className="font-medium text-gray-800">{v.phone || '-'}</span></p>
                                 </div>
@@ -149,6 +158,10 @@ const Volunteers: React.FC<VolunteersProps> = ({ volunteers, onAddVolunteer, onE
                                 <option key={className} value={className}>{className}</option>
                             ))}
                         </select>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Tipo (Cargo)</label>
+                        <input type="text" value={type} onChange={(e) => setType(e.target.value)} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-blue focus:border-brand-blue sm:text-sm" placeholder="Ex: Ministra" />
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Equipe (Supervisora)</label>

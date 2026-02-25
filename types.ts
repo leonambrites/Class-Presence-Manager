@@ -31,6 +31,7 @@ export interface Volunteer {
   name: string;
   class?: string;
   phone?: string;
+  type?: string;
   team?: string;
 }
 
