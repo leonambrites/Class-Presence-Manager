@@ -48,12 +48,6 @@ const Volunteers: React.FC<VolunteersProps> = ({ volunteers, onAddVolunteer, onE
         });
     }, [volunteers, filterClass, filterType, filterTeam]);
 
-    const [name, setName] = useState('');
-    const [volunteerClass, setVolunteerClass] = useState(CLASS_NAMES[0]);
-    const [phone, setPhone] = useState('');
-    const [type, setType] = useState('');
-    const [team, setTeam] = useState('');
-
     const openAddModal = () => {
         setEditingVolunteer(null);
         setName('');
