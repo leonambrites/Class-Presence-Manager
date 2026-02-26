@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Volunteer } from '../types';
 import { CLASS_NAMES } from '../constants';
 import { EditIcon, TrashIcon, UserPlusIcon } from './icons';
@@ -14,6 +14,39 @@ interface VolunteersProps {
 const Volunteers: React.FC<VolunteersProps> = ({ volunteers, onAddVolunteer, onEditVolunteer, onDeleteVolunteer }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingVolunteer, setEditingVolunteer] = useState<Volunteer | null>(null);
+
+    // Form state
+    const [name, setName] = useState('');
+    const [volunteerClass, setVolunteerClass] = useState(CLASS_NAMES[0]);
+    const [phone, setPhone] = useState('');
+    const [type, setType] = useState('');
+    const [team, setTeam] = useState('');
+
+    // Filter state
+    const [filterClass, setFilterClass] = useState('Todas');
+    const [filterType, setFilterType] = useState('Todos');
+    const [filterTeam, setFilterTeam] = useState('Todas');
+
+    // Extract unique types and teams for the filter dropdowns
+    const uniqueTypes = useMemo(() => {
+        const types = new Set(volunteers.map(v => v.type).filter(Boolean) as string[]);
+        return Array.from(types).sort();
+    }, [volunteers]);
+
+    const uniqueTeams = useMemo(() => {
+        const teams = new Set(volunteers.map(v => v.team).filter(Boolean) as string[]);
+        return Array.from(teams).sort();
+    }, [volunteers]);
+
+    // Apply filters
+    const filteredVolunteers = useMemo(() => {
+        return volunteers.filter(v => {
+            const matchClass = filterClass === 'Todas' || v.class === filterClass;
+            const matchType = filterType === 'Todos' || v.type === filterType;
+            const matchTeam = filterTeam === 'Todas' || v.team === filterTeam;
+            return matchClass && matchType && matchTeam;
+        });
+    }, [volunteers, filterClass, filterType, filterTeam]);
 
     const [name, setName] = useState('');
     const [volunteerClass, setVolunteerClass] = useState(CLASS_NAMES[0]);
@@ -71,12 +104,51 @@ const Volunteers: React.FC<VolunteersProps> = ({ volunteers, onAddVolunteer, onE
                 </button>
             </div>
 
+            <div className="bg-white rounded-xl shadow-md p-4 mb-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Filtros</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Turma</label>
+                        <select
+                            value={filterClass}
+                            onChange={(e) => setFilterClass(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-blue focus:border-brand-blue sm:text-sm"
+                        >
+                            <option value="Todas">Todas as Turmas</option>
+                            {CLASS_NAMES.map(c => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+                        <select
+                            value={filterType}
+                            onChange={(e) => setFilterType(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-blue focus:border-brand-blue sm:text-sm"
+                        >
+                            <option value="Todos">Todos os Tipos</option>
+                            {uniqueTypes.map(t => <option key={t} value={t}>{t}</option>)}
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Equipe (Supervisora)</label>
+                        <select
+                            value={filterTeam}
+                            onChange={(e) => setFilterTeam(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-blue focus:border-brand-blue sm:text-sm"
+                        >
+                            <option value="Todas">Todas as Equipes</option>
+                            {uniqueTeams.map(t => <option key={t} value={t}>{t}</option>)}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
             <div className="bg-white rounded-xl shadow-lg p-2 sm:p-4">
-                <h3 className="text-xl font-bold text-gray-800 p-4 border-b">Lista ({volunteers.length})</h3>
+                <h3 className="text-xl font-bold text-gray-800 p-4 border-b">Lista ({filteredVolunteers.length})</h3>
 
                 {/* Desktop Table View */}
                 <div className="hidden md:block overflow-x-auto">
-                    {volunteers.length > 0 ? (
+                    {filteredVolunteers.length > 0 ? (
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
@@ -89,7 +161,7 @@ const Volunteers: React.FC<VolunteersProps> = ({ volunteers, onAddVolunteer, onE
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
-                                {volunteers.map(v => (
+                                {filteredVolunteers.map(v => (
                                     <tr key={v.id}>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="text-sm font-medium text-gray-900">{v.name}</div>
@@ -123,8 +195,8 @@ const Volunteers: React.FC<VolunteersProps> = ({ volunteers, onAddVolunteer, onE
 
                 {/* Mobile Card View */}
                 <div className="md:hidden space-y-4 p-4">
-                    {volunteers.length > 0 ? (
-                        volunteers.map(v => (
+                    {filteredVolunteers.length > 0 ? (
+                        filteredVolunteers.map(v => (
                             <div key={v.id} className="bg-gray-50 p-4 rounded-lg shadow">
                                 <p className="text-lg font-bold text-gray-900">{v.name}</p>
                                 <div className="mt-4 border-t pt-3 space-y-1">
