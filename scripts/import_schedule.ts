@@ -27,9 +27,16 @@ const parseDate = (dn: string): string => {
     const parts = dn.trim().split('/');
     if (parts.length === 3) {
         // Assume DD/MM/YYYY into YYYY-MM-DD
-        return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+        let year = parts[2];
+        if (year.length === 2) year = '20' + year; // handle "26" as "2026"
+        return `${year}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
     }
-    // Handle MM/DD/YYYY or natively properly formatted cases
+    if (parts.length === 2) {
+        // Assume DD/MM into YYYY-MM-DD for current year
+        const currentYear = new Date().getFullYear();
+        return `${currentYear}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+    }
+    // Handle natively properly formatted cases
     if (dn.includes('-')) {
         const parts2 = dn.trim().split('-');
         if (parts2.length === 3 && parts2[0].length === 4) return dn.trim(); // YYYY-MM-DD
