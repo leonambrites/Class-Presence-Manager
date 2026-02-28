@@ -4,7 +4,7 @@ import { Student } from '../types';
 import { calculateAge } from '../utils';
 
 interface StudentFormProps {
-  onSubmit: (formData: { name: string; class: string; age: number; motherName: string; phone: string; birthday: string; hasAllergy?: boolean; allergyDescription?: string; }) => void;
+  onSubmit: (formData: { name: string; class: string; age: number; guardianName: string; phone: string; birthday: string; hasAllergy?: boolean; allergyDescription?: string; }) => void;
   onCancel: () => void;
   initialData?: Partial<Student> | null;
 }
@@ -12,7 +12,7 @@ interface StudentFormProps {
 const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialData }) => {
   const [name, setName] = useState('');
   const [studentClass, setStudentClass] = useState(CLASS_NAMES[0]);
-  const [motherName, setMotherName] = useState('');
+  const [guardianName, setGuardianName] = useState('');
   const [phone, setPhone] = useState('');
   const [birthday, setBirthday] = useState('');
   const [hasAllergy, setHasAllergy] = useState(false);
@@ -23,7 +23,7 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
     if (initialData) {
       setName(initialData.name || '');
       setStudentClass(initialData.class || CLASS_NAMES[0]);
-      setMotherName(initialData.motherName || '');
+      setGuardianName(initialData.guardianName || '');
       setPhone(initialData.phone || '');
       setBirthday(initialData.birthday || '');
       setHasAllergy(initialData.hasAllergy || false);
@@ -31,7 +31,7 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
     } else {
       setName('');
       setStudentClass(CLASS_NAMES[0]);
-      setMotherName('');
+      setGuardianName('');
       setPhone('');
       setBirthday('');
       setHasAllergy(false);
@@ -41,7 +41,7 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !studentClass || !motherName || !phone || !birthday) {
+    if (!name || !studentClass || !guardianName || !phone || !birthday) {
       setError('Todos os campos são obrigatórios.');
       if (!name || !birthday) return;
     }
@@ -54,7 +54,7 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
       name,
       class: studentClass,
       age: calculatedAge,
-      motherName,
+      guardianName,
       phone,
       birthday,
       hasAllergy,
@@ -84,8 +84,8 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
         </div>
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700">Nome da Mãe</label>
-        <input type="text" value={motherName} onChange={(e) => setMotherName(e.target.value)} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-blue focus:border-brand-blue sm:text-sm" />
+        <label className="block text-sm font-medium text-gray-700">Nome do Responsável</label>
+        <input type="text" value={guardianName} onChange={(e) => setGuardianName(e.target.value)} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-blue focus:border-brand-blue sm:text-sm" />
       </div>
       <div>
         <label className="block text-sm font-medium text-gray-700">Telefone</label>
