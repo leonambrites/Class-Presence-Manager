@@ -11,7 +11,7 @@ interface AttendanceProps {
     students: Student[];
     onMarkPresence: (studentId: string, date: string) => void;
     onUnmarkPresence: (studentId: string, date: string) => void;
-    onAddVisitor: (formData: { name: string; class: string; age: number; motherName: string; phone: string; birthday: string }, date: string) => void;
+    onAddVisitor: (formData: { name: string; class: string; age: number; guardianName: string; phone: string; birthday: string; hasAllergy?: boolean; allergyDescription?: string; }, date: string) => void;
     selectedClass: string;
     onClassChange: (className: string) => void;
 }
@@ -59,7 +59,7 @@ const Attendance: React.FC<AttendanceProps> = ({ students, onMarkPresence, onUnm
         return <span className="text-gray-500">Ausente</span>;
     };
 
-    const handleAddVisitorSubmit = (formData: { name: string; class: string; age: number; motherName: string; phone: string; birthday: string }) => {
+    const handleAddVisitorSubmit = (formData: { name: string; class: string; age: number; guardianName: string; phone: string; birthday: string; hasAllergy?: boolean; allergyDescription?: string; }) => {
         onAddVisitor(formData, date);
         setActiveTab('Membro'); // Switch back to member tab after adding
     };

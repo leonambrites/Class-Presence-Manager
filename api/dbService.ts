@@ -25,7 +25,7 @@ export const dbService = {
 
         const formattedStudents = studentsData.map((s: any) => ({
             ...s,
-            motherName: s.mothername || s.motherName || '',
+            guardianName: s.guardianname || s.guardianName || s.mothername || s.motherName || '',
             age: s.age ? Number(s.age) : 0,
             hasAllergy: s.has_allergy,
             allergyDescription: s.allergy_description || '',
@@ -52,6 +52,7 @@ export const dbService = {
         const formattedSchedule = scheduleData.map((s: any) => ({
             ...s,
             id: String(s.id),
+            team: s.team || '',
             ministerIds: s.ministerids ? s.ministerids.split(',') : (s.ministerIds ? s.ministerIds.split(',') : [])
         }));
 
@@ -71,10 +72,10 @@ export const dbService = {
     async addStudent(student: any) {
         const sql = getSql();
         await sql`
-            INSERT INTO students (id, name, class, age, motherName, phone, type, birthday, has_allergy, allergy_description, created_at, updated_at)
+            INSERT INTO students (id, name, class, age, guardianName, phone, type, birthday, has_allergy, allergy_description, created_at, updated_at)
             VALUES (
                 ${String(student.id)}, ${student.name}, ${student.class}, ${student.age}, 
-                ${student.motherName}, ${student.phone}, ${student.type}, ${student.birthday}, 
+                ${student.guardianName}, ${student.phone}, ${student.type}, ${student.birthday}, 
                 ${student.hasAllergy || false}, ${student.allergyDescription || ''},
                 ${getTimestamp()}, ${getTimestamp()}
             )
@@ -85,7 +86,7 @@ export const dbService = {
         const sql = getSql();
         const result = await sql`
             UPDATE students
-            SET name = ${data.name}, class = ${data.class}, age = ${data.age}, motherName = ${data.motherName}, 
+            SET name = ${data.name}, class = ${data.class}, age = ${data.age}, guardianName = ${data.guardianName}, 
                 phone = ${data.phone}, type = ${data.type}, birthday = ${data.birthday}, 
                 has_allergy = ${data.hasAllergy || false}, allergy_description = ${data.allergyDescription || ''}, 
                 updated_at = ${getTimestamp()}
@@ -168,23 +169,23 @@ export const dbService = {
 
     async addSchedule(schedule: any) {
         const sql = getSql();
-        const ministerIdsStr = Array.isArray(schedule.ministerIds) ? schedule.ministerIds.join(',') : schedule.ministerIds;
+        const ministerIdsStr = Array.isArray(schedule.ministerIds) ? schedule.ministerIds.join(',') : (schedule.ministerIds || '');
         await sql`
-            INSERT INTO schedule (id, date, className, supervisorId, deskId, coordinatorId, ministerIds, created_at)
+            INSERT INTO schedule (id, date, className, team, supervisorId, deskId, coordinatorId, ministerIds, created_at)
             VALUES (
-                ${String(Date.now())}, ${schedule.date}, ${schedule.className}, ${schedule.supervisorId}, 
-                ${schedule.deskId}, ${schedule.coordinatorId}, ${ministerIdsStr}, ${getTimestamp()}
+                ${String(Date.now())}, ${schedule.date}, ${schedule.className}, ${schedule.team || ''}, ${schedule.supervisorId || null}, 
+                ${schedule.deskId || null}, ${schedule.coordinatorId || null}, ${ministerIdsStr}, ${getTimestamp()}
             )
         `;
     },
 
     async updateSchedule(id: string, schedule: any) {
         const sql = getSql();
-        const ministerIdsStr = Array.isArray(schedule.ministerIds) ? schedule.ministerIds.join(',') : schedule.ministerIds;
+        const ministerIdsStr = Array.isArray(schedule.ministerIds) ? schedule.ministerIds.join(',') : (schedule.ministerIds || '');
         const result = await sql`
             UPDATE schedule
-            SET date = ${schedule.date}, className = ${schedule.className}, supervisorId = ${schedule.supervisorId}, 
-                deskId = ${schedule.deskId}, coordinatorId = ${schedule.coordinatorId}, ministerIds = ${ministerIdsStr}
+            SET date = ${schedule.date}, className = ${schedule.className}, team = ${schedule.team || ''}, supervisorId = ${schedule.supervisorId || null}, 
+                deskId = ${schedule.deskId || null}, coordinatorId = ${schedule.coordinatorId || null}, ministerIds = ${ministerIdsStr}
             WHERE id = ${String(id)}
             RETURNING id
         `;
@@ -208,9 +209,9 @@ export const dbService = {
 
             for (const s of payload.students) {
                 await sql`
-                    INSERT INTO students (id, name, class, age, motherName, phone, type, birthday, created_at, updated_at)
+                    INSERT INTO students (id, name, class, age, guardianName, phone, type, birthday, created_at, updated_at)
                     VALUES (
-                        ${String(s.id)}, ${s.name}, ${s.class}, ${s.age}, ${s.motherName}, ${s.phone}, 
+                        ${String(s.id)}, ${s.name}, ${s.class}, ${s.age}, ${s.guardianName}, ${s.phone}, 
                         ${s.type}, ${s.birthday || ""}, ${getTimestamp()}, ${getTimestamp()}
                     )
                 `;
@@ -245,12 +246,12 @@ export const dbService = {
             }
 
             for (const sch of payload.schedule) {
-                const ministerIdsStr = Array.isArray(sch.ministerIds) ? sch.ministerIds.join(',') : sch.ministerIds;
+                const ministerIdsStr = Array.isArray(sch.ministerIds) ? sch.ministerIds.join(',') : (sch.ministerIds || '');
                 await sql`
-                    INSERT INTO schedule (id, date, className, supervisorId, deskId, coordinatorId, ministerIds, created_at)
+                    INSERT INTO schedule (id, date, className, team, supervisorId, deskId, coordinatorId, ministerIds, created_at)
                     VALUES (
-                        ${String(sch.id || Date.now())}, ${sch.date}, ${sch.className}, ${sch.supervisorId}, 
-                        ${sch.deskId}, ${sch.coordinatorId}, ${ministerIdsStr}, ${getTimestamp()}
+                        ${String(sch.id || Date.now())}, ${sch.date}, ${sch.className}, ${sch.team || ''}, ${sch.supervisorId || null}, 
+                        ${sch.deskId || null}, ${sch.coordinatorId || null}, ${ministerIdsStr}, ${getTimestamp()}
                     )
                 `;
             }

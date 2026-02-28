@@ -20,7 +20,7 @@ export const initDb = async () => {
                 name TEXT NOT NULL,
                 class TEXT NOT NULL,
                 age INTEGER,
-                motherName TEXT,
+                guardianName TEXT,
                 phone TEXT,
                 type TEXT,
                 birthday TEXT,
@@ -69,7 +69,13 @@ export const initDb = async () => {
             // Columns likely already exist
         }
 
-        // Migration for existing Students table (Allergies)
+        // Migration for existing Students table (Allergies and Renames)
+        try {
+            await sql`ALTER TABLE students RENAME COLUMN mothername TO guardianname`;
+        } catch (e) {
+            // Column likely already renamed
+        }
+
         try {
             await sql`ALTER TABLE students ADD COLUMN has_allergy BOOLEAN DEFAULT FALSE`;
             await sql`ALTER TABLE students ADD COLUMN allergy_description TEXT`;
@@ -90,6 +96,7 @@ export const initDb = async () => {
                 id VARCHAR(255) PRIMARY KEY,
                 date TEXT NOT NULL,
                 className TEXT,
+                team TEXT,
                 supervisorId VARCHAR(255),
                 deskId VARCHAR(255),
                 coordinatorId VARCHAR(255),
@@ -97,6 +104,12 @@ export const initDb = async () => {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `;
+
+        try {
+            await sql`ALTER TABLE schedule ADD COLUMN team TEXT`;
+        } catch (e) {
+            // Column likely already exists
+        }
 
         // Topics Table
         await sql`

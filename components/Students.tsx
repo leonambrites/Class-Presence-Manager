@@ -9,7 +9,7 @@ import { calculateAge } from '../utils';
 
 interface StudentsProps {
   students: Student[];
-  onAddStudent: (formData: { name: string; class: string; age: number; motherName: string; phone: string; birthday: string }) => void;
+  onAddStudent: (formData: { name: string; class: string; age: number; guardianName: string; phone: string; birthday: string; hasAllergy?: boolean; allergyDescription?: string; }) => void;
   onEditStudent: (student: Student) => void;
   onDeleteStudent: (studentId: string) => void;
   onMakeMember: (studentId: string) => void;
@@ -52,7 +52,7 @@ const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStude
     }
   };
 
-  const handleFormSubmit = (formData: { name: string; class: string; age: number; motherName: string; phone: string; birthday: string }) => {
+  const handleFormSubmit = (formData: { name: string; class: string; age: number; guardianName: string; phone: string; birthday: string; hasAllergy?: boolean; allergyDescription?: string; }) => {
     if (editingStudent) {
       onEditStudent({ ...editingStudent, ...formData });
     } else {
@@ -115,7 +115,7 @@ const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStude
               <tr>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Turma</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contato (Mãe)</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contato (Responsável)</th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Alergia</th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status Hoje</th>
                 <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
@@ -135,7 +135,7 @@ const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStude
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.class}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{student.motherName}</div>
+                    <div className="text-sm text-gray-900">{student.guardianName}</div>
                     <div className="text-sm text-gray-500">{student.phone}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -190,7 +190,7 @@ const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStude
               </div>
               <div className="mt-4 border-t pt-3 space-y-1">
                 <p className="text-sm text-gray-600">Turma: <span className="font-medium text-gray-800">{student.class}</span></p>
-                <p className="text-sm text-gray-600">Mãe: <span className="font-medium text-gray-800">{student.motherName}</span></p>
+                <p className="text-sm text-gray-600">Responsável: <span className="font-medium text-gray-800">{student.guardianName}</span></p>
                 <p className="text-sm text-gray-600">Tel: <span className="font-medium text-gray-800">{student.phone}</span></p>
                 {student.hasAllergy && (
                   <p className="text-sm text-gray-600">Alergia: <span className="font-medium text-red-600">{student.allergyDescription}</span></p>

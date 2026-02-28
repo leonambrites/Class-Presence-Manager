@@ -71,7 +71,7 @@ const importStudents = async () => {
                 birthday: parseDate(row.DN),
                 age: age,
                 type: type,
-                motherName: row.RESP ? row.RESP.trim() : '',
+                guardianName: row.RESP ? row.RESP.trim() : '',
                 phone: row.TEL ? row.TEL.trim() : '',
                 hasAllergy: hasAllergy,
                 allergyDescription: allergyDescription,

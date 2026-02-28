@@ -17,7 +17,7 @@ export interface Student {
   name: string;
   class: string;
   age: number;
-  motherName: string;
+  guardianName: string;
   phone: string;
   type: StudentType;
   birthday?: string;
@@ -39,10 +39,11 @@ export interface ScheduleEntry {
   id: string;
   date: string;
   className: string;
-  supervisorId: string | null;
-  ministerIds: string[];
-  deskId: string | null;
-  coordinatorId: string | null;
+  team?: string;
+  supervisorId?: string | null;
+  ministerIds?: string[];
+  deskId?: string | null;
+  coordinatorId?: string | null;
 }
 
 export interface Topic {
