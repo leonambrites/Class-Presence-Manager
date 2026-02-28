@@ -52,6 +52,7 @@ export const dbService = {
         const formattedSchedule = scheduleData.map((s: any) => ({
             ...s,
             id: String(s.id),
+            className: s.classname || s.className || '',
             team: s.team || '',
             ministerIds: s.ministerids ? s.ministerids.split(',') : (s.ministerIds ? s.ministerIds.split(',') : [])
         }));
