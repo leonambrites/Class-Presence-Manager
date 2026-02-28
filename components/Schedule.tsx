@@ -77,8 +77,8 @@ const ScheduleCard: React.FC<{ entry: ScheduleEntry, volunteers: Volunteer[], on
 
     // Dynamic Team Lookups
     const dynamicSupervisor = entry.team ? volunteers.find(v => v.team === entry.team && v.type?.toLowerCase() === 'supervisora') : null;
-    const dynamicCoordinator = entry.team ? volunteers.find(v => v.class === entry.className && v.type?.toLowerCase() === 'coordenadora') : null;
-    const dynamicMinisters = entry.team ? volunteers.filter(v => v.team === entry.team && v.class === entry.className && v.type?.toLowerCase() === 'ministra') : [];
+    const dynamicCoordinator = volunteers.find(v => v.class === entry.className && v.type?.toLowerCase() === 'coordenadora') || null;
+    const dynamicMinisters = entry.team ? volunteers.filter(v => v.team === entry.team && v.type?.toLowerCase() === 'ministra') : [];
 
     // Fallbacks
     const showSupervisor = entry.team ? (dynamicSupervisor?.name || 'N/A') : getName(entry.supervisorId);
@@ -133,7 +133,13 @@ const Schedule: React.FC<ScheduleProps> = ({ schedule, volunteers, selectedClass
     const [isAdding, setIsAdding] = useState(false);
     const [editingEntry, setEditingEntry] = useState<ScheduleEntry | null>(null);
 
-    const scheduleForDate = schedule.filter(s => s.date === selectedDate);
+    // Ensure we are strictly comparing YYYY-MM-DD strings to avoid Timezone bugs
+    const scheduleForDate = schedule.filter(s => {
+        if (!s.date) return false;
+        const entryDate = s.date.split('T')[0];
+        return entryDate === selectedDate;
+    });
+
     const filteredSchedule = selectedClass === 'All'
         ? scheduleForDate
         : scheduleForDate.filter(s => s.className === selectedClass);
