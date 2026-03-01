@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { View, Student, Volunteer, ScheduleEntry, Topic, StudentType } from './types';
+import { View, Student, Volunteer, ScheduleEntry, Topic, StudentType, UserRole } from './types';
 import Header from './components/Header';
 import Dashboard from './components/Dashboard';
 import AttendanceComponent from './components/Attendance';
@@ -9,6 +9,7 @@ import Volunteers from './components/Volunteers';
 import Topics from './components/Topics';
 import Reports from './components/Reports';
 import Dismissal from './components/Dismissal';
+import Login from './components/Login';
 import {
     INITIAL_STUDENTS,
     INITIAL_VOLUNTEERS,
@@ -28,6 +29,7 @@ const App: React.FC = () => {
     const [selectedClass, setSelectedClass] = useState<string>('All');
     const [loading, setLoading] = useState<boolean>(true);
     const [connectionStatus, setConnectionStatus] = useState<'connected' | 'disconnected' | 'syncing' | 'offline'>('syncing');
+    const [userRole, setUserRole] = useState<UserRole | null>(null);
 
     const showNotification = (message: string) => {
         setNotification(message);
@@ -112,6 +114,9 @@ const App: React.FC = () => {
 
     // Initial Load and Polling
     useEffect(() => {
+        const savedRole = localStorage.getItem('userRole') as UserRole | null;
+        if (savedRole) setUserRole(savedRole);
+
         loadDataLocally(); // Load local data immediately for instant render
         setLoading(false); // Stop loading spinner immediately
 
@@ -602,31 +607,49 @@ const App: React.FC = () => {
                     selectedClass={selectedClass}
                     onClassChange={setSelectedClass}
                     onSaveData={handleSaveData}
+                    userRole={userRole!}
                 />;
             case View.Attendance:
-                return <AttendanceComponent students={students} onMarkPresence={handleMarkPresence} onUnmarkPresence={handleUnmarkPresence} onAddVisitor={handleAddVisitor} selectedClass={selectedClass} onClassChange={setSelectedClass} />;
+                return <AttendanceComponent students={students} onMarkPresence={handleMarkPresence} onUnmarkPresence={handleUnmarkPresence} onAddVisitor={handleAddVisitor} selectedClass={selectedClass} onClassChange={setSelectedClass} userRole={userRole!} />;
             case View.Students:
-                return <Students students={students} onAddStudent={handleAddMember} onEditStudent={handleEditStudent} onDeleteStudent={handleDeleteStudent} onMakeMember={handleMakeMember} selectedClass={selectedClass} onClassChange={setSelectedClass} />;
+                return <Students students={students} onAddStudent={handleAddMember} onEditStudent={handleEditStudent} onDeleteStudent={handleDeleteStudent} onMakeMember={handleMakeMember} selectedClass={selectedClass} onClassChange={setSelectedClass} userRole={userRole!} />;
             case View.Schedule:
-                return <Schedule schedule={schedule} volunteers={volunteers} selectedClass={selectedClass} onClassChange={setSelectedClass} onAddSchedule={handleAddSchedule} onEditSchedule={handleEditSchedule} onDeleteSchedule={handleDeleteSchedule} />;
+                return <Schedule schedule={schedule} volunteers={volunteers} selectedClass={selectedClass} onClassChange={setSelectedClass} onAddSchedule={handleAddSchedule} onEditSchedule={handleEditSchedule} onDeleteSchedule={handleDeleteSchedule} userRole={userRole!} />;
             case View.Volunteers:
-                return <Volunteers volunteers={volunteers} onAddVolunteer={handleAddVolunteer} onEditVolunteer={handleEditVolunteer} onDeleteVolunteer={handleDeleteVolunteer} />;
+                return <Volunteers volunteers={volunteers} onAddVolunteer={handleAddVolunteer} onEditVolunteer={handleEditVolunteer} onDeleteVolunteer={handleDeleteVolunteer} userRole={userRole!} />;
             case View.Topics:
-                return <Topics topics={topics} onAddTopic={handleAddTopic} />;
+                return <Topics topics={topics} onAddTopic={handleAddTopic} userRole={userRole!} />;
             case View.Reports:
                 return <Reports students={students} volunteers={volunteers} schedule={schedule} />;
             case View.Dismissal:
-                return <Dismissal students={students} onDismiss={handleDismiss} selectedClass={selectedClass} onClassChange={setSelectedClass} />;
+                return <Dismissal students={students} onDismiss={handleDismiss} selectedClass={selectedClass} onClassChange={setSelectedClass} userRole={userRole!} />;
             default:
-                return <Dashboard students={students} selectedClass={selectedClass} onClassChange={setSelectedClass} onSaveData={handleSaveData} />;
+                return <Dashboard students={students} selectedClass={selectedClass} onClassChange={setSelectedClass} onSaveData={handleSaveData} userRole={userRole!} />;
         }
     };
+
+    const handleLogin = (role: UserRole) => {
+        setUserRole(role);
+        localStorage.setItem('userRole', role);
+    };
+
+    const handleLogout = () => {
+        setUserRole(null);
+        localStorage.removeItem('userRole');
+        setView(View.Dashboard);
+    };
+
+    if (!userRole) {
+        return <Login onLogin={handleLogin} />;
+    }
 
     return (
         <div className="min-h-screen bg-brand-light font-sans relative">
             <Header
                 currentView={view}
                 onNavigate={setView}
+                userRole={userRole}
+                onLogout={handleLogout}
             />
             {/* Network Status Indicator */}
             <div className={`w-full py-1 text-xs text-center text-white font-semibold transition-colors duration-300 ${connectionStatus === 'connected' ? 'bg-green-500' :

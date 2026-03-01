@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo } from 'react';
-import { Student, StudentType } from '../types';
+import { Student, StudentType, UserRole } from '../types';
 import { CLASS_NAMES } from '../constants';
 import { calculateAge } from '../utils';
 

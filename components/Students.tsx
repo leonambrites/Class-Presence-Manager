@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Student, StudentType } from '../types';
+import { Student, StudentType, UserRole } from '../types';
 import Modal from './Modal';
 import StudentForm from './StudentForm';
 import { SearchIcon, PlusCircleIcon, EditIcon, TrashIcon, UserPlusIcon } from './icons';
@@ -15,9 +15,10 @@ interface StudentsProps {
   onMakeMember: (studentId: string) => void;
   selectedClass: string;
   onClassChange: (className: string) => void;
+  userRole: UserRole;
 }
 
-const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStudent, onDeleteStudent, onMakeMember, selectedClass, onClassChange }) => {
+const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStudent, onDeleteStudent, onMakeMember, selectedClass, onClassChange, userRole }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
@@ -65,10 +66,12 @@ const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStude
     <div className="p-4 md:p-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-6">
         <h2 className="text-3xl font-bold text-brand-dark">Alunos Cadastrados</h2>
-        <button onClick={handleOpenAddModal} className="flex items-center justify-center px-4 py-2 bg-brand-blue text-white rounded-lg hover:bg-blue-600 transition shadow-sm">
-          <PlusCircleIcon />
-          <span className="ml-2">Adicionar Membro</span>
-        </button>
+        {userRole !== 'Ministra' && (
+          <button onClick={handleOpenAddModal} className="flex items-center justify-center px-4 py-2 bg-brand-blue text-white rounded-lg hover:bg-blue-600 transition shadow-sm">
+            <PlusCircleIcon />
+            <span className="ml-2">Adicionar Membro</span>
+          </button>
+        )}
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4 mb-6">
@@ -153,11 +156,15 @@ const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStude
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex items-center justify-end space-x-3">
-                      {activeTab === StudentType.Visitante && (
+                      {userRole !== 'Ministra' && activeTab === StudentType.Visitante && (
                         <button onClick={() => onMakeMember(student.id)} className="text-gray-500 hover:text-brand-green" title="Tornar Membro"><UserPlusIcon /></button>
                       )}
-                      <button onClick={() => handleOpenEditModal(student)} className="text-gray-500 hover:text-brand-blue" title="Editar Aluno"><EditIcon /></button>
-                      <button onClick={() => handleDelete(student)} className="text-gray-500 hover:text-brand-red" title="Excluir Aluno"><TrashIcon /></button>
+                      {userRole !== 'Ministra' && (
+                        <button onClick={() => handleOpenEditModal(student)} className="text-gray-500 hover:text-brand-blue" title="Editar Aluno"><EditIcon /></button>
+                      )}
+                      {userRole === 'Pastor' && (
+                        <button onClick={() => handleDelete(student)} className="text-gray-500 hover:text-brand-red" title="Excluir Aluno"><TrashIcon /></button>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -197,11 +204,15 @@ const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStude
                 )}
               </div>
               <div className="flex justify-end items-center mt-3 border-t pt-3 space-x-4">
-                {activeTab === StudentType.Visitante && (
+                {userRole !== 'Ministra' && activeTab === StudentType.Visitante && (
                   <button onClick={() => onMakeMember(student.id)} className="text-gray-500 hover:text-brand-green flex items-center gap-1 text-sm"><UserPlusIcon className="h-4 w-4" /> Tornar Membro</button>
                 )}
-                <button onClick={() => handleOpenEditModal(student)} className="text-gray-500 hover:text-brand-blue flex items-center gap-1 text-sm"><EditIcon className="h-4 w-4" /> Editar</button>
-                <button onClick={() => handleDelete(student)} className="text-gray-500 hover:text-brand-red flex items-center gap-1 text-sm"><TrashIcon className="h-4 w-4" /> Excluir</button>
+                {userRole !== 'Ministra' && (
+                  <button onClick={() => handleOpenEditModal(student)} className="text-gray-500 hover:text-brand-blue flex items-center gap-1 text-sm"><EditIcon className="h-4 w-4" /> Editar</button>
+                )}
+                {userRole === 'Pastor' && (
+                  <button onClick={() => handleDelete(student)} className="text-gray-500 hover:text-brand-red flex items-center gap-1 text-sm"><TrashIcon className="h-4 w-4" /> Excluir</button>
+                )}
               </div>
             </div>
           ))}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ScheduleEntry, Volunteer } from '../types';
+import { ScheduleEntry, Volunteer, UserRole } from '../types';
 import { CLASS_NAMES } from '../constants';
 
 interface ScheduleProps {
@@ -10,6 +10,7 @@ interface ScheduleProps {
     onAddSchedule: (entry: Omit<ScheduleEntry, 'id'>) => void;
     onEditSchedule: (entry: ScheduleEntry) => void;
     onDeleteSchedule: (id: string) => void;
+    userRole: UserRole;
 }
 
 const ScheduleForm: React.FC<{
@@ -71,7 +72,7 @@ const ScheduleForm: React.FC<{
     );
 };
 
-const ScheduleCard: React.FC<{ entry: ScheduleEntry, volunteers: Volunteer[], onEdit: () => void, onDelete: () => void }> = ({ entry, volunteers, onEdit, onDelete }) => {
+const ScheduleCard: React.FC<{ entry: ScheduleEntry, volunteers: Volunteer[], onEdit: () => void, onDelete: () => void, userRole: UserRole }> = ({ entry, volunteers, onEdit, onDelete, userRole }) => {
     // Legacy ID Lookups
     const getName = (id: string | null | undefined) => id ? volunteers.find(v => v.id === id)?.name || '?' : 'N/A';
 
@@ -99,8 +100,12 @@ const ScheduleCard: React.FC<{ entry: ScheduleEntry, volunteers: Volunteer[], on
     return (
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6 relative border-l-4 border-brand-blue">
             <div className="absolute top-4 right-4 flex gap-2">
-                <button onClick={onEdit} className="text-brand-blue hover:text-blue-800 text-sm font-medium">Editar</button>
-                <button onClick={onDelete} className="text-red-500 hover:text-red-700 text-sm font-medium">Excluir</button>
+                {userRole !== 'Ministra' && (
+                    <button onClick={onEdit} className="text-brand-blue hover:text-blue-800 text-sm font-medium">Editar</button>
+                )}
+                {(userRole === 'Pastor' || userRole === 'Coordenadora') && (
+                    <button onClick={onDelete} className="text-red-500 hover:text-red-700 text-sm font-medium">Excluir</button>
+                )}
             </div>
             <h3 className="text-2xl font-bold text-brand-dark mb-1">{entry.className}</h3>
             {entry.team && <div className="text-sm font-semibold text-brand-blue mb-4">Equipe {entry.team}</div>}
@@ -128,7 +133,7 @@ const ScheduleCard: React.FC<{ entry: ScheduleEntry, volunteers: Volunteer[], on
     );
 };
 
-const Schedule: React.FC<ScheduleProps> = ({ schedule, volunteers, selectedClass, onClassChange, onAddSchedule, onEditSchedule, onDeleteSchedule }) => {
+const Schedule: React.FC<ScheduleProps> = ({ schedule, volunteers, selectedClass, onClassChange, onAddSchedule, onEditSchedule, onDeleteSchedule, userRole }) => {
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
     const [isAdding, setIsAdding] = useState(false);
     const [editingEntry, setEditingEntry] = useState<ScheduleEntry | null>(null);
@@ -158,7 +163,7 @@ const Schedule: React.FC<ScheduleProps> = ({ schedule, volunteers, selectedClass
         <div className="p-4 md:p-8">
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-3xl font-bold text-brand-dark">Escala de Voluntários</h2>
-                {volunteers.length > 0 && !isAdding && !editingEntry && (
+                {volunteers.length > 0 && !isAdding && !editingEntry && (userRole === 'Pastor' || userRole === 'Coordenadora') && (
                     <button onClick={() => setIsAdding(true)} className="bg-brand-blue text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition">
                         + Nova Escala
                     </button>
@@ -219,6 +224,7 @@ const Schedule: React.FC<ScheduleProps> = ({ schedule, volunteers, selectedClass
                                 key={entry.id}
                                 entry={entry}
                                 volunteers={volunteers}
+                                userRole={userRole}
                                 onEdit={() => setEditingEntry(entry)}
                                 onDelete={() => {
                                     if (window.confirm('Tem certeza que deseja excluir esta escala?')) {
