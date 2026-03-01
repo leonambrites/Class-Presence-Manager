@@ -8,7 +8,8 @@ interface DashboardProps {
     students: Student[];
     selectedClass: string;
     onClassChange: (className: string) => void;
-    onSaveData?: () => void;
+    onSaveData: () => Promise<void>;
+    userRole: UserRole;
 }
 
 const StatCard: React.FC<{ title: string; value: number | string; color: string }> = ({ title, value, color }) => (

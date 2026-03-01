@@ -9,7 +9,7 @@ import Volunteers from './components/Volunteers';
 import Topics from './components/Topics';
 import Reports from './components/Reports';
 import Dismissal from './components/Dismissal';
-import Login from './components/Login';
+import { SignedIn, SignedOut, SignIn, useUser } from '@clerk/clerk-react';
 import {
     INITIAL_STUDENTS,
     INITIAL_VOLUNTEERS,
@@ -29,7 +29,12 @@ const App: React.FC = () => {
     const [selectedClass, setSelectedClass] = useState<string>('All');
     const [loading, setLoading] = useState<boolean>(true);
     const [connectionStatus, setConnectionStatus] = useState<'connected' | 'disconnected' | 'syncing' | 'offline'>('syncing');
-    const [userRole, setUserRole] = useState<UserRole | null>(null);
+
+    // Clerk hooks
+    const { user, isLoaded } = useUser();
+
+    // Map the local userRole based on the publicMetadata from Clerk Cloud Session
+    const userRole = (user?.publicMetadata?.role as UserRole) || 'Ministra'; // Default fallback
 
     const showNotification = (message: string) => {
         setNotification(message);
@@ -114,9 +119,6 @@ const App: React.FC = () => {
 
     // Initial Load and Polling
     useEffect(() => {
-        const savedRole = localStorage.getItem('userRole') as UserRole | null;
-        if (savedRole) setUserRole(savedRole);
-
         loadDataLocally(); // Load local data immediately for instant render
         setLoading(false); // Stop loading spinner immediately
 
@@ -628,48 +630,47 @@ const App: React.FC = () => {
         }
     };
 
-    const handleLogin = (role: UserRole) => {
-        setUserRole(role);
-        localStorage.setItem('userRole', role);
-    };
-
-    const handleLogout = () => {
-        setUserRole(null);
-        localStorage.removeItem('userRole');
-        setView(View.Dashboard);
-    };
-
-    if (!userRole) {
-        return <Login onLogin={handleLogin} />;
+    if (!isLoaded) {
+        return (
+            <div className="flex bg-brand-light min-h-screen flex-col items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue"></div>
+            </div>
+        );
     }
 
     return (
         <div className="min-h-screen bg-brand-light font-sans relative">
-            <Header
-                currentView={view}
-                onNavigate={setView}
-                userRole={userRole}
-                onLogout={handleLogout}
-            />
-            {/* Network Status Indicator */}
-            <div className={`w-full py-1 text-xs text-center text-white font-semibold transition-colors duration-300 ${connectionStatus === 'connected' ? 'bg-green-500' :
-                connectionStatus === 'syncing' ? 'bg-blue-400' :
-                    connectionStatus === 'offline' ? 'bg-blue-500' : 'bg-red-500'
-                }`}>
-                {connectionStatus === 'connected' ? 'Online - Sincronizado' :
-                    connectionStatus === 'syncing' ? 'Sincronizando...' :
-                        connectionStatus === 'offline' ? 'Modo Local (Dados salvos no navegador)' : 'Desconectado'}
-            </div>
-
-            <main className="container mx-auto pb-20 md:pb-4">
-                {renderView()}
-            </main>
-
-            {notification && (
-                <div className="fixed bottom-20 right-4 md:bottom-5 md:right-5 bg-brand-dark text-white py-2 px-4 rounded-lg shadow-lg animate-bounce z-50">
-                    {notification}
+            <SignedOut>
+                <div className="flex min-h-screen items-center justify-center p-4">
+                    <SignIn appearance={{ elements: { formButtonPrimary: 'bg-brand-blue hover:bg-blue-600', card: 'shadow-xl rounded-xl' } }} />
                 </div>
-            )}
+            </SignedOut>
+            <SignedIn>
+                <Header
+                    currentView={view}
+                    onNavigate={setView}
+                    userRole={userRole}
+                />
+                {/* Network Status Indicator */}
+                <div className={`w-full py-1 text-xs text-center text-white font-semibold transition-colors duration-300 ${connectionStatus === 'connected' ? 'bg-green-500' :
+                    connectionStatus === 'syncing' ? 'bg-blue-400' :
+                        connectionStatus === 'offline' ? 'bg-blue-500' : 'bg-red-500'
+                    }`}>
+                    {connectionStatus === 'connected' ? 'Online - Sincronizado' :
+                        connectionStatus === 'syncing' ? 'Sincronizando...' :
+                            connectionStatus === 'offline' ? 'Modo Local (Dados salvos no navegador)' : 'Desconectado'}
+                </div>
+
+                <main className="container mx-auto pb-20 md:pb-4">
+                    {renderView()}
+                </main>
+
+                {notification && (
+                    <div className="fixed bottom-20 right-4 md:bottom-5 md:right-5 bg-brand-dark text-white py-2 px-4 rounded-lg shadow-lg animate-bounce z-50">
+                        {notification}
+                    </div>
+                )}
+            </SignedIn>
         </div>
     );
 };
