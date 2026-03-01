@@ -62,3 +62,5 @@ export enum View {
   Dismissal = 'Saída',
   Reports = 'Relatórios',
 }
+
+export type UserRole = 'Pastor' | 'Coordenadora' | 'Supervisora' | 'Ministra';

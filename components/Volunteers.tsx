@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Volunteer } from '../types';
+import { Volunteer, UserRole } from '../types';
 import { CLASS_NAMES } from '../constants';
 import { EditIcon, TrashIcon, UserPlusIcon } from './icons';
 import Modal from './Modal';
@@ -9,9 +9,10 @@ interface VolunteersProps {
     onAddVolunteer: (volunteer: Omit<Volunteer, 'id'>) => void;
     onEditVolunteer: (id: string, volunteer: Omit<Volunteer, 'id'>) => void;
     onDeleteVolunteer: (id: string) => void;
+    userRole: UserRole;
 }
 
-const Volunteers: React.FC<VolunteersProps> = ({ volunteers, onAddVolunteer, onEditVolunteer, onDeleteVolunteer }) => {
+const Volunteers: React.FC<VolunteersProps> = ({ volunteers, onAddVolunteer, onEditVolunteer, onDeleteVolunteer, userRole }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingVolunteer, setEditingVolunteer] = useState<Volunteer | null>(null);
 
@@ -92,10 +93,12 @@ const Volunteers: React.FC<VolunteersProps> = ({ volunteers, onAddVolunteer, onE
         <div className="p-4 md:p-8">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
                 <h2 className="text-3xl font-bold text-brand-dark">Professores e Voluntários</h2>
-                <button onClick={openAddModal} className="mt-4 sm:mt-0 flex items-center justify-center px-4 py-2 bg-brand-blue text-white rounded-lg hover:bg-blue-600 transition shadow-sm">
-                    <UserPlusIcon className="w-5 h-5" />
-                    <span className="ml-2">Adicionar Novo</span>
-                </button>
+                {userRole !== 'Ministra' && (
+                    <button onClick={openAddModal} className="mt-4 sm:mt-0 flex items-center justify-center px-4 py-2 bg-brand-blue text-white rounded-lg hover:bg-blue-600 transition shadow-sm">
+                        <UserPlusIcon className="w-5 h-5" />
+                        <span className="ml-2">Adicionar Novo</span>
+                    </button>
+                )}
             </div>
 
             <div className="bg-white rounded-xl shadow-md p-4 mb-6">
@@ -174,8 +177,12 @@ const Volunteers: React.FC<VolunteersProps> = ({ volunteers, onAddVolunteer, onE
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <div className="flex items-center justify-end space-x-3">
-                                                <button onClick={() => openEditModal(v)} className="text-gray-500 hover:text-brand-blue" title="Editar"><EditIcon /></button>
-                                                <button onClick={() => { if (window.confirm('Tem certeza?')) onDeleteVolunteer(v.id) }} className="text-gray-500 hover:text-brand-red" title="Excluir"><TrashIcon /></button>
+                                                {userRole !== 'Ministra' && (
+                                                    <>
+                                                        <button onClick={() => openEditModal(v)} className="text-gray-500 hover:text-brand-blue" title="Editar"><EditIcon /></button>
+                                                        <button onClick={() => { if (window.confirm('Tem certeza?')) onDeleteVolunteer(v.id) }} className="text-gray-500 hover:text-brand-red" title="Excluir"><TrashIcon /></button>
+                                                    </>
+                                                )}
                                             </div>
                                         </td>
                                     </tr>
@@ -200,8 +207,12 @@ const Volunteers: React.FC<VolunteersProps> = ({ volunteers, onAddVolunteer, onE
                                     <p className="text-sm text-gray-600">Tel: <span className="font-medium text-gray-800">{v.phone || '-'}</span></p>
                                 </div>
                                 <div className="flex justify-end items-center mt-3 border-t pt-3 space-x-4">
-                                    <button onClick={() => openEditModal(v)} className="text-gray-500 hover:text-brand-blue flex items-center gap-1 text-sm"><EditIcon className="h-4 w-4" /> Editar</button>
-                                    <button onClick={() => { if (window.confirm('Tem certeza?')) onDeleteVolunteer(v.id) }} className="text-gray-500 hover:text-brand-red flex items-center gap-1 text-sm"><TrashIcon className="h-4 w-4" /> Excluir</button>
+                                    {userRole !== 'Ministra' && (
+                                        <>
+                                            <button onClick={() => openEditModal(v)} className="text-gray-500 hover:text-brand-blue flex items-center gap-1 text-sm"><EditIcon className="h-4 w-4" /> Editar</button>
+                                            <button onClick={() => { if (window.confirm('Tem certeza?')) onDeleteVolunteer(v.id) }} className="text-gray-500 hover:text-brand-red flex items-center gap-1 text-sm"><TrashIcon className="h-4 w-4" /> Excluir</button>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         ))

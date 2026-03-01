@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo } from 'react';
-import { Student, StudentType } from '../types';
+import { Student, StudentType, UserRole } from '../types';
 import StudentForm from './StudentForm';
 import { SearchIcon, CalendarIcon } from './icons';
 import { CLASS_NAMES } from '../constants';
@@ -14,6 +14,7 @@ interface AttendanceProps {
     onAddVisitor: (formData: { name: string; class: string; age: number; guardianName: string; phone: string; birthday: string; hasAllergy?: boolean; allergyDescription?: string; }, date: string) => void;
     selectedClass: string;
     onClassChange: (className: string) => void;
+    userRole: UserRole;
 }
 
 const getDayFromDate = (dateString: string): 'Sunday' | 'Wednesday' | null => {
@@ -24,7 +25,7 @@ const getDayFromDate = (dateString: string): 'Sunday' | 'Wednesday' | null => {
     return null;
 }
 
-const Attendance: React.FC<AttendanceProps> = ({ students, onMarkPresence, onUnmarkPresence, onAddVisitor, selectedClass, onClassChange }) => {
+const Attendance: React.FC<AttendanceProps> = ({ students, onMarkPresence, onUnmarkPresence, onAddVisitor, selectedClass, onClassChange, userRole }) => {
     const [activeTab, setActiveTab] = useState<'Membro' | 'Visitante'>('Membro');
     const [searchTerm, setSearchTerm] = useState('');
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
@@ -180,8 +181,12 @@ const Attendance: React.FC<AttendanceProps> = ({ students, onMarkPresence, onUnm
 
                 {activeTab === 'Visitante' && (
                     <div>
-                        <h3 className="text-xl font-semibold text-brand-dark mb-4">Cadastrar Novo Aluno (Visitante)</h3>
-                        <StudentForm onSubmit={handleAddVisitorSubmit} onCancel={() => setActiveTab('Membro')} />
+                        {userRole !== 'Ministra' && (
+                            <>
+                                <h3 className="text-xl font-semibold text-brand-dark mb-4">Cadastrar Novo Aluno (Visitante)</h3>
+                                <StudentForm onSubmit={handleAddVisitorSubmit} onCancel={() => setActiveTab('Membro')} />
+                            </>
+                        )}
 
                         <div className="mt-8">
                             <h3 className="text-xl font-semibold text-brand-dark mb-4 border-t pt-6">Visitantes Atuais</h3>
