@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { View, UserRole } from '../types';
 import { DashboardIcon, CheckCircleIcon, UsersIcon, CalendarIcon, BookOpenIcon, LogOutIcon, UserPlusIcon, MoreHorizontalIcon, FileTextIcon } from './icons';
 import { LOGO_URL } from '../constants';
+import { UserButton } from '@clerk/clerk-react';
 
 interface HeaderProps {
     currentView: View;
     onNavigate: (view: View) => void;
     userRole?: UserRole | null;
-    onLogout?: () => void;
 }
 
 const NavButton: React.FC<{
@@ -33,7 +33,7 @@ const NavButton: React.FC<{
     );
 };
 
-const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, userRole, onLogout }) => {
+const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, userRole }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     // Close menu when navigating
@@ -89,19 +89,15 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, userRole, onLo
                                 {navItems.map(item => <NavButton key={item.view} {...item} currentView={currentView} onClick={onNavigate} />)}
                             </nav>
 
-                            {userRole && onLogout && (
+                            {userRole && (
                                 <div className="flex items-center gap-4 ml-4 pl-4 border-l border-gray-200">
                                     <div className="text-right">
                                         <p className="text-xs text-gray-500 font-medium">Conectado como</p>
                                         <p className="text-sm font-bold text-brand-blue">{userRole}</p>
                                     </div>
-                                    <button
-                                        onClick={onLogout}
-                                        className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                                        title="Sair do Sistema"
-                                    >
-                                        <LogOutIcon className="w-5 h-5" />
-                                    </button>
+                                    <div className="w-8 h-8 rounded-full overflow-hidden border border-gray-300 shadow-sm flex items-center justify-center">
+                                        <UserButton afterSignOutUrl="/" />
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -158,18 +154,19 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, userRole, onLo
                                 </button>
                             ))}
 
-                            {userRole && onLogout && (
+                            {userRole && (
                                 <>
                                     <div className="my-2 border-t border-gray-100"></div>
-                                    <div className="px-4 py-2 mb-2 bg-blue-50 rounded-lg border border-blue-100 flex justify-between items-center">
-                                        <span className="text-sm text-brand-dark font-medium">Perfil: <strong>{userRole}</strong></span>
+                                    <div className="px-4 py-3 mb-2 bg-blue-50 rounded-lg border border-blue-100 flex justify-between items-center">
+                                        <span className="text-sm text-brand-dark font-medium">Perfil de Acesso:</span>
+                                        <span className="text-sm font-bold text-brand-blue">{userRole}</span>
                                     </div>
-                                    <button
-                                        onClick={() => { onLogout(); setIsMenuOpen(false); }}
-                                        className="flex items-center justify-center px-4 py-3 bg-red-50 text-red-600 font-bold rounded-xl hover:bg-red-100 transition-colors"
-                                    >
-                                        Sair do Sistema
-                                    </button>
+                                    <div className="flex items-center px-4 py-2 mt-2 gap-3">
+                                        <span className="w-full text-center text-sm text-gray-400 font-medium pr-2 border-r">
+                                            Gerenciar conta:
+                                        </span>
+                                        <UserButton afterSignOutUrl="/" />
+                                    </div>
                                 </>
                             )}
                         </div>
