@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, UserRole } from '../types';
-import { DashboardIcon, CheckCircleIcon, UsersIcon, CalendarIcon, BookOpenIcon, LogOutIcon, UserPlusIcon, MoreHorizontalIcon, FileTextIcon } from './icons';
+import { DashboardIcon, CheckCircleIcon, UsersIcon, CalendarIcon, BookOpenIcon, LogOutIcon, UserPlusIcon, MoreHorizontalIcon, FileTextIcon, ShieldIcon } from './icons';
 import { LOGO_URL } from '../constants';
 import { UserButton } from '@clerk/clerk-react';
 
@@ -53,6 +53,10 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, userRole }) =>
         { view: View.Dismissal, icon: <LogOutIcon />, label: "Saída" },
     ];
 
+    if (userRole === 'Pastor' || userRole === 'Coordenadora') {
+        navItems.push({ view: View.Admin, icon: <ShieldIcon />, label: "Acessos" });
+    }
+
     const mainMobileItems = [
         { view: View.Dashboard, icon: <DashboardIcon />, label: "Início" },
         { view: View.Attendance, icon: <CheckCircleIcon />, label: "Presença" },
@@ -66,6 +70,10 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, userRole }) =>
         { view: View.Reports, icon: <FileTextIcon />, label: "Relatórios" },
         { view: View.Dismissal, icon: <LogOutIcon />, label: "Saída" },
     ];
+
+    if (userRole === 'Pastor' || userRole === 'Coordenadora') {
+        extraMobileItems.push({ view: View.Admin, icon: <ShieldIcon />, label: "Acessos" });
+    }
 
     return (
         <>

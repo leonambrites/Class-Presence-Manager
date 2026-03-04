@@ -61,6 +61,15 @@ export enum View {
   Topics = 'Assuntos',
   Dismissal = 'Saída',
   Reports = 'Relatórios',
+  Admin = 'Acessos',
+}
+
+export interface ClerkUser {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: UserRole;
 }
 
 export type UserRole = 'Pastor' | 'Coordenadora' | 'Supervisora' | 'Ministra';
