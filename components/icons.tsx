@@ -88,3 +88,9 @@ export const FileTextIcon = (props: React.ComponentProps<'svg'>) => (
     <polyline points="10 9 9 9 8 9"></polyline>
   </svg>
 );
+
+export const ShieldIcon = (props: React.ComponentProps<'svg'>) => (
+  <svg {...iconProps} {...props}>
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+  </svg>
+);

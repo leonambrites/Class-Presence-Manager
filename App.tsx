@@ -9,6 +9,7 @@ import Volunteers from './components/Volunteers';
 import Topics from './components/Topics';
 import Reports from './components/Reports';
 import Dismissal from './components/Dismissal';
+import Admin from './components/Admin';
 import { SignedIn, SignedOut, SignIn, useUser } from '@clerk/clerk-react';
 import {
     INITIAL_STUDENTS,
@@ -625,6 +626,8 @@ const App: React.FC = () => {
                 return <Reports students={students} volunteers={volunteers} schedule={schedule} />;
             case View.Dismissal:
                 return <Dismissal students={students} onDismiss={handleDismiss} selectedClass={selectedClass} onClassChange={setSelectedClass} userRole={userRole!} />;
+            case View.Admin:
+                return <Admin userRole={userRole!} />;
             default:
                 return <Dashboard students={students} selectedClass={selectedClass} onClassChange={setSelectedClass} onSaveData={handleSaveData} userRole={userRole!} />;
         }

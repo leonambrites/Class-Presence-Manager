@@ -1,4 +1,10 @@
 import express from 'express';
+import dotenv from 'dotenv';
+
+// Load local variables for local development
+dotenv.config({ path: '.env.local' });
+dotenv.config(); // fallback to .env if any
+
 import { dbService } from './dbService';
 import { INITIAL_STUDENTS, INITIAL_VOLUNTEERS, INITIAL_SCHEDULE, INITIAL_TOPICS } from '../constants';
 import { initDb } from './database';
@@ -8,6 +14,64 @@ initDb().catch(console.error);
 
 const app = express();
 app.use(express.json({ limit: '10mb' }) as any); // Increased limit for full data sync
+
+// --- Clerk Admin Endpoints ---
+const CLERK_SECRET_KEY = process.env.CLERK_SECRET_KEY;
+
+// GET Clerk Users
+app.get('/api/users', async (req, res) => {
+    try {
+        if (!CLERK_SECRET_KEY) throw new Error('Missing CLERK_SECRET_KEY');
+        const response = await fetch('https://api.clerk.com/v1/users?limit=100', {
+            headers: {
+                'Authorization': `Bearer ${CLERK_SECRET_KEY}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) throw new Error("Failed to fetch Clerk users");
+        const users = await response.json();
+
+        // Map to a cleaner format
+        const mappedUsers = users.map((u: any) => ({
+            id: u.id,
+            email: u.email_addresses?.[0]?.email_address || '',
+            firstName: u.first_name || '',
+            lastName: u.last_name || '',
+            role: u.public_metadata?.role || 'Ministra'
+        }));
+
+        res.status(200).json(mappedUsers);
+    } catch (error) {
+        console.error("Error fetching Clerk users:", error);
+        res.status(500).json({ error: "Failed to fetch users" });
+    }
+});
+
+// PATCH Clerk User Role
+app.patch('/api/users/:id/role', async (req, res) => {
+    try {
+        if (!CLERK_SECRET_KEY) throw new Error('Missing CLERK_SECRET_KEY');
+        const { id } = req.params;
+        const { role } = req.body;
+
+        const response = await fetch(`https://api.clerk.com/v1/users/${id}/metadata`, {
+            method: 'PATCH',
+            headers: {
+                'Authorization': `Bearer ${CLERK_SECRET_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                public_metadata: { role }
+            })
+        });
+
+        if (!response.ok) throw new Error("Failed to update Clerk user metadata");
+        res.status(200).json({ message: "Role updated successfully" });
+    } catch (error) {
+        console.error("Error updating Clerk user role:", error);
+        res.status(500).json({ error: "Failed to update role" });
+    }
+});
 
 // --- API Endpoints ---
 
