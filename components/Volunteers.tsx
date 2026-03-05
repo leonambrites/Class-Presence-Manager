@@ -49,6 +49,37 @@ const Volunteers: React.FC<VolunteersProps> = ({ volunteers, onAddVolunteer, onE
         });
     }, [volunteers, filterClass, filterType, filterTeam]);
 
+    const [sortConfig, setSortConfig] = useState<{ key: keyof Volunteer; direction: 'asc' | 'desc' } | null>(null);
+
+    const sortedVolunteers = useMemo(() => {
+        let sortableItems = [...filteredVolunteers];
+        if (sortConfig !== null) {
+            sortableItems.sort((a, b) => {
+                const valA = (a[sortConfig.key] || '').toString().toLowerCase();
+                const valB = (b[sortConfig.key] || '').toString().toLowerCase();
+
+                // Standard string comparison
+                if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
+                if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+        }
+        return sortableItems;
+    }, [filteredVolunteers, sortConfig]);
+
+    const handleSort = (key: keyof Volunteer) => {
+        let direction: 'asc' | 'desc' = 'asc';
+        if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
+            direction = 'desc';
+        }
+        setSortConfig({ key, direction });
+    };
+
+    const SortIndicator = ({ columnKey }: { columnKey: keyof Volunteer }) => {
+        if (!sortConfig || sortConfig.key !== columnKey) return <span className="text-gray-300 ml-1">↕</span>;
+        return <span className="text-brand-blue ml-1 font-bold">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>;
+    };
+
     const openAddModal = () => {
         setEditingVolunteer(null);
         setName('');
@@ -141,24 +172,24 @@ const Volunteers: React.FC<VolunteersProps> = ({ volunteers, onAddVolunteer, onE
             </div>
 
             <div className="bg-white rounded-xl shadow-lg p-2 sm:p-4">
-                <h3 className="text-xl font-bold text-gray-800 p-4 border-b">Lista ({filteredVolunteers.length})</h3>
+                <h3 className="text-xl font-bold text-gray-800 p-4 border-b">Lista ({sortedVolunteers.length})</h3>
 
                 {/* Desktop Table View */}
                 <div className="hidden md:block overflow-x-auto">
-                    {filteredVolunteers.length > 0 ? (
+                    {sortedVolunteers.length > 0 ? (
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome do Voluntário</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Turma</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Equipe (Supervisora)</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contato</th>
+                                    <th scope="col" onClick={() => handleSort('name')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none">Nome do Voluntário <SortIndicator columnKey="name" /></th>
+                                    <th scope="col" onClick={() => handleSort('class')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none">Turma <SortIndicator columnKey="class" /></th>
+                                    <th scope="col" onClick={() => handleSort('type')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none">Tipo <SortIndicator columnKey="type" /></th>
+                                    <th scope="col" onClick={() => handleSort('team')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none">Equipe (Supervisora) <SortIndicator columnKey="team" /></th>
+                                    <th scope="col" onClick={() => handleSort('phone')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none">Contato <SortIndicator columnKey="phone" /></th>
                                     <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
-                                {filteredVolunteers.map(v => (
+                                {sortedVolunteers.map(v => (
                                     <tr key={v.id}>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="text-sm font-medium text-gray-900">{v.name}</div>
@@ -196,8 +227,8 @@ const Volunteers: React.FC<VolunteersProps> = ({ volunteers, onAddVolunteer, onE
 
                 {/* Mobile Card View */}
                 <div className="md:hidden space-y-4 p-4">
-                    {filteredVolunteers.length > 0 ? (
-                        filteredVolunteers.map(v => (
+                    {sortedVolunteers.length > 0 ? (
+                        sortedVolunteers.map(v => (
                             <div key={v.id} className="bg-gray-50 p-4 rounded-lg shadow">
                                 <p className="text-lg font-bold text-gray-900">{v.name}</p>
                                 <div className="mt-4 border-t pt-3 space-y-1">
