@@ -5,6 +5,7 @@ import csv from 'csv-parser';
 import dotenv from 'dotenv';
 import { neon } from '@neondatabase/serverless';
 
+dotenv.config({ path: '.env.local' });
 dotenv.config();
 
 const csvFilePath = path.join(__dirname, '../escala.csv');
@@ -22,24 +23,29 @@ interface CsvRow {
     team: string;
 }
 
+const MONTH_MAP: Record<string, string> = {
+    'jan': '01', 'fev': '02', 'mar': '03', 'abr': '04',
+    'mai': '05', 'jun': '06', 'jul': '07', 'ago': '08',
+    'sep': '09', 'set': '09', 'out': '10', 'nov': '11', 'dez': '12'
+};
+
 const parseDate = (dn: string): string => {
     if (!dn) return '';
     const parts = dn.trim().split('/');
     if (parts.length === 3) {
-        // Assume DD/MM/YYYY into YYYY-MM-DD
         let year = parts[2];
-        if (year.length === 2) year = '20' + year; // handle "26" as "2026"
+        if (year.length === 2) year = '20' + year;
         return `${year}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
     }
     if (parts.length === 2) {
-        // Assume DD/MM into YYYY-MM-DD for current year
         const currentYear = new Date().getFullYear();
-        return `${currentYear}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+        let month = parts[1].toLowerCase();
+        month = MONTH_MAP[month] || month.padStart(2, '0');
+        return `${currentYear}-${month}-${parts[0].padStart(2, '0')}`;
     }
-    // Handle natively properly formatted cases
     if (dn.includes('-')) {
         const parts2 = dn.trim().split('-');
-        if (parts2.length === 3 && parts2[0].length === 4) return dn.trim(); // YYYY-MM-DD
+        if (parts2.length === 3 && parts2[0].length === 4) return dn.trim();
     }
     return dn.trim();
 };
@@ -53,9 +59,9 @@ const importSchedule = async () => {
     const entriesToInsert: any[] = [];
     console.log('Lendo dados do arquivo CSV...');
 
-    fs.createReadStream(csvFilePath)
-        // Standardize headers to lowercase to match "date, class, team" as specified by user
-        .pipe(csv({ separator: ';', mapHeaders: ({ header }) => header.trim().toLowerCase().replace(/^[\uFEFF\u200B]+/, '') }))
+    fs.createReadStream(csvFilePath, { encoding: 'latin1' })
+        // Use tab separator instead of ;
+        .pipe(csv({ separator: '\t', mapHeaders: ({ header }) => header.trim().toLowerCase().replace(/^[\uFEFF\u200B]+/, '') }))
         .on('data', (row: any) => {
             // Check for potential fallback column names if "date" or "class" didn't match perfectly
             const rowDate = row.date || row.data || row.dia;

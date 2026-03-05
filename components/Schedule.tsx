@@ -145,9 +145,34 @@ const Schedule: React.FC<ScheduleProps> = ({ schedule, volunteers, selectedClass
         return entryDate === selectedDate;
     });
 
-    const filteredSchedule = selectedClass === 'All'
+    let filteredSchedule = selectedClass === 'All'
         ? scheduleForDate
         : scheduleForDate.filter(s => s.className === selectedClass);
+
+    // Sort by specific class hierarchy
+    const CLASS_ORDER = [
+        "Maternal",
+        "2 a 3 anos",
+        "4 a 5 anos",
+        "6 a 7 anos",
+        "8 a 10 anos"
+    ];
+
+    filteredSchedule.sort((a, b) => {
+        const indexA = CLASS_ORDER.indexOf(a.className);
+        const indexB = CLASS_ORDER.indexOf(b.className);
+
+        // If both exist in our explicit list, sort by the array index
+        if (indexA !== -1 && indexB !== -1) {
+            return indexA - indexB;
+        }
+        // If one is missing from the list, push it to the bottom
+        if (indexA === -1 && indexB !== -1) return 1;
+        if (indexA !== -1 && indexB === -1) return -1;
+
+        // Fallback to alphabetical for any unknown string
+        return a.className.localeCompare(b.className);
+    });
 
     const handleSaveForm = (data: any) => {
         if (data.id) {
