@@ -62,6 +62,50 @@ const DailyView: React.FC<DashboardProps & { date: string; setDate: (date: strin
         return { name: '', important: false };
     }, [date]);
 
+    // --- Birthday Logic ---
+    const { birthdaysToday, birthdaysThisWeek } = useMemo(() => {
+        const today = new Date(date + 'T00:00:00');
+        const todayMonth = today.getMonth();
+        const todayDay = today.getDate();
+        const todayDayOfWeek = today.getDay(); // 0=Sun
+
+        // Calculate the start (Sunday) and end (Saturday) of the current week
+        const weekStart = new Date(today);
+        weekStart.setDate(today.getDate() - todayDayOfWeek);
+        const weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekStart.getDate() + 6);
+
+        const bToday: Student[] = [];
+        const bWeek: Student[] = [];
+
+        studentsToDisplay.forEach(s => {
+            if (!s.birthday) return;
+            const bd = new Date(s.birthday + 'T00:00:00');
+            if (isNaN(bd.getTime())) return;
+            const bdMonth = bd.getMonth();
+            const bdDay = bd.getDate();
+
+            if (bdMonth === todayMonth && bdDay === todayDay) {
+                bToday.push(s);
+            } else {
+                // Check if birthday falls within same week (compare month/day)
+                for (let d = new Date(weekStart); d <= weekEnd; d.setDate(d.getDate() + 1)) {
+                    if (d.getMonth() === bdMonth && d.getDate() === bdDay) {
+                        // Exclude today since those are in bToday
+                        if (!(d.getMonth() === todayMonth && d.getDate() === todayDay)) {
+                            bWeek.push(s);
+                        }
+                        break;
+                    }
+                }
+            }
+        });
+
+        return { birthdaysToday: bToday, birthdaysThisWeek: bWeek };
+    }, [studentsToDisplay, date]);
+
+    const hasBirthdays = birthdaysToday.length > 0 || birthdaysThisWeek.length > 0;
+
     return (
         <div>
             <div className="flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-center mb-6">
@@ -88,6 +132,52 @@ const DailyView: React.FC<DashboardProps & { date: string; setDate: (date: strin
                     </select>
                 </div>
             </div>
+
+            {/* Birthday Notifications */}
+            {hasBirthdays && (
+                <div className="mb-8 bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl p-5 border border-pink-200 shadow-sm">
+                    {birthdaysToday.length > 0 && (
+                        <div className="mb-4">
+                            <h3 className="text-lg font-bold text-pink-700 mb-3 flex items-center gap-2">
+                                <span className="text-2xl">🎂</span> Aniversariantes de Hoje!
+                            </h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                {birthdaysToday.map(s => (
+                                    <div key={s.id} className="bg-white rounded-lg p-4 border-2 border-pink-300 shadow-md flex items-center gap-3 animate-pulse-once">
+                                        <div className="text-3xl">🎉</div>
+                                        <div>
+                                            <p className="font-bold text-gray-900">{s.name}</p>
+                                            <p className="text-sm text-gray-500">{s.class} — {calculateAge(s.birthday, s.age)} anos hoje!</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    {birthdaysThisWeek.length > 0 && (
+                        <div>
+                            <h3 className="text-md font-semibold text-purple-600 mb-2 flex items-center gap-2">
+                                <span className="text-xl">🎁</span> Esta Semana
+                            </h3>
+                            <div className="flex flex-wrap gap-2">
+                                {birthdaysThisWeek.map(s => {
+                                    const bdDate = s.birthday ? new Date(s.birthday + 'T00:00:00') : null;
+                                    const bdFormatted = bdDate ? `${String(bdDate.getDate()).padStart(2, '0')}/${String(bdDate.getMonth() + 1).padStart(2, '0')}` : '';
+                                    return (
+                                        <div key={s.id} className="bg-white rounded-lg px-3 py-2 border border-purple-200 text-sm flex items-center gap-2 shadow-sm">
+                                            <span>🎁</span>
+                                            <span className="font-medium text-gray-800">{s.name}</span>
+                                            <span className="text-gray-400">({s.class})</span>
+                                            <span className="text-purple-600 font-semibold">{bdFormatted}</span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
                 <StatCard title="Total Presentes" value={totalPresent} color="bg-brand-blue" />
                 <StatCard title="Membros Presentes" value={presentMembers} color="bg-brand-green" />

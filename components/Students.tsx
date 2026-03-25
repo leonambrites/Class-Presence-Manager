@@ -1,8 +1,9 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Student, StudentType, UserRole } from '../types';
 import Modal from './Modal';
 import StudentForm from './StudentForm';
+import StudentProfile from './StudentProfile';
 import { SearchIcon, PlusCircleIcon, EditIcon, TrashIcon, UserPlusIcon } from './icons';
 import { CLASS_NAMES } from '../constants';
 import { calculateAge } from '../utils';
@@ -18,11 +19,33 @@ interface StudentsProps {
   userRole: UserRole;
 }
 
+// Helper: calculate days since last attendance
+const getDaysSinceLastAttendance = (student: Student): number | null => {
+    const presentDates = student.attendance
+        .filter(a => a.present)
+        .map(a => a.date)
+        .sort((a, b) => b.localeCompare(a));
+
+    if (presentDates.length === 0) return null;
+
+    const last = new Date(presentDates[0] + 'T00:00:00');
+    const now = new Date();
+    return Math.floor((now.getTime() - last.getTime()) / (1000 * 60 * 60 * 24));
+};
+
+const InactivityBadge: React.FC<{ days: number | null }> = ({ days }) => {
+    if (days === null) return <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-gray-100 text-gray-500">Sem registro</span>;
+    if (days >= 30) return <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-red-100 text-red-700 animate-pulse">⚠ {days}d ausente</span>;
+    if (days >= 14) return <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-orange-100 text-orange-700">{days}d ausente</span>;
+    return null;
+};
+
 const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStudent, onDeleteStudent, onMakeMember, selectedClass, onClassChange, userRole }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
-  const [activeTab, setActiveTab] = useState<StudentType>(StudentType.Membro);
+  const [profileStudent, setProfileStudent] = useState<Student | null>(null);
+  const [activeTab, setActiveTab] = useState<StudentType | 'Inativos'>(StudentType.Membro);
 
   const today = new Date().toISOString().split('T')[0];
 
@@ -30,12 +53,39 @@ const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStude
     ? students
     : students.filter(s => s.class === selectedClass);
 
-  const filteredStudents = studentsForClass
-    .filter(s => s.type === activeTab)
-    .filter(s =>
-      s.name.toLowerCase().includes(searchTerm.toLowerCase()) || s.phone.includes(searchTerm)
-    )
-    .sort((a, b) => a.name.localeCompare(b.name));
+  const filteredStudents = useMemo(() => {
+    let list = studentsForClass;
+
+    if (activeTab === 'Inativos') {
+      // Show members absent 14+ days, sorted by longest absence
+      list = list
+        .filter(s => s.type === StudentType.Membro)
+        .filter(s => {
+          const days = getDaysSinceLastAttendance(s);
+          return days === null || days >= 14;
+        })
+        .sort((a, b) => {
+          const dA = getDaysSinceLastAttendance(a) ?? 9999;
+          const dB = getDaysSinceLastAttendance(b) ?? 9999;
+          return dB - dA;
+        });
+    } else {
+      list = list.filter(s => s.type === activeTab);
+    }
+
+    return list
+      .filter(s =>
+        s.name.toLowerCase().includes(searchTerm.toLowerCase()) || s.phone.includes(searchTerm)
+      )
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [studentsForClass, activeTab, searchTerm]);
+
+  const inactiveCount = useMemo(() => {
+    return studentsForClass
+      .filter(s => s.type === StudentType.Membro)
+      .filter(s => { const d = getDaysSinceLastAttendance(s); return d === null || d >= 14; })
+      .length;
+  }, [studentsForClass]);
 
   const handleOpenAddModal = () => {
     setEditingStudent(null);
@@ -45,6 +95,10 @@ const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStude
   const handleOpenEditModal = (student: Student) => {
     setEditingStudent(student);
     setIsModalOpen(true);
+  };
+
+  const handleOpenProfile = (student: Student) => {
+    setProfileStudent(student);
   };
 
   const handleDelete = (student: Student) => {
@@ -109,6 +163,14 @@ const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStude
           <button onClick={() => setActiveTab(StudentType.Visitante)} className={`py-2 px-4 text-lg font-semibold transition-colors ${activeTab === StudentType.Visitante ? 'border-b-2 border-brand-blue text-brand-blue' : 'text-gray-500'}`}>
             Visitantes
           </button>
+          <button onClick={() => setActiveTab('Inativos')} className={`py-2 px-4 text-lg font-semibold transition-colors relative ${activeTab === 'Inativos' ? 'border-b-2 border-red-500 text-red-500' : 'text-gray-500'}`}>
+            Inativos
+            {inactiveCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                {inactiveCount}
+              </span>
+            )}
+          </button>
         </div>
 
         {/* Desktop Table */}
@@ -125,14 +187,17 @@ const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStude
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredStudents.map(student => (
+              {filteredStudents.map(student => {
+                const daysSince = getDaysSinceLastAttendance(student);
+                return (
                 <tr key={student.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <button onClick={() => handleOpenEditModal(student)} className="text-left hover:text-brand-blue transition-colors">
+                    <button onClick={() => handleOpenProfile(student)} className="text-left hover:text-brand-blue transition-colors">
                       <div className="text-sm font-medium text-gray-900">{student.name}</div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-gray-500 flex items-center gap-2">
                         {calculateAge(student.birthday, student.age)} anos
-                        {student.birthday && <span className="ml-1 text-xs text-gray-400">({new Date(student.birthday).toLocaleDateString('pt-BR')})</span>}
+                        {student.birthday && <span className="text-xs text-gray-400">({new Date(student.birthday).toLocaleDateString('pt-BR')})</span>}
+                        <InactivityBadge days={daysSince} />
                       </div>
                     </button>
                   </td>
@@ -168,22 +233,25 @@ const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStude
                     </div>
                   </td>
                 </tr>
-              ))}
+              );})}
             </tbody>
           </table>
         </div>
 
         {/* Mobile Card List */}
         <div className="md:hidden space-y-4">
-          {filteredStudents.map(student => (
+          {filteredStudents.map(student => {
+            const daysSince = getDaysSinceLastAttendance(student);
+            return (
             <div key={student.id} className="bg-gray-50 p-4 rounded-lg shadow">
               <div className="flex justify-between items-start">
-                <button onClick={() => handleOpenEditModal(student)} className="text-left">
-                  <div className="flex items-center gap-2">
+                <button onClick={() => handleOpenProfile(student)} className="text-left">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <p className="text-lg font-bold text-gray-900 hover:text-brand-blue transition-colors">{student.name}</p>
                     {student.hasAllergy && (
                       <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-700 tracking-wider">ALERGIA</span>
                     )}
+                    <InactivityBadge days={daysSince} />
                   </div>
                   <p className="text-sm text-gray-500">
                     {calculateAge(student.birthday, student.age)} anos
@@ -215,7 +283,8 @@ const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStude
                 )}
               </div>
             </div>
-          ))}
+          );
+          })}
         </div>
 
         {filteredStudents.length === 0 && (
@@ -230,6 +299,14 @@ const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStude
           initialData={editingStudent}
         />
       </Modal>
+
+      {/* Student Profile Modal */}
+      {profileStudent && (
+        <StudentProfile
+          student={profileStudent}
+          onClose={() => setProfileStudent(null)}
+        />
+      )}
     </div>
   );
 };
