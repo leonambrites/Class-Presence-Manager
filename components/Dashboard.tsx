@@ -163,12 +163,14 @@ const DailyView: React.FC<DashboardProps & { date: string; setDate: (date: strin
                                 {birthdaysThisWeek.map(s => {
                                     const bdDate = s.birthday ? new Date(s.birthday + 'T00:00:00') : null;
                                     const bdFormatted = bdDate ? `${String(bdDate.getDate()).padStart(2, '0')}/${String(bdDate.getMonth() + 1).padStart(2, '0')}` : '';
+                                    const turningAge = bdDate ? new Date().getFullYear() - bdDate.getFullYear() : null;
                                     return (
                                         <div key={s.id} className="bg-white rounded-lg px-3 py-2 border border-purple-200 text-sm flex items-center gap-2 shadow-sm">
                                             <span>🎁</span>
                                             <span className="font-medium text-gray-800">{s.name}</span>
                                             <span className="text-gray-400">({s.class})</span>
                                             <span className="text-purple-600 font-semibold">{bdFormatted}</span>
+                                            {turningAge !== null && <span className="text-pink-500 font-bold text-xs">→ {turningAge} anos</span>}
                                         </div>
                                     );
                                 })}
