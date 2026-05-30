@@ -34,14 +34,16 @@ const getDayFromDate = (dateString: string): 'Sunday' | 'Wednesday' | null => {
     return null;
 }
 
-const DailyView: React.FC<DashboardProps & { date: string; setDate: (date: string) => void }> = ({ students, selectedClass, onClassChange, date, setDate }) => {
+const DailyView: React.FC<DashboardProps & { startDate: string; setStartDate: (date: string) => void; endDate: string; setEndDate: (date: string) => void }> = ({ students, selectedClass, onClassChange, startDate, setStartDate, endDate, setEndDate }) => {
     const studentsToDisplay = selectedClass === 'All'
         ? students
         : students.filter(s => s.class === selectedClass);
 
-    const presentStudents = studentsToDisplay
-        .filter(s => s.attendance.some(a => a.date === date && a.present))
-        .sort((a, b) => a.name.localeCompare(b.name));
+    const presentStudents = useMemo(() => {
+        return studentsToDisplay
+            .filter(s => s.attendance.some(a => a.date >= startDate && a.date <= endDate && a.present))
+            .sort((a, b) => a.name.localeCompare(b.name));
+    }, [studentsToDisplay, startDate, endDate]);
 
     const presentMembers = presentStudents.filter(s => s.type === StudentType.Membro).length;
     const presentVisitors = presentStudents.filter(s => s.type === StudentType.Visitante).length;
@@ -50,21 +52,23 @@ const DailyView: React.FC<DashboardProps & { date: string; setDate: (date: strin
     const getClassPresence = (className: string) => {
         return students.filter(s =>
             s.class === className &&
-            s.attendance.some(a => a.date === date && a.present)
+            s.attendance.some(a => a.date >= startDate && a.date <= endDate && a.present)
         ).length;
     };
     const classColors = ['bg-red-400', 'bg-orange-400', 'bg-amber-400', 'bg-lime-500', 'bg-cyan-500', 'bg-violet-500'];
 
     const selectedDay = useMemo(() => {
-        const day = getDayFromDate(date);
-        if (day === 'Sunday') return { name: 'Domingo', important: true };
-        if (day === 'Wednesday') return { name: 'Quarta-feira', important: false };
+        if (startDate === endDate) {
+            const day = getDayFromDate(startDate);
+            if (day === 'Sunday') return { name: 'Domingo', important: true };
+            if (day === 'Wednesday') return { name: 'Quarta-feira', important: false };
+        }
         return { name: '', important: false };
-    }, [date]);
+    }, [startDate, endDate]);
 
     // --- Birthday Logic ---
     const { birthdaysToday, birthdaysThisWeek } = useMemo(() => {
-        const today = new Date(date + 'T00:00:00');
+        const today = new Date(endDate + 'T00:00:00');
         const todayMonth = today.getMonth();
         const todayDay = today.getDate();
         const todayDayOfWeek = today.getDay(); // 0=Sun
@@ -102,25 +106,53 @@ const DailyView: React.FC<DashboardProps & { date: string; setDate: (date: strin
         });
 
         return { birthdaysToday: bToday, birthdaysThisWeek: bWeek };
-    }, [studentsToDisplay, date]);
+    }, [studentsToDisplay, endDate]);
 
     const hasBirthdays = birthdaysToday.length > 0 || birthdaysThisWeek.length > 0;
 
+    const presentOccurrences = useMemo(() => {
+        const occurrences: { student: Student; date: string; dailyCode?: number }[] = [];
+        studentsToDisplay.forEach(student => {
+            student.attendance.forEach(att => {
+                if (att.date >= startDate && att.date <= endDate && att.present) {
+                    occurrences.push({
+                        student,
+                        date: att.date,
+                        dailyCode: att.dailyCode
+                    });
+                }
+            });
+        });
+        return occurrences.sort((a, b) => b.date.localeCompare(a.date) || a.student.name.localeCompare(b.student.name));
+    }, [studentsToDisplay, startDate, endDate]);
+
     return (
         <div>
-            <div className="flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-center mb-6">
-                <div>
-                    <label htmlFor="date-select-dashboard" className="mr-2 text-sm font-medium text-gray-600">Data:</label>
-                    <input
-                        id="date-select-dashboard"
-                        type="date"
-                        value={date}
-                        onChange={e => setDate(e.target.value)}
-                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand-blue focus:border-brand-blue block w-full p-2"
-                    />
+            <div className="flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-end mb-6">
+                <div className="flex flex-col sm:flex-row gap-4">
+                    <div>
+                        <label htmlFor="start-date-dashboard" className="block text-sm font-medium text-gray-600 mb-1">De:</label>
+                        <input
+                            id="start-date-dashboard"
+                            type="date"
+                            value={startDate}
+                            onChange={e => setStartDate(e.target.value)}
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand-blue focus:border-brand-blue block w-full p-2"
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="end-date-dashboard" className="block text-sm font-medium text-gray-600 mb-1">Até:</label>
+                        <input
+                            id="end-date-dashboard"
+                            type="date"
+                            value={endDate}
+                            onChange={e => setEndDate(e.target.value)}
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand-blue focus:border-brand-blue block w-full p-2"
+                        />
+                    </div>
                 </div>
                 <div className="flex items-center">
-                    <label htmlFor="class-select-dashboard" className="mr-2 text-sm font-medium text-gray-600">Turma:</label>
+                    <label htmlFor="class-select-dashboard" className="mr-2 text-sm font-medium text-gray-600 shrink-0">Turma:</label>
                     <select
                         id="class-select-dashboard"
                         value={selectedClass}
@@ -204,20 +236,23 @@ const DailyView: React.FC<DashboardProps & { date: string; setDate: (date: strin
 
             <div className="mt-12 bg-white p-6 rounded-xl shadow-lg">
                 <h3 className="text-2xl font-bold text-brand-dark mb-4">
-                    Alunos Presentes em {new Date(date + 'T00:00:00').toLocaleDateString('pt-BR')}
+                    {startDate === endDate 
+                        ? `Alunos Presentes em ${new Date(startDate + 'T00:00:00').toLocaleDateString('pt-BR')}`
+                        : `Presenças no Período (${new Date(startDate + 'T00:00:00').toLocaleDateString('pt-BR')} a ${new Date(endDate + 'T00:00:00').toLocaleDateString('pt-BR')})`
+                    }
                     {selectedDay.name && (
                         <span className={`ml-3 text-lg font-semibold px-3 py-1 rounded-full ${selectedDay.important ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'}`}>
                             {selectedDay.name}{selectedDay.important && ' (Principal)'}
                         </span>
                     )}
                 </h3>
-                {presentStudents.length > 0 ? (
+                {presentOccurrences.length > 0 ? (
                     <ul className="divide-y divide-gray-200">
-                        {presentStudents.map(student => {
-                            const att = student.attendance.find(a => a.date === date);
-                            const displayCode = att?.dailyCode || '-';
+                        {presentOccurrences.map((occ, idx) => {
+                            const student = occ.student;
+                            const displayCode = occ.dailyCode || '-';
                             return (
-                                <li key={student.id} className="py-4 flex justify-between items-center bg-gray-50 hover:bg-gray-100 px-4 rounded-lg my-1 transition-colors">
+                                <li key={`${student.id}-${occ.date}-${idx}`} className="py-4 flex justify-between items-center bg-gray-50 hover:bg-gray-100 px-4 rounded-lg my-1 transition-colors">
                                     <div className="flex items-center gap-4">
                                         <div className="flex flex-col items-center justify-center bg-brand-blue text-white rounded-md p-2 min-w-14">
                                             <span className="text-xs font-semibold uppercase opacity-80">Cód</span>
@@ -225,7 +260,14 @@ const DailyView: React.FC<DashboardProps & { date: string; setDate: (date: strin
                                         </div>
                                         <div>
                                             <p className="text-lg font-medium text-gray-900">{student.name}</p>
-                                            <p className="text-sm text-gray-500">{student.class} - {calculateAge(student.birthday, student.age)} anos</p>
+                                            <p className="text-sm text-gray-500">
+                                                {student.class} - {calculateAge(student.birthday, student.age)} anos
+                                                {startDate !== endDate && (
+                                                    <span className="ml-2 font-semibold text-brand-purple">
+                                                        • {new Date(occ.date + 'T00:00:00').toLocaleDateString('pt-BR')}
+                                                    </span>
+                                                )}
+                                            </p>
                                         </div>
                                     </div>
                                     <span className={`px-3 py-1 text-sm font-semibold rounded-full ${student.type === StudentType.Membro ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
@@ -237,12 +279,12 @@ const DailyView: React.FC<DashboardProps & { date: string; setDate: (date: strin
                         })}
                     </ul>
                 ) : (
-                    <p className="text-center text-gray-500 py-8">Nenhum aluno presente na data selecionada.</p>
+                    <p className="text-center text-gray-500 py-8">Nenhum aluno presente no período selecionado.</p>
                 )}
             </div>
         </div>
     );
-}
+};
 
 const MonthlyView: React.FC<DashboardProps> = ({ students, selectedClass, onClassChange }) => {
     const [month, setMonth] = useState(new Date().getMonth() + 1);
@@ -427,15 +469,19 @@ const MonthlyView: React.FC<DashboardProps> = ({ students, selectedClass, onClas
 
 const Dashboard: React.FC<DashboardProps> = (props) => {
     const [viewMode, setViewMode] = useState<'daily' | 'monthly'>('daily');
-    const [dailyDate, setDailyDate] = useState(new Date().toISOString().split('T')[0]);
+    const today = new Date();
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(today.getDate() - 7);
+    const [startDate, setStartDate] = useState(sevenDaysAgo.toISOString().split('T')[0]);
+    const [endDate, setEndDate] = useState(today.toISOString().split('T')[0]);
 
     return (
         <div className="p-4 md:p-8">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
-                <h2 className="text-3xl font-bold text-brand-dark mb-4 sm:mb-0">Dashboard</h2>
+                <h2 className="text-3xl font-bold text-brand-dark mb-4 sm:mb-0">Home</h2>
                 <div className="flex bg-gray-200 rounded-lg p-1">
                     <button onClick={() => setViewMode('daily')} className={`px-4 py-2 text-sm font-semibold rounded-md transition-colors ${viewMode === 'daily' ? 'bg-white text-brand-blue shadow' : 'text-gray-600'}`}>
-                        Visão Diária
+                        Visão por Período
                     </button>
                     <button onClick={() => setViewMode('monthly')} className={`px-4 py-2 text-sm font-semibold rounded-md transition-colors ${viewMode === 'monthly' ? 'bg-white text-brand-blue shadow' : 'text-gray-600'}`}>
                         Visão Mensal
@@ -443,7 +489,17 @@ const Dashboard: React.FC<DashboardProps> = (props) => {
                 </div>
             </div>
 
-            {viewMode === 'daily' ? <DailyView {...props} date={dailyDate} setDate={setDailyDate} /> : <MonthlyView {...props} />}
+            {viewMode === 'daily' ? (
+                <DailyView
+                    {...props}
+                    startDate={startDate}
+                    setStartDate={setStartDate}
+                    endDate={endDate}
+                    setEndDate={setEndDate}
+                />
+            ) : (
+                <MonthlyView {...props} />
+            )}
 
             {/* Footer Actions */}
             <div className="mt-12 border-t pt-8 flex flex-col sm:flex-row justify-end gap-4 items-center">

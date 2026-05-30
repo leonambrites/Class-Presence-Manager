@@ -19,7 +19,7 @@ import {
 } from './constants';
 
 const App: React.FC = () => {
-    const [view, setView] = useState<View>(View.Dashboard);
+    const [view, setView] = useState<View>(View.Home);
 
     const [students, setStudents] = useState<Student[]>([]);
     const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
@@ -604,7 +604,7 @@ const App: React.FC = () => {
         }
 
         switch (view) {
-            case View.Dashboard:
+            case View.Home:
                 return <Dashboard
                     students={students}
                     selectedClass={selectedClass}

@@ -28,7 +28,7 @@ const getDayFromDate = (dateString: string): 'Sunday' | 'Wednesday' | null => {
 const Attendance: React.FC<AttendanceProps> = ({ students, onMarkPresence, onUnmarkPresence, onAddVisitor, selectedClass, onClassChange, userRole }) => {
     const [activeTab, setActiveTab] = useState<'Membro' | 'Visitante'>('Membro');
     const [searchTerm, setSearchTerm] = useState('');
-    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+    const date = useMemo(() => new Date().toISOString().split('T')[0], []);
     const [historyModalOpen, setHistoryModalOpen] = useState(false);
     const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
 
@@ -87,22 +87,20 @@ const Attendance: React.FC<AttendanceProps> = ({ students, onMarkPresence, onUnm
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
                 <h2 className="text-3xl font-bold text-brand-dark mb-4 sm:mb-0">Marcar Presença</h2>
                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-                    <div>
-                        <label htmlFor="date-select-attendance" className="mr-2 text-sm font-medium text-gray-600">
-                            Data da Aula:
-                            {selectedDay.name && (
-                                <span className={`ml-2 font-semibold ${selectedDay.important ? 'text-brand-purple' : 'text-gray-700'}`}>
-                                    {selectedDay.name}{selectedDay.important && ' (Principal)'}
-                                </span>
-                            )}
-                        </label>
-                        <input
-                            id="date-select-attendance"
-                            type="date"
-                            value={date}
-                            onChange={e => setDate(e.target.value)}
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand-blue focus:border-brand-blue block w-full p-2"
-                        />
+                    <div className="bg-white border border-gray-200 px-4 py-2 rounded-lg shadow-sm">
+                        <span className="text-sm font-medium text-gray-500 mr-2">Data de Hoje:</span>
+                        <span className="font-bold text-gray-800">
+                            {new Date(date + 'T00:00:00').toLocaleDateString('pt-BR')}
+                        </span>
+                        {selectedDay.name ? (
+                            <span className={`ml-2 px-2 py-0.5 text-xs font-semibold rounded-full ${selectedDay.important ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}`}>
+                                {selectedDay.name}
+                            </span>
+                        ) : (
+                            <span className="ml-2 px-2 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-800">
+                                Fora do dia de Aula
+                            </span>
+                        )}
                     </div>
                     <div className="flex items-center w-full">
                         <label htmlFor="class-select-attendance" className="mr-2 text-sm font-medium text-gray-600">Turma:</label>
@@ -119,6 +117,15 @@ const Attendance: React.FC<AttendanceProps> = ({ students, onMarkPresence, onUnm
                 </div>
             </div>
             <div className="w-full max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-6">
+                {!selectedDay.name && (
+                    <div className="mb-6 p-4 bg-amber-50 border-l-4 border-amber-500 rounded-r-xl text-amber-800 shadow-sm flex items-start gap-3">
+                        <span className="text-xl mt-0.5">⚠️</span>
+                        <div>
+                            <p className="font-bold text-amber-900">Marcação de Presença Desabilitada</p>
+                            <p className="text-sm text-amber-800">A chamada online e cadastro de novos alunos só podem ser realizados às **Quartas-feiras** ou **Domingos**. Hoje o painel está aberto apenas para consulta.</p>
+                        </div>
+                    </div>
+                )}
                 <div className="flex border-b mb-6">
                     <button onClick={() => setActiveTab('Membro')} className={`py-2 px-4 text-lg font-semibold transition-colors ${activeTab === 'Membro' ? 'border-b-2 border-brand-blue text-brand-blue' : 'text-gray-500'}`}>
                         Membro
@@ -159,14 +166,16 @@ const Attendance: React.FC<AttendanceProps> = ({ students, onMarkPresence, onUnm
                                             {isPresent ? (
                                                 <button
                                                     onClick={() => onUnmarkPresence(student.id, date)}
-                                                    className="px-4 py-1 bg-brand-yellow text-white rounded-full hover:bg-yellow-600 transition w-28 text-center"
+                                                    disabled={!selectedDay.name}
+                                                    className="px-4 py-1 bg-brand-yellow text-white rounded-full hover:bg-yellow-600 transition w-28 text-center disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-brand-yellow"
                                                 >
                                                     Desmarcar
                                                 </button>
                                             ) : (
                                                 <button
                                                     onClick={() => onMarkPresence(student.id, date)}
-                                                    className="px-4 py-1 bg-brand-green text-white rounded-full hover:bg-green-600 transition w-28 text-center"
+                                                    disabled={!selectedDay.name}
+                                                    className="px-4 py-1 bg-brand-green text-white rounded-full hover:bg-green-600 transition w-28 text-center disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-brand-green"
                                                 >
                                                     Marcar
                                                 </button>
@@ -184,7 +193,13 @@ const Attendance: React.FC<AttendanceProps> = ({ students, onMarkPresence, onUnm
                         {userRole !== 'Ministra' && (
                             <>
                                 <h3 className="text-xl font-semibold text-brand-dark mb-4">Cadastrar Novo Aluno (Visitante)</h3>
-                                <StudentForm onSubmit={handleAddVisitorSubmit} onCancel={() => setActiveTab('Membro')} />
+                                {!selectedDay.name ? (
+                                    <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg text-gray-500 mb-6 text-sm">
+                                        O cadastro de novos visitantes está desabilitado hoje pois não é um dia de aula (Domingo ou Quarta-feira).
+                                    </div>
+                                ) : (
+                                    <StudentForm onSubmit={handleAddVisitorSubmit} onCancel={() => setActiveTab('Membro')} />
+                                )}
                             </>
                         )}
 
@@ -208,14 +223,16 @@ const Attendance: React.FC<AttendanceProps> = ({ students, onMarkPresence, onUnm
                                                     {isPresent ? (
                                                         <button
                                                             onClick={() => onUnmarkPresence(visitor.id, date)}
-                                                            className="px-4 py-1 bg-brand-yellow text-white rounded-full hover:bg-yellow-600 transition w-28 text-center"
+                                                            disabled={!selectedDay.name}
+                                                            className="px-4 py-1 bg-brand-yellow text-white rounded-full hover:bg-yellow-600 transition w-28 text-center disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-brand-yellow"
                                                         >
                                                             Desmarcar
                                                         </button>
                                                     ) : (
                                                         <button
                                                             onClick={() => onMarkPresence(visitor.id, date)}
-                                                            className="px-4 py-1 bg-brand-green text-white rounded-full hover:bg-green-600 transition w-28 text-center"
+                                                            disabled={!selectedDay.name}
+                                                            className="px-4 py-1 bg-brand-green text-white rounded-full hover:bg-green-600 transition w-28 text-center disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-brand-green"
                                                         >
                                                             Marcar
                                                         </button>
