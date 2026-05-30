@@ -53,7 +53,7 @@ export interface Topic {
 }
 
 export enum View {
-  Dashboard = 'Dashboard',
+  Home = 'Home',
   Attendance = 'Presença',
   Students = 'Alunos',
   Schedule = 'Escala',

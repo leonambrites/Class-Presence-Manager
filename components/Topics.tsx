@@ -12,6 +12,12 @@ const Topics: React.FC<TopicsProps> = ({ topics, onAddTopic, userRole }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
 
+  const today = new Date();
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(today.getDate() - 30);
+  const [startDate, setStartDate] = useState(thirtyDaysAgo.toISOString().split('T')[0]);
+  const [endDate, setEndDate] = useState(today.toISOString().split('T')[0]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (title && description && date) {
@@ -21,11 +27,9 @@ const Topics: React.FC<TopicsProps> = ({ topics, onAddTopic, userRole }) => {
     }
   };
 
-  const todayStr = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD local timezone
-
   const sortedTopics = [...topics]
-    .filter(topic => topic.date >= todayStr)
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    .filter(topic => topic.date >= startDate && topic.date <= endDate)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   return (
     <div className="p-4 md:p-8">
@@ -55,7 +59,32 @@ const Topics: React.FC<TopicsProps> = ({ topics, onAddTopic, userRole }) => {
         )}
         <div className={userRole !== 'Ministra' ? "lg:col-span-2" : "lg:col-span-3"}>
           <div className="bg-white rounded-xl shadow-lg p-6">
-            <h3 className="text-xl font-semibold text-brand-dark mb-4">Histórico de Assuntos</h3>
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4 border-b pb-4">
+              <h3 className="text-xl font-semibold text-brand-dark">Histórico de Assuntos</h3>
+              <div className="flex gap-2 items-center">
+                <div>
+                  <label htmlFor="start-date-topics" className="sr-only">De</label>
+                  <input
+                    id="start-date-topics"
+                    type="date"
+                    value={startDate}
+                    onChange={e => setStartDate(e.target.value)}
+                    className="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-brand-blue"
+                  />
+                </div>
+                <span className="text-gray-400 text-sm">até</span>
+                <div>
+                  <label htmlFor="end-date-topics" className="sr-only">Até</label>
+                  <input
+                    id="end-date-topics"
+                    type="date"
+                    value={endDate}
+                    onChange={e => setEndDate(e.target.value)}
+                    className="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-brand-blue"
+                  />
+                </div>
+              </div>
+            </div>
             <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
               {sortedTopics.map((topic, index) => (
                 <div key={index} className="border-l-4 border-brand-purple bg-purple-50 p-4 rounded-r-lg">

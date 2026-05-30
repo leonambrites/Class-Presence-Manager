@@ -22,6 +22,7 @@ const ScheduleForm: React.FC<{
 }> = ({ initialData, date, volunteers, onSave, onCancel }) => {
     const [className, setClassName] = useState(initialData?.className || CLASS_NAMES[0]);
     const [selectedTeam, setSelectedTeam] = useState(initialData?.team || '');
+    const [formDate, setFormDate] = useState(initialData?.date ? initialData.date.split('T')[0] : date);
 
     const uniqueTeams = Array.from(new Set(volunteers.map(v => v.team).filter(Boolean) as string[])).sort();
 
@@ -29,7 +30,7 @@ const ScheduleForm: React.FC<{
         e.preventDefault();
         onSave({
             ...(initialData ? { id: initialData.id } : {}),
-            date,
+            date: formDate,
             className,
             team: selectedTeam,
             // Fallback empty values to match API
@@ -42,9 +43,13 @@ const ScheduleForm: React.FC<{
 
     return (
         <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg p-6 mb-8 border-2 border-brand-blue">
-            <h3 className="text-xl font-bold text-brand-dark mb-4">{initialData ? 'Editar Escala' : 'Nova Escala'} ({new Date(date + 'T00:00:00').toLocaleDateString('pt-BR')})</h3>
+            <h3 className="text-xl font-bold text-brand-dark mb-4">{initialData ? 'Editar Escala' : 'Nova Escala'}</h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div className="md:col-span-2">
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">Data da Escala</label>
+                    <input type="date" required value={formDate} onChange={e => setFormDate(e.target.value)} className="w-full p-2 border border-gray-300 rounded-md bg-white focus:ring-brand-blue focus:border-brand-blue" />
+                </div>
                 <div className="md:col-span-2 bg-blue-50 p-4 rounded-md border border-blue-200">
                     <label className="block text-sm font-semibold text-brand-blue mb-1">Equipe Responsável</label>
                     <select required value={selectedTeam} onChange={e => setSelectedTeam(e.target.value)} className="w-full p-2 border border-blue-300 rounded-md bg-white focus:ring-brand-blue focus:border-brand-blue">
@@ -107,7 +112,12 @@ const ScheduleCard: React.FC<{ entry: ScheduleEntry, volunteers: Volunteer[], on
                     <button onClick={onDelete} className="text-red-500 hover:text-red-700 text-sm font-medium">Excluir</button>
                 )}
             </div>
-            <h3 className="text-2xl font-bold text-brand-dark mb-1">{entry.className}</h3>
+            <h3 className="text-2xl font-bold text-brand-dark mb-1 flex items-center gap-3">
+                {entry.className}
+                <span className="text-xs font-semibold text-brand-purple bg-purple-50 px-2.5 py-1 rounded-full border border-purple-100">
+                    {new Date(entry.date.split('T')[0] + 'T00:00:00').toLocaleDateString('pt-BR')}
+                </span>
+            </h3>
             {entry.team && <div className="text-sm font-semibold text-brand-blue mb-4">Equipe {entry.team}</div>}
             <div className="space-y-3">
                 <div className="flex items-start">
@@ -134,7 +144,11 @@ const ScheduleCard: React.FC<{ entry: ScheduleEntry, volunteers: Volunteer[], on
 };
 
 const Schedule: React.FC<ScheduleProps> = ({ schedule, volunteers, selectedClass, onClassChange, onAddSchedule, onEditSchedule, onDeleteSchedule, userRole }) => {
-    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+    const today = new Date();
+    const sevenDaysLater = new Date();
+    sevenDaysLater.setDate(today.getDate() + 7);
+    const [startDate, setStartDate] = useState(today.toISOString().split('T')[0]);
+    const [endDate, setEndDate] = useState(sevenDaysLater.toISOString().split('T')[0]);
     const [isAdding, setIsAdding] = useState(false);
     const [editingEntry, setEditingEntry] = useState<ScheduleEntry | null>(null);
 
@@ -142,14 +156,14 @@ const Schedule: React.FC<ScheduleProps> = ({ schedule, volunteers, selectedClass
     const scheduleForDate = schedule.filter(s => {
         if (!s.date) return false;
         const entryDate = s.date.split('T')[0];
-        return entryDate === selectedDate;
+        return entryDate >= startDate && entryDate <= endDate;
     });
 
     let filteredSchedule = selectedClass === 'All'
         ? scheduleForDate
         : scheduleForDate.filter(s => s.className === selectedClass);
 
-    // Sort by specific class hierarchy
+    // Sort by date ascending, then by specific class hierarchy
     const CLASS_ORDER = [
         "Maternal",
         "2 a 3 anos",
@@ -159,6 +173,10 @@ const Schedule: React.FC<ScheduleProps> = ({ schedule, volunteers, selectedClass
     ];
 
     filteredSchedule.sort((a, b) => {
+        // First sort by date
+        const dateCompare = a.date.localeCompare(b.date);
+        if (dateCompare !== 0) return dateCompare;
+
         const indexA = CLASS_ORDER.indexOf(a.className);
         const indexB = CLASS_ORDER.indexOf(b.className);
 
@@ -202,14 +220,24 @@ const Schedule: React.FC<ScheduleProps> = ({ schedule, volunteers, selectedClass
             )}
 
             <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
                     <div>
-                        <label htmlFor="date-select" className="block text-sm font-medium text-gray-700 mb-1">Selecione a Data</label>
+                        <label htmlFor="start-date-schedule" className="block text-sm font-medium text-gray-700 mb-1">De:</label>
                         <input
-                            id="date-select"
+                            id="start-date-schedule"
                             type="date"
-                            value={selectedDate}
-                            onChange={e => setSelectedDate(e.target.value)}
+                            value={startDate}
+                            onChange={e => setStartDate(e.target.value)}
+                            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-blue"
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="end-date-schedule" className="block text-sm font-medium text-gray-700 mb-1">Até:</label>
+                        <input
+                            id="end-date-schedule"
+                            type="date"
+                            value={endDate}
+                            onChange={e => setEndDate(e.target.value)}
                             className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-blue"
                         />
                     </div>
@@ -231,7 +259,7 @@ const Schedule: React.FC<ScheduleProps> = ({ schedule, volunteers, selectedClass
             {(isAdding || editingEntry) && (
                 <ScheduleForm
                     initialData={editingEntry || undefined}
-                    date={selectedDate}
+                    date={endDate}
                     volunteers={volunteers}
                     onSave={handleSaveForm}
                     onCancel={() => { setIsAdding(false); setEditingEntry(null); }}
@@ -240,7 +268,10 @@ const Schedule: React.FC<ScheduleProps> = ({ schedule, volunteers, selectedClass
 
             <div>
                 <h3 className="text-2xl font-bold text-brand-dark mb-4">
-                    Escala para {new Date(selectedDate + 'T00:00:00').toLocaleDateString('pt-BR')}
+                    {startDate === endDate 
+                        ? `Escala para ${new Date(startDate + 'T00:00:00').toLocaleDateString('pt-BR')}`
+                        : `Escalas no Período (${new Date(startDate + 'T00:00:00').toLocaleDateString('pt-BR')} a ${new Date(endDate + 'T00:00:00').toLocaleDateString('pt-BR')})`
+                    }
                 </h3>
                 {filteredSchedule.length > 0 ? (
                     <div>

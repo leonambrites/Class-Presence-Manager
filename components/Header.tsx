@@ -43,7 +43,7 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, userRole }) =>
     };
 
     const navItems = [
-        { view: View.Dashboard, icon: <DashboardIcon />, label: "Dashboard" },
+        { view: View.Home, icon: <DashboardIcon />, label: "Home" },
         { view: View.Attendance, icon: <CheckCircleIcon />, label: "Presença" },
         { view: View.Students, icon: <UsersIcon />, label: "Alunos" },
         { view: View.Volunteers, icon: <UserPlusIcon />, label: "Professores" },
@@ -58,7 +58,7 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, userRole }) =>
     }
 
     const mainMobileItems = [
-        { view: View.Dashboard, icon: <DashboardIcon />, label: "Início" },
+        { view: View.Home, icon: <DashboardIcon />, label: "Home" },
         { view: View.Attendance, icon: <CheckCircleIcon />, label: "Presença" },
         { view: View.Students, icon: <UsersIcon />, label: "Alunos" },
         { view: View.Schedule, icon: <CalendarIcon />, label: "Escala" },
