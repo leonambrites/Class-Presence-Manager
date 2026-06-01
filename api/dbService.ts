@@ -137,12 +137,30 @@ export const dbService = {
         if (result.length === 0) throw new Error("Attendance record not found to dismiss");
     },
 
-    async addTopic(date: string, title: string, description: string) {
+    async addTopic(date: string, title: string, description: string, id?: string) {
         const sql = getSql();
+        const finalId = id || String(Date.now() + Math.floor(Math.random() * 1000));
         await sql`
             INSERT INTO topics (id, date, title, description, created_at)
-            VALUES (${String(Date.now())}, ${date}, ${title}, ${description}, ${getTimestamp()})
+            VALUES (${String(finalId)}, ${date}, ${title}, ${description}, ${getTimestamp()})
         `;
+    },
+
+    async updateTopic(id: string, date: string, title: string, description: string) {
+        const sql = getSql();
+        const result = await sql`
+            UPDATE topics 
+            SET date = ${date}, title = ${title}, description = ${description}
+            WHERE id = ${String(id)}
+            RETURNING id
+        `;
+        if (result.length === 0) throw new Error("Topic not found");
+    },
+
+    async deleteTopic(id: string) {
+        const sql = getSql();
+        const result = await sql`DELETE FROM topics WHERE id = ${String(id)} RETURNING id`;
+        if (result.length === 0) throw new Error("Topic not found");
     },
 
     async addVolunteer(volunteer: any) {

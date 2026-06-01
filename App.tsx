@@ -378,7 +378,7 @@ const App: React.FC = () => {
     }, [students, connectionStatus]);
 
     const handleAddTopic = useCallback(async (date: string, title: string, description: string) => {
-        const newTopic = { date, title, description };
+        const newTopic = { id: String(Date.now() + Math.floor(Math.random() * 1000)), date, title, description };
         const updatedTopics = [...topics, newTopic].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
         setTopics(updatedTopics);
         saveDataLocally('topics', updatedTopics);
@@ -397,6 +397,78 @@ const App: React.FC = () => {
             }
         } else {
             showNotification("Assunto salvo localmente.");
+        }
+    }, [topics, connectionStatus]);
+
+    const handleEditTopic = useCallback(async (id: string, date: string, title: string, description: string) => {
+        const updatedTopics = topics.map(t => t.id === id ? { ...t, date, title, description } : t);
+        setTopics(updatedTopics);
+        saveDataLocally('topics', updatedTopics);
+
+        if (connectionStatus === 'connected') {
+            try {
+                await fetch(`/api/topics/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ date, title, description })
+                });
+                showNotification(`Assunto "${title}" atualizado.`);
+            } catch (e) {
+                setConnectionStatus('offline');
+                showNotification("Salvo localmente.");
+            }
+        } else {
+            showNotification("Assunto atualizado localmente.");
+        }
+    }, [topics, connectionStatus]);
+
+    const handleDeleteTopic = useCallback(async (id: string) => {
+        const tTitle = topics.find(t => t.id === id)?.title || 'Assunto';
+        if (!window.confirm(`Tem certeza que deseja excluir o assunto "${tTitle}"?`)) return;
+
+        const updatedTopics = topics.filter(t => t.id !== id);
+        setTopics(updatedTopics);
+        saveDataLocally('topics', updatedTopics);
+
+        if (connectionStatus === 'connected') {
+            try {
+                await fetch(`/api/topics/${id}`, { method: 'DELETE' });
+                showNotification(`Assunto excluído.`);
+            } catch (e) {
+                setConnectionStatus('offline');
+                showNotification("Excluído localmente.");
+            }
+        } else {
+            showNotification("Excluído localmente.");
+        }
+    }, [topics, connectionStatus]);
+
+    const handleImportTopics = useCallback(async (imported: Omit<Topic, 'id'>[]) => {
+        const newTopics = imported.map((item, idx) => ({
+            ...item,
+            id: String(Date.now() + Math.floor(Math.random() * 10000) + idx)
+        }));
+
+        const updatedTopics = [...topics, ...newTopics].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        setTopics(updatedTopics);
+        saveDataLocally('topics', updatedTopics);
+
+        if (connectionStatus === 'connected') {
+            try {
+                await Promise.all(newTopics.map(t => 
+                    fetch('/api/topics', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(t)
+                    })
+                ));
+                showNotification(`${newTopics.length} assuntos importados com sucesso!`);
+            } catch (e) {
+                setConnectionStatus('offline');
+                showNotification("Importação salva localmente.");
+            }
+        } else {
+            showNotification("Importação salva localmente.");
         }
     }, [topics, connectionStatus]);
 
@@ -621,7 +693,16 @@ const App: React.FC = () => {
             case View.Volunteers:
                 return <Volunteers volunteers={volunteers} onAddVolunteer={handleAddVolunteer} onEditVolunteer={handleEditVolunteer} onDeleteVolunteer={handleDeleteVolunteer} userRole={userRole!} />;
             case View.Topics:
-                return <Topics topics={topics} onAddTopic={handleAddTopic} userRole={userRole!} />;
+                return (
+                    <Topics 
+                        topics={topics} 
+                        onAddTopic={handleAddTopic} 
+                        onEditTopic={handleEditTopic} 
+                        onDeleteTopic={handleDeleteTopic} 
+                        onImportTopics={handleImportTopics} 
+                        userRole={userRole!} 
+                    />
+                );
             case View.Reports:
                 return <Reports students={students} volunteers={volunteers} schedule={schedule} />;
             case View.Dismissal:

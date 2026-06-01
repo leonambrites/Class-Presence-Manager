@@ -47,6 +47,7 @@ export interface ScheduleEntry {
 }
 
 export interface Topic {
+  id?: string;
   date: string;
   title: string;
   description: string;
