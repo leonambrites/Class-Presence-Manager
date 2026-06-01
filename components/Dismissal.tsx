@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Student, UserRole } from '../types';
 import { SearchIcon } from './icons';
 import { CLASS_NAMES } from '../constants';

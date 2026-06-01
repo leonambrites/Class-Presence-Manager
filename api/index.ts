@@ -1,5 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import path from 'path';
+import fs from 'fs';
 
 // Load local variables for local development
 dotenv.config({ path: '.env.local' });
@@ -166,13 +168,105 @@ app.delete('/api/students/:id', async (req, res) => {
 
 // Add Topic
 app.post('/api/topics', async (req, res) => {
-    const { date, title, description } = req.body;
+    const { id, date, title, description } = req.body;
     try {
-        await dbService.addTopic(date, title, description);
+        await dbService.addTopic(date, title, description, id);
         res.status(201).json({ message: 'Topic created' });
     } catch (error) {
         console.error("Error adding topic:", error);
         res.status(500).json({ error: "Failed to create topic" });
+    }
+});
+
+// Update Topic
+app.put('/api/topics/:id', async (req, res) => {
+    const { id } = req.params;
+    const { date, title, description } = req.body;
+    try {
+        await dbService.updateTopic(id, date, title, description);
+        res.status(200).json({ message: 'Topic updated' });
+    } catch (error) {
+        console.error("Error updating topic:", error);
+        res.status(500).json({ error: "Failed to update topic" });
+    }
+});
+
+// Delete Topic
+app.delete('/api/topics/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        await dbService.deleteTopic(id);
+        res.status(200).json({ message: 'Topic deleted' });
+    } catch (error) {
+        console.error("Error deleting topic:", error);
+        res.status(500).json({ error: "Failed to delete topic" });
+    }
+});
+
+// Download Lesson Plan (serves physical docx in /data/topics or compiles a fallback doc file)
+app.get('/api/download-lesson', async (req, res) => {
+    const { fileName, title, description, date, className } = req.query;
+    if (!fileName) {
+        return res.status(400).json({ error: 'Missing fileName parameter' });
+    }
+
+    const dataPath = path.join(process.cwd(), 'data', 'topics');
+    const filePath = path.join(dataPath, String(fileName));
+
+    try {
+        if (fs.existsSync(filePath)) {
+            res.download(filePath, String(fileName));
+        } else {
+            const tTitle = title ? String(title) : 'Assunto da Aula';
+            const tDesc = description ? String(description) : '';
+            const tDate = date ? String(date) : '';
+            const tClass = className ? String(className) : '';
+
+            const formattedDate = tDate ? new Date(tDate + 'T00:00:00').toLocaleDateString('pt-BR') : '';
+
+            const htmlContent = `
+                <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+                <head>
+                  <title>Aula - ${tTitle}</title>
+                  <style>
+                    body { font-family: Arial, sans-serif; line-height: 1.6; }
+                    h1 { color: #3B82F6; font-size: 24px; border-bottom: 2px solid #3B82F6; padding-bottom: 5px; }
+                    .meta-box { background-color: #F3F4F6; border: 1px solid #E5E7EB; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+                    .meta-item { margin-bottom: 5px; }
+                    .meta-label { font-weight: bold; color: #4B5563; }
+                    .content { font-size: 14px; color: #1F2937; }
+                    .section-title { font-size: 18px; font-weight: bold; color: #1F2937; border-bottom: 1px solid #E5E7EB; padding-bottom: 3px; margin-top: 25px; margin-bottom: 10px; }
+                  </style>
+                </head>
+                <body>
+                  <h1>AULA - MUNDO KIDS</h1>
+                  
+                  <div class="meta-box">
+                    <div class="meta-item"><span class="meta-label">Data da Aula:</span> ${formattedDate}</div>
+                    <div class="meta-item"><span class="meta-label">Turma:</span> ${tClass}</div>
+                    <div class="meta-item"><span class="meta-label">Assunto / Tema:</span> ${tTitle}</div>
+                  </div>
+                  
+                  <div class="section-title">Conteúdo / Descrição do Ensino</div>
+                  <div class="content">
+                    ${tDesc.replace(/\n/g, '<br/>')}
+                  </div>
+                  
+                  <div class="section-title">Anotações da Aula</div>
+                  <div class="content">
+                    <p style="color: #9CA3AF; font-style: italic;">Use este espaço para suas anotações pessoais durante a aplicação da aula...</p>
+                  </div>
+                </body>
+                </html>
+            `;
+
+            res.setHeader('Content-Type', 'application/msword');
+            res.setHeader('Content-Disposition', `attachment; filename="${String(fileName).replace(/\.docx$/, '.doc')}"`);
+            res.send('\ufeff' + htmlContent);
+        }
+    } catch (error) {
+        console.error("Download error:", error);
+        res.status(500).json({ error: "Failed to download lesson plan" });
     }
 });
 
