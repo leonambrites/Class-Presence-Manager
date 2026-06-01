@@ -210,11 +210,30 @@ app.get('/api/download-lesson', async (req, res) => {
         return res.status(400).json({ error: 'Missing fileName parameter' });
     }
 
-    const dataPath = path.join(process.cwd(), 'data', 'topics');
-    const filePath = path.join(dataPath, String(fileName));
+    const dataPathCapitalized = path.join(process.cwd(), 'data', 'Topics');
+    const dataPathLowercase = path.join(process.cwd(), 'data', 'topics');
+    
+    let filePath = path.join(dataPathCapitalized, String(fileName));
+    console.log(`[DOWNLOAD] Requesting file name: ${fileName}`);
+    console.log(`[DOWNLOAD] Checking path: ${filePath}`);
 
     try {
-        if (fs.existsSync(filePath)) {
+        let fileExists = fs.existsSync(filePath);
+        if (!fileExists) {
+            const fallbackPath = path.join(dataPathLowercase, String(fileName));
+            console.log(`[DOWNLOAD] Capitalized path not found. Checking lowercase path: ${fallbackPath}`);
+            if (fs.existsSync(fallbackPath)) {
+                filePath = fallbackPath;
+                fileExists = true;
+                console.log(`[DOWNLOAD] File found at lowercase path: ${filePath}`);
+            } else {
+                console.log(`[DOWNLOAD] File not found anywhere. Falling back to dynamic doc generation.`);
+            }
+        } else {
+            console.log(`[DOWNLOAD] File found at capitalized path: ${filePath}`);
+        }
+
+        if (fileExists) {
             res.download(filePath, String(fileName));
         } else {
             const tTitle = title ? String(title) : 'Assunto da Aula';
