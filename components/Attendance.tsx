@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Student, StudentType, UserRole } from '../types';
 import StudentForm from './StudentForm';
@@ -12,6 +11,9 @@ interface AttendanceProps {
     onMarkPresence: (studentId: string, date: string) => void;
     onUnmarkPresence: (studentId: string, date: string) => void;
     onAddVisitor: (formData: { name: string; class: string; age: number; guardianName: string; phone: string; birthday: string; hasAllergy?: boolean; allergyDescription?: string; }, date: string) => void;
+    onDismiss: (studentId: string, responsibleName: string, date: string) => void;
+    onUndoDismissal: (studentId: string, date: string) => void;
+    onToggleReadyToLeave: (studentId: string, date: string, readyToLeave: boolean) => void;
     selectedClass: string;
     onClassChange: (className: string) => void;
     userRole: UserRole;
@@ -25,14 +27,29 @@ const getDayFromDate = (dateString: string): 'Sunday' | 'Wednesday' | null => {
     return null;
 }
 
-const Attendance: React.FC<AttendanceProps> = ({ students, onMarkPresence, onUnmarkPresence, onAddVisitor, selectedClass, onClassChange, userRole }) => {
+const Attendance: React.FC<AttendanceProps> = ({ 
+    students, 
+    onMarkPresence, 
+    onUnmarkPresence, 
+    onAddVisitor, 
+    onDismiss,
+    onUndoDismissal,
+    onToggleReadyToLeave,
+    selectedClass, 
+    onClassChange, 
+    userRole 
+}) => {
     const [activeTab, setActiveTab] = useState<'Membro' | 'Visitante'>('Membro');
     const [searchTerm, setSearchTerm] = useState('');
     const date = useMemo(() => new Date().toISOString().split('T')[0], []);
     const [historyModalOpen, setHistoryModalOpen] = useState(false);
     const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
 
-    // Derive the selected student from the current students prop to ensure we always have the latest data (e.g., after marking presence)
+    // Modal state for releasing student
+    const [releasingStudent, setReleasingStudent] = useState<Student | null>(null);
+    const [guardianName, setGuardianName] = useState('');
+
+    // Derive the selected student from the current students prop to ensure we always have the latest data
     const selectedStudentForHistory = useMemo(() =>
         students.find(s => s.id === selectedStudentId) || null
         , [students, selectedStudentId]);
@@ -40,6 +57,15 @@ const Attendance: React.FC<AttendanceProps> = ({ students, onMarkPresence, onUnm
     const studentsForClass = selectedClass === 'All'
         ? students
         : students.filter(s => s.class === selectedClass);
+
+    // Filter active queue (Ready to leave, present today, not yet dismissed)
+    const awaitingReleaseStudents = useMemo(() => {
+        return students.filter(s => {
+            const classMatch = selectedClass === 'All' || s.class === selectedClass;
+            const todayAtt = s.attendance.find(a => a.date === date);
+            return classMatch && todayAtt && todayAtt.present && todayAtt.readyToLeave && !todayAtt.dismissedBy;
+        });
+    }, [students, selectedClass, date]);
 
     const filteredMembers = studentsForClass
         .filter(s =>
@@ -55,9 +81,15 @@ const Attendance: React.FC<AttendanceProps> = ({ students, onMarkPresence, onUnm
     const getStudentStatus = (student: Student) => {
         const attendanceForDate = student.attendance.find(a => a.date === date);
         if (attendanceForDate?.present) {
-            return <span className="text-green-600 font-semibold">Presente</span>;
+            if (attendanceForDate.dismissedBy) {
+                return <span className="text-emerald-600 font-bold text-xs bg-emerald-50 px-2 py-1 rounded border border-emerald-100">Entregue</span>;
+            }
+            if (attendanceForDate.readyToLeave) {
+                return <span className="text-amber-600 font-extrabold text-xs bg-amber-50 px-2 py-1 rounded border border-amber-100 animate-pulse">Aguardando</span>;
+            }
+            return <span className="text-green-600 font-semibold text-xs bg-green-50 px-2 py-1 rounded border border-green-100">Presente</span>;
         }
-        return <span className="text-gray-500">Ausente</span>;
+        return <span className="text-gray-400 text-xs">Ausente</span>;
     };
 
     const handleAddVisitorSubmit = (formData: { name: string; class: string; age: number; guardianName: string; phone: string; birthday: string; hasAllergy?: boolean; allergyDescription?: string; }) => {
@@ -73,6 +105,22 @@ const Attendance: React.FC<AttendanceProps> = ({ students, onMarkPresence, onUnm
     const handleCloseHistoryModal = () => {
         setHistoryModalOpen(false);
         setSelectedStudentId(null);
+    };
+
+    // Open Release Modal
+    const handleStartRelease = (student: Student) => {
+        setReleasingStudent(student);
+        setGuardianName(student.guardianName || '');
+    };
+
+    // Submit Release Confirmation
+    const handleConfirmRelease = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (releasingStudent && guardianName.trim()) {
+            onDismiss(releasingStudent.id, guardianName.trim(), date);
+            setReleasingStudent(null);
+            setGuardianName('');
+        }
     };
 
     const selectedDay = useMemo(() => {
@@ -103,12 +151,12 @@ const Attendance: React.FC<AttendanceProps> = ({ students, onMarkPresence, onUnm
                         )}
                     </div>
                     <div className="flex items-center w-full">
-                        <label htmlFor="class-select-attendance" className="mr-2 text-sm font-medium text-gray-600">Turma:</label>
+                        <label htmlFor="class-select-attendance" className="mr-2 text-sm font-medium text-gray-600 font-bold whitespace-nowrap">Filtrar Sala:</label>
                         <select
                             id="class-select-attendance"
                             value={selectedClass}
                             onChange={(e) => onClassChange(e.target.value)}
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand-blue focus:border-brand-blue block w-full p-2"
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand-blue focus:border-brand-blue block w-full p-2 font-semibold"
                         >
                             <option value="All">Todas as Turmas</option>
                             {CLASS_NAMES.map(name => <option key={name} value={name}>{name}</option>)}
@@ -116,6 +164,48 @@ const Attendance: React.FC<AttendanceProps> = ({ students, onMarkPresence, onUnm
                     </div>
                 </div>
             </div>
+
+            {/* --- REAL-TIME CLASSROOM DISMISSAL QUEUE PANEL --- */}
+            {selectedDay.name && awaitingReleaseStudents.length > 0 && (
+                <div className="mb-6 w-full max-w-2xl mx-auto bg-amber-50/50 border border-amber-200 rounded-xl p-5 shadow-sm transition-all duration-300">
+                  <div className="flex items-center justify-between mb-3.5 pb-2 border-b border-amber-200/60">
+                    <h3 className="text-base font-bold text-amber-900 flex items-center gap-2">
+                      <span className="relative flex h-3 w-3">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+                      </span>
+                      🚨 Fila de Saída - Aguardando Liberação ({awaitingReleaseStudents.length})
+                    </h3>
+                    <span className="text-[10px] bg-amber-150 text-amber-800 px-2.5 py-0.5 rounded-full font-extrabold uppercase tracking-wider">
+                      Ministras: Entregar Criança
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {awaitingReleaseStudents.map(student => (
+                      <div key={student.id} className="bg-white rounded-lg p-3 border border-amber-200/80 shadow-sm flex items-center justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="font-bold text-gray-800 text-sm truncate">{student.name}</p>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className="text-[10px] font-bold text-gray-400">{calculateAge(student.birthday, student.age)} anos</span>
+                            <span className="text-[9px] font-extrabold bg-brand-blue/10 text-brand-blue px-1.5 py-0.2 rounded uppercase">
+                              {student.class}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <button
+                          onClick={() => handleStartRelease(student)}
+                          className="bg-amber-500 hover:bg-amber-600 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition shadow-sm whitespace-nowrap flex items-center gap-1"
+                        >
+                          🚪 Liberar
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+            )}
+
             <div className="w-full max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-6">
                 {!selectedDay.name && (
                     <div className="mb-6 p-4 bg-amber-50 border-l-4 border-amber-500 rounded-r-xl text-amber-800 shadow-sm flex items-start gap-3">
@@ -149,36 +239,93 @@ const Attendance: React.FC<AttendanceProps> = ({ students, onMarkPresence, onUnm
                                 <SearchIcon />
                             </div>
                         </div>
-                        <ul className="divide-y divide-gray-200 max-h-96 overflow-y-auto">
+                        <ul className="divide-y divide-gray-200 max-h-96 overflow-y-auto pr-1 custom-scrollbar">
                             {filteredMembers.map(student => {
-                                const isPresent = student.attendance.some(a => a.date === date && a.present);
+                                const attRecord = student.attendance.find(a => a.date === date);
+                                const isPresent = !!attRecord?.present;
+                                const isDismissed = isPresent && !!attRecord?.dismissedBy;
+                                const isAwaitingRelease = isPresent && !!attRecord?.readyToLeave && !isDismissed;
+
                                 return (
-                                    <li key={student.id} className="py-3 flex justify-between items-center">
+                                    <li key={student.id} className="py-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                                         <div>
-                                            <p className="font-medium text-gray-800">{student.name}</p>
-                                            <p className="text-sm text-gray-500">{calculateAge(student.birthday, student.age)} anos</p>
+                                            <p className="font-bold text-gray-800">{student.name}</p>
+                                            <p className="text-xs text-gray-500">{calculateAge(student.birthday, student.age)} anos</p>
                                         </div>
-                                        <div className="flex items-center space-x-2">
-                                            <button onClick={() => handleViewHistory(student.id)} className="text-gray-500 hover:text-brand-blue p-1 rounded-full" title="Ver Histórico">
+                                        
+                                        <div className="flex items-center justify-end flex-wrap gap-2.5">
+                                            {/* History shortcut */}
+                                            <button onClick={() => handleViewHistory(student.id)} className="text-gray-400 hover:text-brand-blue p-1 rounded-full" title="Ver Histórico">
                                                 <CalendarIcon className="h-5 w-5" />
                                             </button>
-                                            <div className="w-20 text-center">{getStudentStatus(student)}</div>
-                                            {isPresent ? (
-                                                <button
-                                                    onClick={() => onUnmarkPresence(student.id, date)}
-                                                    disabled={!selectedDay.name}
-                                                    className="px-4 py-1 bg-brand-yellow text-white rounded-full hover:bg-yellow-600 transition w-28 text-center disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-brand-yellow"
-                                                >
-                                                    Desmarcar
-                                                </button>
-                                            ) : (
-                                                <button
-                                                    onClick={() => onMarkPresence(student.id, date)}
-                                                    disabled={!selectedDay.name}
-                                                    className="px-4 py-1 bg-brand-green text-white rounded-full hover:bg-green-600 transition w-28 text-center disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-brand-green"
-                                                >
-                                                    Marcar
-                                                </button>
+
+                                            {/* Status Badge */}
+                                            <div className="text-right min-w-[70px]">{getStudentStatus(student)}</div>
+
+                                            {/* Dismissal flow logic */}
+                                            {isPresent && (
+                                                <div className="flex gap-2">
+                                                    {isDismissed ? (
+                                                        <div className="flex items-center gap-1.5">
+                                                            <span className="text-[11px] text-gray-500 font-semibold bg-gray-100 border px-2 py-1 rounded line-clamp-1" title={`Entregue para: ${attRecord.dismissedBy}`}>
+                                                                Entregue: {attRecord.dismissedBy}
+                                                            </span>
+                                                            <button
+                                                                onClick={() => onUndoDismissal(student.id, date)}
+                                                                className="text-xs text-red-500 hover:text-red-700 hover:bg-red-50 px-2 py-1 rounded font-bold transition"
+                                                                title="Desfazer liberação de saída"
+                                                            >
+                                                                Desfazer
+                                                            </button>
+                                                        </div>
+                                                    ) : isAwaitingRelease ? (
+                                                        <div className="flex gap-1.5">
+                                                            <button
+                                                                onClick={() => handleStartRelease(student)}
+                                                                className="px-2.5 py-1 bg-amber-500 text-white text-xs font-bold rounded-lg hover:bg-amber-600 transition"
+                                                            >
+                                                                Liberar
+                                                            </button>
+                                                            <button
+                                                                onClick={() => onToggleReadyToLeave(student.id, date, false)}
+                                                                className="px-2.5 py-1 bg-gray-200 text-gray-600 text-xs font-bold rounded-lg hover:bg-gray-300 transition"
+                                                                title="Cancelar chamado de saída"
+                                                            >
+                                                                Cancelar
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <button
+                                                            onClick={() => onToggleReadyToLeave(student.id, date, true)}
+                                                            disabled={!selectedDay.name}
+                                                            className="px-3 py-1 bg-amber-50/50 text-amber-700 border border-amber-200 hover:bg-amber-100 rounded-lg text-xs font-bold transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                                            title="Chamar aluno para saída (Fila de liberação)"
+                                                        >
+                                                            🛎️ Pronto p/ Sair
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            )}
+
+                                            {/* Presence toggle button */}
+                                            {!isDismissed && (
+                                                isPresent ? (
+                                                    <button
+                                                        onClick={() => onUnmarkPresence(student.id, date)}
+                                                        disabled={!selectedDay.name}
+                                                        className="px-3.5 py-1 bg-brand-yellow text-white rounded-lg hover:bg-yellow-600 transition text-xs font-semibold w-24 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    >
+                                                        Desmarcar
+                                                    </button>
+                                                ) : (
+                                                    <button
+                                                        onClick={() => onMarkPresence(student.id, date)}
+                                                        disabled={!selectedDay.name}
+                                                        className="px-3.5 py-1 bg-brand-green text-white rounded-lg hover:bg-green-600 transition text-xs font-semibold w-24 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    >
+                                                        Marcar
+                                                    </button>
+                                                )
                                             )}
                                         </div>
                                     </li>
@@ -206,36 +353,89 @@ const Attendance: React.FC<AttendanceProps> = ({ students, onMarkPresence, onUnm
                         <div className="mt-8">
                             <h3 className="text-xl font-semibold text-brand-dark mb-4 border-t pt-6">Visitantes Atuais</h3>
                             {visitors.length > 0 ? (
-                                <ul className="divide-y divide-gray-200 max-h-60 overflow-y-auto">
+                                <ul className="divide-y divide-gray-200 max-h-60 overflow-y-auto pr-1 custom-scrollbar">
                                     {visitors.map(visitor => {
-                                        const isPresent = visitor.attendance.some(a => a.date === date && a.present);
+                                        const attRecord = visitor.attendance.find(a => a.date === date);
+                                        const isPresent = !!attRecord?.present;
+                                        const isDismissed = isPresent && !!attRecord?.dismissedBy;
+                                        const isAwaitingRelease = isPresent && !!attRecord?.readyToLeave && !isDismissed;
+
                                         return (
-                                            <li key={visitor.id} className="py-3 flex justify-between items-center">
+                                            <li key={visitor.id} className="py-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                                                 <div>
-                                                    <p className="font-medium text-gray-800">{visitor.name}</p>
-                                                    <p className="text-sm text-gray-500">{visitor.class} - {calculateAge(visitor.birthday, visitor.age)} anos</p>
+                                                    <p className="font-bold text-gray-800">{visitor.name}</p>
+                                                    <p className="text-xs text-gray-500">{visitor.class} - {calculateAge(visitor.birthday, visitor.age)} anos</p>
                                                 </div>
-                                                <div className="flex items-center space-x-2">
-                                                    <button onClick={() => handleViewHistory(visitor.id)} className="text-gray-500 hover:text-brand-blue p-1 rounded-full" title="Ver Histórico">
+                                                <div className="flex items-center justify-end flex-wrap gap-2.5">
+                                                    {/* History shortcut */}
+                                                    <button onClick={() => handleViewHistory(visitor.id)} className="text-gray-400 hover:text-brand-blue p-1 rounded-full" title="Ver Histórico">
                                                         <CalendarIcon className="h-5 w-5" />
                                                     </button>
-                                                    <div className="w-20 text-center">{getStudentStatus(visitor)}</div>
-                                                    {isPresent ? (
-                                                        <button
-                                                            onClick={() => onUnmarkPresence(visitor.id, date)}
-                                                            disabled={!selectedDay.name}
-                                                            className="px-4 py-1 bg-brand-yellow text-white rounded-full hover:bg-yellow-600 transition w-28 text-center disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-brand-yellow"
-                                                        >
-                                                            Desmarcar
-                                                        </button>
-                                                    ) : (
-                                                        <button
-                                                            onClick={() => onMarkPresence(visitor.id, date)}
-                                                            disabled={!selectedDay.name}
-                                                            className="px-4 py-1 bg-brand-green text-white rounded-full hover:bg-green-600 transition w-28 text-center disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-brand-green"
-                                                        >
-                                                            Marcar
-                                                        </button>
+
+                                                    {/* Status Badge */}
+                                                    <div className="text-right min-w-[70px]">{getStudentStatus(visitor)}</div>
+
+                                                    {/* Dismissal flow logic */}
+                                                    {isPresent && (
+                                                        <div className="flex gap-2">
+                                                            {isDismissed ? (
+                                                                <div className="flex items-center gap-1.5">
+                                                                    <span className="text-[11px] text-gray-500 font-semibold bg-gray-100 border px-2 py-1 rounded line-clamp-1" title={`Entregue para: ${attRecord.dismissedBy}`}>
+                                                                        Entregue: {attRecord.dismissedBy}
+                                                                    </span>
+                                                                    <button
+                                                                        onClick={() => onUndoDismissal(visitor.id, date)}
+                                                                        className="text-xs text-red-500 hover:text-red-700 hover:bg-red-50 px-2 py-1 rounded font-bold transition"
+                                                                    >
+                                                                        Desfazer
+                                                                    </button>
+                                                                </div>
+                                                            ) : isAwaitingRelease ? (
+                                                                <div className="flex gap-1.5">
+                                                                    <button
+                                                                        onClick={() => handleStartRelease(visitor)}
+                                                                        className="px-2.5 py-1 bg-amber-500 text-white text-xs font-bold rounded-lg hover:bg-amber-600 transition"
+                                                                    >
+                                                                        Liberar
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => onToggleReadyToLeave(visitor.id, date, false)}
+                                                                        className="px-2.5 py-1 bg-gray-200 text-gray-600 text-xs font-bold rounded-lg hover:bg-gray-300 transition"
+                                                                    >
+                                                                        Cancelar
+                                                                    </button>
+                                                                </div>
+                                                            ) : (
+                                                                <button
+                                                                    onClick={() => onToggleReadyToLeave(visitor.id, date, true)}
+                                                                    disabled={!selectedDay.name}
+                                                                    className="px-3 py-1 bg-amber-50/50 text-amber-700 border border-amber-200 hover:bg-amber-100 rounded-lg text-xs font-bold transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                                                >
+                                                                    🛎️ Pronto p/ Sair
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    )}
+
+                                                    {/* Presence toggle button */}
+                                                    {!isDismissed && (
+                                                        isPresent ? (
+                                                            <button
+                                                                onClick={() => onUnmarkPresence(visitor.id, date)}
+                                                                disabled={!selectedDay.name}
+                                                                className="px-3.5 py-1 bg-brand-yellow text-white rounded-lg hover:bg-yellow-600 transition text-xs font-semibold w-24 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                                                            >
+                                                                Desmarcar
+                                                            </button>
+                                                        ) : (
+                                                            <button
+                                                                onClick={() => onMarkPresence(visitor.id, date)}
+                                                                disabled={!selectedDay.name}
+                                                                className="px-3.5 py-1 bg-brand-green text-white rounded-lg hover:bg-green-600 transition text-xs font-semibold w-24 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                                                            >
+                                                                Marcar
+                                                            </button>
+                                                        )
                                                     )}
                                                 </div>
                                             </li>
@@ -249,9 +449,53 @@ const Attendance: React.FC<AttendanceProps> = ({ students, onMarkPresence, onUnm
                     </div>
                 )}
             </div>
+            
+            {/* IN-PLACE HISTORY MODAL */}
             <Modal isOpen={historyModalOpen} onClose={handleCloseHistoryModal} title={`Histórico de ${selectedStudentForHistory?.name}`}>
                 {selectedStudentForHistory && <AttendanceHistory student={selectedStudentForHistory} allStudents={students} />}
             </Modal>
+
+            {/* CONFIRM DISMISSAL/RELEASE MODAL */}
+            {releasingStudent && (
+                <Modal isOpen={!!releasingStudent} onClose={() => setReleasingStudent(null)} title="Liberar Aluno">
+                    <form onSubmit={handleConfirmRelease} className="space-y-4">
+                        <div className="bg-amber-50 border border-amber-200 rounded-xl p-3.5 text-amber-900 text-sm font-semibold">
+                            <span className="block text-amber-800 text-xs uppercase font-extrabold tracking-wide mb-1">Entrega de Aluno</span>
+                            Liberando o aluno <span className="text-brand-dark font-extrabold text-base block mt-0.5">{releasingStudent.name}</span>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-1.5">
+                                Nome do Responsável que retira a criança:
+                            </label>
+                            <input
+                                type="text"
+                                required
+                                placeholder="Ex: João da Silva (Pai)"
+                                value={guardianName}
+                                onChange={e => setGuardianName(e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-brand-blue focus:border-brand-blue sm:text-sm bg-white font-semibold text-gray-800"
+                            />
+                        </div>
+
+                        <div className="flex gap-3 pt-4 border-t border-gray-100">
+                            <button
+                                type="submit"
+                                className="flex-1 bg-brand-green hover:bg-green-600 text-white px-4 py-2.5 rounded-lg font-bold transition text-sm shadow-sm flex items-center justify-center gap-1.5"
+                            >
+                                ✓ Confirmar Liberação
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setReleasingStudent(null)}
+                                className="flex-1 bg-gray-200 text-gray-700 px-4 py-2.5 rounded-lg font-bold hover:bg-gray-300 transition text-sm"
+                            >
+                                Cancelar
+                            </button>
+                        </div>
+                    </form>
+                </Modal>
+            )}
         </div>
     );
 };

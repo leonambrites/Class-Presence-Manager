@@ -90,6 +90,12 @@ export const initDb = async () => {
             // Column likely already exists
         }
 
+        try {
+            await sql`ALTER TABLE attendance ADD COLUMN ready_to_leave BOOLEAN DEFAULT FALSE`;
+        } catch (e) {
+            // Column likely already exists
+        }
+
         // Schedule Table
         await sql`
             CREATE TABLE IF NOT EXISTS schedule (

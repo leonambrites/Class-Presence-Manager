@@ -45,12 +45,11 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, userRole }) =>
     const navItems = [
         { view: View.Home, icon: <DashboardIcon />, label: "Home" },
         { view: View.Attendance, icon: <CheckCircleIcon />, label: "Presença" },
-        { view: View.Students, icon: <UsersIcon />, label: "Alunos" },
-        { view: View.Volunteers, icon: <UserPlusIcon />, label: "Professores" },
         { view: View.Schedule, icon: <CalendarIcon />, label: "Escala" },
         { view: View.Topics, icon: <BookOpenIcon />, label: "Assuntos" },
+        { view: View.Students, icon: <UsersIcon />, label: "Alunos" },
+        { view: View.Volunteers, icon: <UserPlusIcon />, label: "Professores" },
         { view: View.Reports, icon: <FileTextIcon />, label: "Relatórios" },
-        { view: View.Dismissal, icon: <LogOutIcon />, label: "Saída" },
     ];
 
     if (userRole === 'Pastor' || userRole === 'Coordenadora') {
@@ -60,15 +59,14 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, userRole }) =>
     const mainMobileItems = [
         { view: View.Home, icon: <DashboardIcon />, label: "Home" },
         { view: View.Attendance, icon: <CheckCircleIcon />, label: "Presença" },
-        { view: View.Students, icon: <UsersIcon />, label: "Alunos" },
         { view: View.Schedule, icon: <CalendarIcon />, label: "Escala" },
+        { view: View.Topics, icon: <BookOpenIcon />, label: "Assuntos" },
     ];
 
     const extraMobileItems = [
+        { view: View.Students, icon: <UsersIcon />, label: "Alunos" },
         { view: View.Volunteers, icon: <UserPlusIcon />, label: "Professores" },
-        { view: View.Topics, icon: <BookOpenIcon />, label: "Assuntos" },
         { view: View.Reports, icon: <FileTextIcon />, label: "Relatórios" },
-        { view: View.Dismissal, icon: <LogOutIcon />, label: "Saída" },
     ];
 
     if (userRole === 'Pastor' || userRole === 'Coordenadora') {
