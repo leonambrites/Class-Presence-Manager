@@ -393,6 +393,129 @@ app.post('/api/seed', async (req, res) => {
     }
 });
 
+// Get List of Available Lesson Files
+app.get('/api/available-lessons', async (req, res) => {
+    try {
+        const dataPathCapitalized = path.join(process.cwd(), 'data', 'Topics');
+        const dataPathLowercase = path.join(process.cwd(), 'data', 'topics');
+        
+        const files: { fileName: string; sizeBytes: number; folder: string }[] = [];
+        
+        const scanDir = (dirPath: string, folderName: string) => {
+            if (fs.existsSync(dirPath)) {
+                const list = fs.readdirSync(dirPath);
+                for (const f of list) {
+                    if (f.toLowerCase().endsWith('.docx')) {
+                        const stat = fs.statSync(path.join(dirPath, f));
+                        // Prevent duplicates
+                        if (!files.some(existing => existing.fileName === f)) {
+                            files.push({
+                                fileName: f,
+                                sizeBytes: stat.size,
+                                folder: folderName
+                            });
+                        }
+                    }
+                }
+            }
+        };
+        
+        scanDir(dataPathCapitalized, 'Topics');
+        scanDir(dataPathLowercase, 'topics');
+        
+        const MONTHS_PT = [
+          'JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO',
+          'JULHO', 'AGOSTO', 'SETEMBRO', 'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO'
+        ];
+        
+        const formatted = files.map(f => {
+            const regex = /^AULA\s+(\d+)\s+([A-ZÇÁÉÍÓÚÂÊÔÕÃ]+)\s+(\d{4})\s*-\s*(.+)\.docx$/i;
+            const match = f.fileName.match(regex);
+            
+            let dateStr = '';
+            let className = '';
+            let parsedCorrectly = false;
+            
+            if (match) {
+                const sundayNum = parseInt(match[1], 10);
+                const monthName = match[2].toUpperCase();
+                const year = parseInt(match[3], 10);
+                className = match[4].trim();
+                
+                const monthIndex = MONTHS_PT.indexOf(monthName);
+                if (monthIndex !== -1) {
+                    // Find Sundays in that month
+                    const sundays: string[] = [];
+                    const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+                    for (let day = 1; day <= daysInMonth; day++) {
+                        const d = new Date(year, monthIndex, day);
+                        if (d.getDay() === 0) {
+                            const yyyy = year;
+                            const mm = String(monthIndex + 1).padStart(2, '0');
+                            const dd = String(day).padStart(2, '0');
+                            sundays.push(`${yyyy}-${mm}-${dd}`);
+                        }
+                    }
+                    if (sundayNum >= 1 && sundayNum <= sundays.length) {
+                        dateStr = sundays[sundayNum - 1];
+                        parsedCorrectly = true;
+                    }
+                }
+            }
+            
+            return {
+                fileName: f.fileName,
+                sizeBytes: f.sizeBytes,
+                className: className || 'Outros',
+                date: dateStr,
+                parsed: parsedCorrectly
+            };
+        });
+        
+        res.status(200).json({ lessons: formatted });
+    } catch (error) {
+        console.error('[AVAILABLE LESSONS] Error reading directory:', error);
+        res.status(500).json({ error: 'Failed to retrieve available lessons' });
+    }
+});
+
+// Upload a Lesson File
+app.post('/api/upload-lesson', async (req, res) => {
+    try {
+        const { fileName, fileContent, date, title, description } = req.body;
+        if (!fileName || !fileContent) {
+            return res.status(400).json({ error: 'Missing fileName or fileContent' });
+        }
+        
+        const dataPath = path.join(process.cwd(), 'data', 'Topics');
+        if (!fs.existsSync(dataPath)) {
+            fs.mkdirSync(dataPath, { recursive: true });
+        }
+        
+        const filePath = path.join(dataPath, String(fileName));
+        const buffer = Buffer.from(String(fileContent), 'base64');
+        fs.writeFileSync(filePath, buffer);
+        console.log(`[UPLOAD] File saved successfully: ${filePath}`);
+        
+        // Auto topic creation in DB
+        if (date) {
+            const allData = await dbService.getAllData();
+            const exists = allData.topics.some((t: any) => t.date === date);
+            if (!exists) {
+                const finalTitle = title ? String(title) : `Aula - ${String(fileName).replace('.docx', '')}`;
+                const finalDesc = description ? String(description) : `Arquivo de aula enviado pelo Pastor.`;
+                await dbService.addTopic(date, finalTitle, finalDesc);
+                console.log(`[UPLOAD] Created new topic in DB for date: ${date}`);
+            }
+        }
+        
+        res.status(200).json({ success: true, message: 'Upload completed successfully' });
+    } catch (error) {
+        console.error('[UPLOAD] Error saving file:', error);
+        res.status(500).json({ error: 'Failed to upload lesson' });
+    }
+});
+
 // Standalone Server Support
 if (typeof require !== 'undefined' && require.main === module) {
     const port = process.env.PORT || 3000;
