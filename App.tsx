@@ -8,7 +8,6 @@ import Schedule from './components/Schedule';
 import Volunteers from './components/Volunteers';
 import Topics from './components/Topics';
 import Reports from './components/Reports';
-import Dismissal from './components/Dismissal';
 import Admin from './components/Admin';
 import { SignedIn, SignedOut, SignIn, useUser } from '@clerk/clerk-react';
 import {
@@ -475,7 +474,7 @@ const App: React.FC = () => {
     const handleDismiss = useCallback(async (studentId: string, responsibleName: string, date: string) => {
         const updatedStudents = students.map(s => {
             if (s.id === studentId) {
-                return { ...s, attendance: s.attendance.map(a => a.date === date ? { ...a, dismissedBy: responsibleName } : a) };
+                return { ...s, attendance: s.attendance.map(a => a.date === date ? { ...a, dismissedBy: responsibleName, readyToLeave: false } : a) };
             }
             return s;
         });
@@ -497,6 +496,62 @@ const App: React.FC = () => {
             }
         } else {
             showNotification("Saída registrada (Offline).");
+        }
+    }, [students, connectionStatus]);
+
+    const handleToggleReadyToLeave = useCallback(async (studentId: string, date: string, readyToLeave: boolean) => {
+        const updatedStudents = students.map(s => {
+            if (s.id === studentId) {
+                return { ...s, attendance: s.attendance.map(a => a.date === date ? { ...a, readyToLeave } : a) };
+            }
+            return s;
+        });
+
+        setStudents(updatedStudents);
+        saveDataLocally('students', updatedStudents);
+
+        if (connectionStatus === 'connected') {
+            try {
+                await fetch('/api/attendance/ready', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ studentId, date, readyToLeave })
+                });
+                showNotification(readyToLeave ? "Fila de Saída alertada com sucesso!" : "Chamado de liberação cancelado.");
+            } catch (e) {
+                setConnectionStatus('offline');
+                showNotification("Salvo localmente (Servidor offline).");
+            }
+        } else {
+            showNotification("Alteração salva localmente.");
+        }
+    }, [students, connectionStatus]);
+
+    const handleUndoDismissal = useCallback(async (studentId: string, date: string) => {
+        const updatedStudents = students.map(s => {
+            if (s.id === studentId) {
+                return { ...s, attendance: s.attendance.map(a => a.date === date ? { ...a, dismissedBy: null, readyToLeave: false } : a) };
+            }
+            return s;
+        });
+
+        setStudents(updatedStudents);
+        saveDataLocally('students', updatedStudents);
+
+        if (connectionStatus === 'connected') {
+            try {
+                await fetch('/api/attendance/undo-dismissal', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ studentId, date })
+                });
+                showNotification("Liberação do aluno desfeita com sucesso.");
+            } catch (e) {
+                setConnectionStatus('offline');
+                showNotification("Salvo localmente.");
+            }
+        } else {
+            showNotification("Desfeito localmente (Offline).");
         }
     }, [students, connectionStatus]);
 
@@ -685,7 +740,20 @@ const App: React.FC = () => {
                     userRole={userRole!}
                 />;
             case View.Attendance:
-                return <AttendanceComponent students={students} onMarkPresence={handleMarkPresence} onUnmarkPresence={handleUnmarkPresence} onAddVisitor={handleAddVisitor} selectedClass={selectedClass} onClassChange={setSelectedClass} userRole={userRole!} />;
+                return (
+                    <AttendanceComponent 
+                        students={students} 
+                        onMarkPresence={handleMarkPresence} 
+                        onUnmarkPresence={handleUnmarkPresence} 
+                        onAddVisitor={handleAddVisitor} 
+                        onDismiss={handleDismiss}
+                        onUndoDismissal={handleUndoDismissal}
+                        onToggleReadyToLeave={handleToggleReadyToLeave}
+                        selectedClass={selectedClass} 
+                        onClassChange={setSelectedClass} 
+                        userRole={userRole!} 
+                    />
+                );
             case View.Students:
                 return <Students students={students} onAddStudent={handleAddMember} onEditStudent={handleEditStudent} onDeleteStudent={handleDeleteStudent} onMakeMember={handleMakeMember} selectedClass={selectedClass} onClassChange={setSelectedClass} userRole={userRole!} />;
             case View.Schedule:
@@ -705,8 +773,6 @@ const App: React.FC = () => {
                 );
             case View.Reports:
                 return <Reports students={students} volunteers={volunteers} schedule={schedule} />;
-            case View.Dismissal:
-                return <Dismissal students={students} onDismiss={handleDismiss} selectedClass={selectedClass} onClassChange={setSelectedClass} userRole={userRole!} />;
             case View.Admin:
                 return <Admin userRole={userRole!} />;
             default:

@@ -10,6 +10,7 @@ export interface Attendance {
   dismissedBy?: string | null;
   day?: 'Sunday' | 'Wednesday';
   dailyCode?: number;
+  readyToLeave?: boolean;
 }
 
 export interface Student {
@@ -60,7 +61,6 @@ export enum View {
   Schedule = 'Escala',
   Volunteers = 'Voluntários',
   Topics = 'Assuntos',
-  Dismissal = 'Saída',
   Reports = 'Relatórios',
   Admin = 'Acessos',
 }

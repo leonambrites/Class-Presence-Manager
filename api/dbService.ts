@@ -36,7 +36,8 @@ export const dbService = {
                     present: a.present,
                     day: a.day,
                     dismissedBy: a.dismissed_by,
-                    dailyCode: a.daily_code ? Number(a.daily_code) : undefined
+                    dailyCode: a.daily_code ? Number(a.daily_code) : undefined,
+                    readyToLeave: a.ready_to_leave || false
                 }))
         }));
 
@@ -130,11 +131,33 @@ export const dbService = {
         const sql = getSql();
         const result = await sql`
             UPDATE attendance 
-            SET dismissed_by = ${responsibleName}
+            SET dismissed_by = ${responsibleName}, ready_to_leave = FALSE
             WHERE student_id = ${studentId} AND date = ${date}
             RETURNING id
         `;
         if (result.length === 0) throw new Error("Attendance record not found to dismiss");
+    },
+
+    async resetDismissal(studentId: string, date: string) {
+        const sql = getSql();
+        const result = await sql`
+            UPDATE attendance 
+            SET dismissed_by = NULL, ready_to_leave = FALSE
+            WHERE student_id = ${studentId} AND date = ${date}
+            RETURNING id
+        `;
+        if (result.length === 0) throw new Error("Attendance record not found to reset dismissal");
+    },
+
+    async updateReadyToLeave(studentId: string, date: string, readyToLeave: boolean) {
+        const sql = getSql();
+        const result = await sql`
+            UPDATE attendance
+            SET ready_to_leave = ${readyToLeave}
+            WHERE student_id = ${studentId} AND date = ${date}
+            RETURNING id
+        `;
+        if (result.length === 0) throw new Error("Attendance record not found to update ready to leave status");
     },
 
     async addTopic(date: string, title: string, description: string, id?: string) {

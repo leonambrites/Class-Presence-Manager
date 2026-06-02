@@ -112,6 +112,30 @@ app.post('/api/dismissal', async (req, res) => {
     }
 });
 
+// Update Awaiting Release (Ready to Leave) Status
+app.post('/api/attendance/ready', async (req, res) => {
+    const { studentId, date, readyToLeave } = req.body;
+    try {
+        await dbService.updateReadyToLeave(studentId, date, readyToLeave);
+        res.status(200).json({ message: 'Ready to leave status updated' });
+    } catch (error) {
+        console.error("Error updating ready to leave status:", error);
+        res.status(500).json({ error: "Failed to update ready to leave status" });
+    }
+});
+
+// Undo/Reset Dismissal
+app.post('/api/attendance/undo-dismissal', async (req, res) => {
+    const { studentId, date } = req.body;
+    try {
+        await dbService.resetDismissal(studentId, date);
+        res.status(200).json({ message: 'Dismissal reset successfully' });
+    } catch (error) {
+        console.error("Error resetting dismissal:", error);
+        res.status(500).json({ error: "Failed to undo dismissal" });
+    }
+});
+
 // Add Student
 app.post('/api/students', async (req, res) => {
     const newStudent = req.body;
