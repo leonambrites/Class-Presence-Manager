@@ -327,6 +327,10 @@ const Schedule: React.FC<ScheduleProps> = ({
                             const matchesDate = entryDate === cell.dateString;
                             const matchesClass = selectedClass === 'All' || s.className === selectedClass;
                             return matchesDate && matchesClass;
+                        }).sort((a, b) => {
+                            const indexA = CLASS_NAMES.indexOf(a.className);
+                            const indexB = CLASS_NAMES.indexOf(b.className);
+                            return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
                         });
 
                         const isToday = cell.dateString === todayStr;
@@ -411,6 +415,7 @@ const Schedule: React.FC<ScheduleProps> = ({
                     setCreateDate(null);
                 }}
                 title={editingEntry ? 'Editar Escala' : 'Nova Escala'}
+                maxWidth="max-w-2xl"
             >
                 <ScheduleForm
                     initialData={editingEntry || undefined}
@@ -434,6 +439,7 @@ const Schedule: React.FC<ScheduleProps> = ({
                         setSelectedEntry(null);
                     }}
                     title={`Detalhes da Escala: ${selectedEntry.className}`}
+                    maxWidth="max-w-2xl"
                 >
                     <div className="space-y-4">
                         <div className="flex justify-between items-center bg-blue-50/55 p-3 rounded-lg border border-blue-100">
@@ -540,6 +546,7 @@ const Schedule: React.FC<ScheduleProps> = ({
                     isOpen={!!selectedDayString}
                     onClose={() => setSelectedDayString(null)}
                     title={`Escalas em ${new Date(selectedDayString + 'T00:00:00').toLocaleDateString('pt-BR')}`}
+                    maxWidth="max-w-2xl"
                 >
                     <div className="space-y-4">
                         <p className="text-xs text-gray-500">Selecione uma turma para ver os detalhes da equipe de voluntários:</p>
@@ -547,6 +554,11 @@ const Schedule: React.FC<ScheduleProps> = ({
                             {schedule
                                 .filter(s => s.date && s.date.split('T')[0] === selectedDayString)
                                 .filter(s => selectedClass === 'All' || s.className === selectedClass)
+                                .sort((a, b) => {
+                                    const indexA = CLASS_NAMES.indexOf(a.className);
+                                    const indexB = CLASS_NAMES.indexOf(b.className);
+                                    return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+                                })
                                 .map(entry => (
                                     <div
                                         key={entry.id}
