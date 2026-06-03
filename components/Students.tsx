@@ -42,7 +42,7 @@ const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStude
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   const [profileStudent, setProfileStudent] = useState<Student | null>(null);
-  const [activeTab, setActiveTab] = useState<StudentType | 'Inativos'>(StudentType.Membro);
+  const [activeTab, setActiveTab] = useState<StudentType>(StudentType.Membro);
 
   const today = new Date().toISOString().split('T')[0];
 
@@ -50,43 +50,14 @@ const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStude
     ? students
     : students.filter(s => s.class === selectedClass);
 
-  const inactiveCount = useMemo(() => {
-    return studentsForClass
-      .filter(s => s.type === StudentType.Membro)
-      .filter(s => {
-        const d = getDaysSinceLastAttendance(s);
-        return d === null || d >= 14;
-      })
-      .length;
-  }, [studentsForClass]);
-
   const filteredStudents = useMemo(() => {
-    let list = studentsForClass;
+    let list = studentsForClass.filter(s => s.type === activeTab);
 
-    if (activeTab === 'Inativos') {
-      list = list
-        .filter(s => s.type === StudentType.Membro)
-        .filter(s => {
-          const days = getDaysSinceLastAttendance(s);
-          return days === null || days >= 14;
-        });
-    } else {
-      list = list.filter(s => s.type === activeTab);
-    }
-
-    list = list.filter(s =>
-      s.name.toLowerCase().includes(searchTerm.toLowerCase()) || s.phone.includes(searchTerm)
-    );
-
-    if (activeTab === 'Inativos') {
-      return list.sort((a, b) => {
-        const dA = getDaysSinceLastAttendance(a) ?? 9999;
-        const dB = getDaysSinceLastAttendance(b) ?? 9999;
-        return dB - dA;
-      });
-    }
-
-    return list.sort((a, b) => a.name.localeCompare(b.name));
+    return list
+      .filter(s =>
+        s.name.toLowerCase().includes(searchTerm.toLowerCase()) || s.phone.includes(searchTerm)
+      )
+      .sort((a, b) => a.name.localeCompare(b.name));
   }, [studentsForClass, activeTab, searchTerm]);
 
   const handleOpenAddModal = () => {
@@ -164,14 +135,6 @@ const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStude
           </button>
           <button onClick={() => setActiveTab(StudentType.Visitante)} className={`py-2 px-4 text-lg font-semibold transition-colors shrink-0 ${activeTab === StudentType.Visitante ? 'border-b-2 border-brand-blue text-brand-blue' : 'text-gray-500'}`}>
             Visitantes
-          </button>
-          <button onClick={() => setActiveTab('Inativos')} className={`py-2 px-4 text-lg font-semibold transition-colors shrink-0 relative ${activeTab === 'Inativos' ? 'border-b-2 border-red-500 text-red-500' : 'text-gray-500'}`}>
-            Inativos
-            {inactiveCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                {inactiveCount}
-              </span>
-            )}
           </button>
         </div>
 
