@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Topic, UserRole } from '../types';
 import { CLASS_NAMES } from '../constants';
 import Modal from './Modal';
-import { upload } from '@vercel/blob/client';
+import { put } from '@vercel/blob/client';
 
 interface TopicsProps {
   topics: Topic[];
@@ -315,10 +315,22 @@ const Topics: React.FC<TopicsProps> = ({
     try {
       const generatedName = getLessonFileName(uploadingTopic.date, uploadingClass);
 
-      // 1. Upload to Vercel Blob directly from client
-      const blob = await upload(generatedName, directFile, {
+      // 1. Get a client token from the server
+      const tokenRes = await fetch('/api/upload-lesson/get-token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pathname: generatedName }),
+      });
+      if (!tokenRes.ok) {
+        const errData = await tokenRes.json();
+        throw new Error(errData.error || 'Failed to get upload token');
+      }
+      const { clientToken } = await tokenRes.json();
+
+      // 2. Upload directly to Vercel Blob using the client token
+      const blob = await put(generatedName, directFile, {
         access: 'public',
-        handleUploadUrl: '/api/upload-lesson/vercel-blob',
+        token: clientToken,
       });
 
       // 2. Register metadata in Neon Database
@@ -433,10 +445,22 @@ const Topics: React.FC<TopicsProps> = ({
           continue;
         }
 
-        // 1. Upload directly to Vercel Blob from client
-        const blob = await upload(file.name, file, {
+        // 1. Get a client token from the server
+        const tokenRes = await fetch('/api/upload-lesson/get-token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pathname: file.name }),
+        });
+        if (!tokenRes.ok) {
+          const errData = await tokenRes.json();
+          throw new Error(errData.error || 'Failed to get upload token');
+        }
+        const { clientToken } = await tokenRes.json();
+
+        // 2. Upload directly to Vercel Blob using the client token
+        const blob = await put(file.name, file, {
           access: 'public',
-          handleUploadUrl: '/api/upload-lesson/vercel-blob',
+          token: clientToken,
         });
         
         // 2. Register metadata in Neon Database
