@@ -140,13 +140,15 @@ const Admin: React.FC<AdminProps> = ({ userRole }) => {
                                                 className={`text-sm rounded-full px-3 py-1 font-semibold border-0 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6 ${user.role === 'Pastor' ? 'bg-purple-50 text-purple-700 ring-purple-600/20' :
                                                         user.role === 'Coordenadora' ? 'bg-blue-50 text-blue-700 ring-blue-600/20' :
                                                             user.role === 'Supervisora' ? 'bg-green-50 text-green-700 ring-green-600/20' :
-                                                                'bg-gray-50 text-gray-600 ring-gray-600/20'
+                                                                user.role === 'Visitante' ? 'bg-red-50 text-red-750 ring-red-600/20' :
+                                                                    'bg-gray-50 text-gray-600 ring-gray-600/20'
                                                     }`}
                                             >
                                                 <option value="Pastor" className="text-gray-900 bg-white">Pastor (Acesso Total)</option>
                                                 <option value="Coordenadora" className="text-gray-900 bg-white">Coordenadora (Edição Avançada)</option>
                                                 <option value="Supervisora" className="text-gray-900 bg-white">Supervisora (Edição da Equipe)</option>
-                                                <option value="Ministra" className="text-gray-900 bg-white">Ministra (Apenas Leitura)</option>
+                                                <option value="Ministra" className="text-gray-900 bg-white">Ministra (Presença e Saída)</option>
+                                                <option value="Visitante" className="text-gray-900 bg-white">Visitante (Sem Acesso)</option>
                                             </select>
                                         </td>
                                     </tr>

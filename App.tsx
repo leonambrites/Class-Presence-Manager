@@ -14,7 +14,8 @@ import {
     INITIAL_STUDENTS,
     INITIAL_VOLUNTEERS,
     INITIAL_SCHEDULE,
-    INITIAL_TOPICS
+    INITIAL_TOPICS,
+    LOGO_URL
 } from './constants';
 
 const App: React.FC = () => {
@@ -726,6 +727,51 @@ const App: React.FC = () => {
                 <div className="flex flex-col items-center justify-center h-64">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue"></div>
                     <p className="mt-4 text-gray-500">Carregando dados...</p>
+                </div>
+            );
+        }
+
+        if (userRole === 'Visitante') {
+            return (
+                <div className="flex flex-col items-center justify-center px-4 py-16 min-h-[75vh]">
+                    <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full border border-gray-100 flex flex-col items-center text-center relative overflow-hidden">
+                        {/* Decorative Top Accent */}
+                        <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-brand-blue to-blue-600"></div>
+                        
+                        <div className="relative mb-8 mt-4 bg-gray-50 p-6 rounded-2xl border border-gray-100 flex items-center justify-center">
+                            <img
+                                src={LOGO_URL}
+                                alt="Mundo Kids Logo"
+                                className="h-24 w-auto object-contain animate-pulse"
+                            />
+                        </div>
+                        
+                        <h2 className="text-3xl font-extrabold text-brand-dark mb-4">
+                            Mundo Kids
+                        </h2>
+                        
+                        <h3 className="text-lg font-bold text-gray-700 mb-2">
+                            Acesso em Análise
+                        </h3>
+                        
+                        <p className="text-gray-500 text-sm mb-6 leading-relaxed">
+                            Seu usuário está atualmente cadastrado como <strong>Visitante</strong>.
+                            Nesta modalidade, você não possui permissões de acesso às ferramentas de chamada, escalas ou relatórios.
+                        </p>
+                        
+                        <div className="bg-amber-50/70 border border-amber-200 rounded-xl p-4 text-left w-full mb-6">
+                            <h4 className="text-xs font-bold text-amber-800 uppercase tracking-wider mb-1 flex items-center gap-1">
+                                🔑 Como liberar o acesso?
+                            </h4>
+                            <p className="text-xs text-amber-900 leading-relaxed font-medium">
+                                Solicite à <strong>coordenação</strong> do Ministério Infantil a liberação de perfil adequado para o seu papel (Ministra, Supervisora ou Coordenadora).
+                            </p>
+                        </div>
+                        
+                        <p className="text-[11px] text-gray-400">
+                            Caso queira alternar sua conta, clique no ícone de perfil no topo direito para fazer logout.
+                        </p>
+                    </div>
                 </div>
             );
         }

@@ -73,4 +73,4 @@ export interface ClerkUser {
   role: UserRole;
 }
 
-export type UserRole = 'Pastor' | 'Coordenadora' | 'Supervisora' | 'Ministra';
+export type UserRole = 'Pastor' | 'Coordenadora' | 'Supervisora' | 'Ministra' | 'Visitante';

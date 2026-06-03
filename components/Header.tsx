@@ -77,7 +77,7 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, userRole }) =>
         <>
             <header className="bg-white shadow-sm sticky top-0 z-40 border-b border-gray-100">
                 <div className="container mx-auto p-4">
-                    <div className="flex justify-center md:justify-between items-center">
+                    <div className="flex justify-between items-center">
                         <div className="flex items-center gap-3">
                             <img
                                 src={LOGO_URL}
@@ -89,14 +89,29 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, userRole }) =>
                             </h1>
                         </div>
 
+                        {/* Mobile User Button for Visitante */}
+                        {userRole === 'Visitante' && (
+                            <div className="md:hidden flex items-center gap-2">
+                                <div className="text-right mr-1">
+                                    <p className="text-[10px] text-gray-500 font-medium leading-none">Perfil</p>
+                                    <p className="text-xs font-bold text-brand-blue leading-tight">{userRole}</p>
+                                </div>
+                                <div className="w-8 h-8 rounded-full overflow-hidden border border-gray-300 shadow-sm flex items-center justify-center">
+                                    <UserButton afterSignOutUrl="/" />
+                                </div>
+                            </div>
+                        )}
+
                         {/* Desktop Nav */}
                         <div className="hidden md:flex items-center gap-4">
-                            <nav className="flex items-center space-x-1">
-                                {navItems.map(item => <NavButton key={item.view} {...item} currentView={currentView} onClick={onNavigate} />)}
-                            </nav>
+                            {userRole !== 'Visitante' && (
+                                <nav className="flex items-center space-x-1">
+                                    {navItems.map(item => <NavButton key={item.view} {...item} currentView={currentView} onClick={onNavigate} />)}
+                                </nav>
+                            )}
 
                             {userRole && (
-                                <div className="flex items-center gap-4 ml-4 pl-4 border-l border-gray-200">
+                                <div className={`flex items-center gap-4 ${userRole !== 'Visitante' ? 'ml-4 pl-4 border-l border-gray-200' : ''}`}>
                                     <div className="text-right">
                                         <p className="text-xs text-gray-500 font-medium">Conectado como</p>
                                         <p className="text-sm font-bold text-brand-blue">{userRole}</p>
@@ -112,7 +127,8 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, userRole }) =>
             </header>
 
             {/* Mobile Bottom Navigation */}
-            <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 pb-[env(safe-area-inset-bottom)] shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+            {userRole !== 'Visitante' && (
+                <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 pb-[env(safe-area-inset-bottom)] shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
                 <div className="flex justify-around items-center h-16">
                     {mainMobileItems.map(item => {
                         const isActive = currentView === item.view;
@@ -138,6 +154,7 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, userRole }) =>
                     </button>
                 </div>
             </div>
+            )}
 
             {/* More Menu Bottom Sheet Overlay */}
             {isMenuOpen && (
