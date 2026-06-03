@@ -462,7 +462,7 @@ app.get('/api/available-lessons', async (req, res) => {
         const dataPathCapitalized = path.join(process.cwd(), 'data', 'Topics');
         const dataPathLowercase = path.join(process.cwd(), 'data', 'topics');
         
-        const files: { fileName: string; sizeBytes: number; folder: string }[] = [];
+                const files: { fileName: string; sizeBytes: number; folder: string; createdAt?: string }[] = [];
         
         const scanDir = (dirPath: string, folderName: string) => {
             if (fs.existsSync(dirPath)) {
@@ -475,7 +475,8 @@ app.get('/api/available-lessons', async (req, res) => {
                             files.push({
                                 fileName: f,
                                 sizeBytes: stat.size,
-                                folder: folderName
+                                folder: folderName,
+                                createdAt: stat.mtime.toISOString()
                             });
                         }
                     }
@@ -543,7 +544,8 @@ app.get('/api/available-lessons', async (req, res) => {
                 sizeBytes: f.sizeBytes,
                 className: className || 'Outros',
                 date: dateStr,
-                parsed: parsedCorrectly
+                parsed: parsedCorrectly,
+                createdAt: f.createdAt || new Date().toISOString()
             };
         });
         

@@ -19,12 +19,90 @@ interface AvailableLesson {
   className: string;
   date: string;
   parsed: boolean;
+  createdAt: string;
 }
 
 const MONTHS_PT = [
   'JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO',
   'JULHO', 'AGOSTO', 'SETEMBRO', 'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO'
 ];
+
+const getClassNameWithEmoji = (name: string): { emoji: string; cleanName: string } => {
+  const lower = name.toLowerCase();
+  let emoji = '📄';
+  let cleanName = name;
+
+  if (lower.includes('4') || lower.includes('5')) {
+    emoji = '👶';
+    cleanName = '4–5 anos';
+  } else if (lower.includes('6') || lower.includes('7')) {
+    emoji = '👶';
+    cleanName = '6–7 anos';
+  } else if (lower.includes('8') || lower.includes('9')) {
+    emoji = '🧒';
+    cleanName = '8–9 anos';
+  } else if (lower.includes('10') || lower.includes('11')) {
+    emoji = '🧑';
+    cleanName = '10–11 anos';
+  } else if (lower.includes('berçário') || lower.includes('bercario')) {
+    emoji = '👶';
+    cleanName = 'Berçário';
+  } else if (lower.includes('maternal')) {
+    emoji = '👶';
+    cleanName = 'Maternal';
+  } else if (lower.includes('primários') || lower.includes('primarios')) {
+    emoji = '🧒';
+    cleanName = 'Primários';
+  } else if (lower.includes('juniores')) {
+    emoji = '🧑';
+    cleanName = 'Juniores';
+  }
+  
+  return { emoji, cleanName };
+};
+
+const isNewLesson = (createdAtString: string) => {
+  try {
+    const created = new Date(createdAtString);
+    const diffTime = Math.abs(new Date().getTime() - created.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays <= 7;
+  } catch {
+    return false;
+  }
+};
+
+
+const CardSkeleton = () => (
+  <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm space-y-4 animate-pulse">
+    <div className="flex justify-between items-center">
+      <div className="h-6 w-24 bg-gray-200 rounded-full"></div>
+      <div className="h-4 w-16 bg-gray-200 rounded"></div>
+    </div>
+    <div className="space-y-2">
+      <div className="h-6 w-3/4 bg-gray-200 rounded text-transparent">Aula</div>
+      <div className="h-4 w-1/2 bg-gray-200 rounded text-transparent">Mês</div>
+    </div>
+    <div className="space-y-3 pt-2">
+      <div className="flex items-center gap-2">
+        <div className="h-4 w-4 bg-gray-200 rounded-full"></div>
+        <div className="h-4 w-28 bg-gray-200 rounded"></div>
+      </div>
+      <div className="flex items-center gap-2">
+        <div className="h-4 w-4 bg-gray-200 rounded-full"></div>
+        <div className="h-4 w-20 bg-gray-200 rounded text-transparent">Doc</div>
+      </div>
+      <div className="flex items-center gap-2">
+        <div className="h-4 w-4 bg-gray-200 rounded-full"></div>
+        <div className="h-4 w-16 bg-gray-200 rounded"></div>
+      </div>
+    </div>
+    <div className="pt-2">
+      <div className="h-9 w-full bg-gray-200 rounded-xl"></div>
+    </div>
+  </div>
+);
+
 
 const Topics: React.FC<TopicsProps> = ({ 
   topics, 
@@ -64,6 +142,10 @@ const Topics: React.FC<TopicsProps> = ({
   const [searchFileClass, setSearchFileClass] = useState('');
   const [searchFileMonth, setSearchFileMonth] = useState('');
   const [searchFileYear, setSearchFileYear] = useState('');
+  const [lessonsSearchQuery, setLessonsSearchQuery] = useState('');
+  const [lessonsSortOrder, setLessonsSortOrder] = useState<'recent' | 'oldest' | 'az' | 'za'>('recent');
+  const [lessonsError, setLessonsError] = useState<string | null>(null);
+  const [downloadingLessonsMap, setDownloadingLessonsMap] = useState<Record<string, boolean>>({});
 
   // Option B: Drag and Drop Bulk Uploader State
   const [isDragActive, setIsDragActive] = useState(false);
@@ -79,14 +161,18 @@ const Topics: React.FC<TopicsProps> = ({
   // Fetch available lesson files from backend
   const fetchAvailableLessons = async () => {
     setLoadingLessons(true);
+    setLessonsError(null);
     try {
       const response = await fetch('/api/available-lessons');
       if (response.ok) {
         const data = await response.json();
         setAvailableLessons(data.lessons || []);
+      } else {
+        setLessonsError('Não foi possível carregar as aulas do servidor.');
       }
     } catch (error) {
       console.error('Error fetching available lesson files:', error);
+      setLessonsError('Erro de conexão ao buscar os arquivos de aulas.');
     } finally {
       setLoadingLessons(false);
     }
@@ -182,27 +268,41 @@ const Topics: React.FC<TopicsProps> = ({
     return `AULA ${sundayNum} ${monthName} ${year} - ${upperClass}.docx`;
   };
 
-  const handleDownloadWord = (topicDate: string, className: string, topicTitle?: string, topicDesc?: string) => {
+  const handleDownloadWord = async (topicDate: string, className: string, topicTitle?: string, topicDesc?: string) => {
     const fileName = getLessonFileName(topicDate, className);
-    
-    // Construct the download URL with parameters for fallback generation
-    const params = new URLSearchParams({
-      fileName,
-      title: topicTitle || '',
-      description: topicDesc || '',
-      date: topicDate,
-      className
-    });
-    
-    const downloadUrl = `/api/download-lesson?${params.toString()}`;
-    
-    // Trigger file download
-    const a = document.createElement('a');
-    a.href = downloadUrl;
-    a.download = fileName;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    setDownloadingLessonsMap(prev => ({ ...prev, [fileName]: true }));
+
+    try {
+      const params = new URLSearchParams({
+        fileName,
+        title: topicTitle || '',
+        description: topicDesc || '',
+        date: topicDate,
+        className
+      });
+      
+      const downloadUrl = `/api/download-lesson?${params.toString()}`;
+      const response = await fetch(downloadUrl);
+      if (!response.ok) {
+        throw new Error('Falha ao baixar o arquivo.');
+      }
+      
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
+    } catch (e) {
+      console.error(e);
+      alert('Erro ao realizar o download do arquivo de aula.');
+    } finally {
+      setDownloadingLessonsMap(prev => ({ ...prev, [fileName]: false }));
+    }
   };
 
   // Robust CSV/Excel parser
@@ -534,8 +634,47 @@ const Topics: React.FC<TopicsProps> = ({
         return false;
       }
     }
+
+    // Search query filtering (by title, class name, month, year)
+    let matchesSearch = true;
+    const query = lessonsSearchQuery.toLowerCase().trim();
+    if (query) {
+      const parsed = parseLessonFileName(lesson.fileName);
+      const fileNameLower = lesson.fileName.toLowerCase();
+      const classNameLower = lesson.className.toLowerCase();
+      
+      let titleSearch = fileNameLower;
+      let subtitleSearch = '';
+      if (parsed) {
+        titleSearch = `aula ${parsed.sundayNum}`;
+        subtitleSearch = `${parsed.monthName.toLowerCase()} ${parsed.year}`;
+      }
+      
+      matchesSearch = 
+        fileNameLower.includes(query) ||
+        classNameLower.includes(query) ||
+        titleSearch.includes(query) ||
+        subtitleSearch.includes(query);
+    }
     
-    return matchesClass && matchesMonth && matchesYear;
+    return matchesClass && matchesMonth && matchesYear && matchesSearch;
+  });
+
+  const sortedLessons = [...filteredLessons].sort((a, b) => {
+    if (lessonsSortOrder === 'recent') {
+      const valA = a.date ? a.date + 'T00:00:00' : a.createdAt;
+      const valB = b.date ? b.date + 'T00:00:00' : b.createdAt;
+      return new Date(valB).getTime() - new Date(valA).getTime();
+    } else if (lessonsSortOrder === 'oldest') {
+      const valA = a.date ? a.date + 'T00:00:00' : a.createdAt;
+      const valB = b.date ? b.date + 'T00:00:00' : b.createdAt;
+      return new Date(valA).getTime() - new Date(valB).getTime();
+    } else if (lessonsSortOrder === 'az') {
+      return a.fileName.localeCompare(b.fileName, 'pt-BR');
+    } else if (lessonsSortOrder === 'za') {
+      return b.fileName.localeCompare(a.fileName, 'pt-BR');
+    }
+    return 0;
   });
 
   const isPastor = userRole === 'Pastor';
@@ -548,6 +687,42 @@ const Topics: React.FC<TopicsProps> = ({
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
   };
+  const getLessonCardDetails = (lesson: AvailableLesson) => {
+    const parsed = parseLessonFileName(lesson.fileName);
+    let title = lesson.fileName.replace(/\.docx$/i, '');
+    let subtitle = 'Arquivo externo';
+    let classNameWithEmoji = getClassNameWithEmoji(lesson.className || 'Outros');
+    let hasDate = !!lesson.date;
+    let formattedDate = 'Sem data';
+
+    if (parsed) {
+      title = `Aula ${parsed.sundayNum}`;
+      const monthLower = parsed.monthName.toLowerCase();
+      const monthFormatted = monthLower.charAt(0).toUpperCase() + monthLower.slice(1);
+      subtitle = `${monthFormatted} de ${parsed.year}`;
+      classNameWithEmoji = getClassNameWithEmoji(parsed.className);
+      if (parsed.date) {
+        const d = new Date(parsed.date + 'T00:00:00');
+        formattedDate = d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
+      }
+    } else {
+      if (lesson.date) {
+        const d = new Date(lesson.date + 'T00:00:00');
+        formattedDate = d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
+        hasDate = true;
+      }
+    }
+
+    return {
+      title,
+      subtitle,
+      emoji: classNameWithEmoji.emoji,
+      cleanClassName: classNameWithEmoji.cleanName,
+      formattedDate,
+      hasDate
+    };
+  };
+
 
   return (
     <div className="p-4 md:p-8">
@@ -864,123 +1039,260 @@ const Topics: React.FC<TopicsProps> = ({
           )}
 
           {/* Central Lessons Grid View (Available for all functions) */}
-          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 w-full">
-            <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 mb-6 border-b pb-4 border-gray-100">
+          <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-150 w-full space-y-6">
+            {/* Header Area */}
+            <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
               <div>
-                <h3 className="text-xl font-bold text-brand-dark">Arquivos de Aulas Cadastrados</h3>
-                <p className="text-xs text-gray-400 mt-0.5">Lista de arquivos Word oficiais no servidor.</p>
-              </div>
-
-              {/* Filtering Controls */}
-              <div className="flex flex-wrap items-center gap-3">
-                {/* Class selector */}
-                <select
-                  value={searchFileClass}
-                  onChange={e => setSearchFileClass(e.target.value)}
-                  className="px-2.5 py-1.5 border border-gray-300 rounded-lg text-xs font-semibold text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-brand-blue min-w-[140px]"
-                >
-                  <option value="">Todas as Turmas</option>
-                  {CLASS_NAMES.map(c => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
-                </select>
-
-                {/* Month selector */}
-                <select
-                  value={searchFileMonth}
-                  onChange={e => setSearchFileMonth(e.target.value)}
-                  className="px-2.5 py-1.5 border border-gray-300 rounded-lg text-xs font-semibold text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-brand-blue min-w-[120px]"
-                >
-                  <option value="">Todos os Meses</option>
-                  {MONTHS_PT.map((m, idx) => (
-                    <option key={idx} value={idx}>{m}</option>
-                  ))}
-                </select>
-
-                {/* Year selector */}
-                <select
-                  value={searchFileYear}
-                  onChange={e => setSearchFileYear(e.target.value)}
-                  className="px-2.5 py-1.5 border border-gray-300 rounded-lg text-xs font-semibold text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-brand-blue min-w-[100px]"
-                >
-                  <option value="">Todos os Anos</option>
-                  <option value="2025">2025</option>
-                  <option value="2026">2026</option>
-                  <option value="2027">2027</option>
-                </select>
-
-                {/* Reset Filters */}
-                {(searchFileClass !== '' || searchFileMonth !== '' || searchFileYear !== '') && (
-                  <button
-                    onClick={() => { setSearchFileClass(''); setSearchFileMonth(''); setSearchFileYear(''); }}
-                    className="text-xs text-brand-blue hover:text-blue-800 font-bold"
-                  >
-                    Limpar Filtros
-                  </button>
+                <h3 className="text-xl font-bold text-gray-900">Arquivos de Aulas</h3>
+                <p className="text-sm text-gray-500 mt-1">Encontre e baixe rapidamente os materiais cadastrados.</p>
+                
+                {/* Results Count Badge */}
+                {!loadingLessons && !lessonsError && (
+                  <div className="text-[11px] font-bold text-gray-400 mt-3 bg-gray-50 inline-flex items-center px-2.5 py-1 rounded-md border border-gray-100">
+                    {sortedLessons.length === 0 ? (
+                      <span>Nenhum arquivo encontrado</span>
+                    ) : sortedLessons.length === 1 ? (
+                      <span>1 arquivo encontrado</span>
+                    ) : (
+                      <span>{sortedLessons.length} arquivos encontrados</span>
+                    )}
+                  </div>
                 )}
-
-                {/* Sync list button */}
-                <button
-                  onClick={fetchAvailableLessons}
-                  className="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition"
-                  title="Atualizar lista"
-                  disabled={loadingLessons}
-                >
-                  🔄
-                </button>
               </div>
             </div>
 
-            {/* Files Grid Display */}
-            {loadingLessons ? (
-              <div className="text-center py-16 flex flex-col items-center justify-center gap-3">
-                <div className="w-8 h-8 border-4 border-brand-blue border-t-transparent rounded-full animate-spin"></div>
-                <p className="text-gray-400 text-sm font-medium">Buscando arquivos oficiais no servidor...</p>
+            {/* Unified Search and Filtering Bar */}
+            <div className="bg-gray-50/50 rounded-2xl border border-gray-150 p-4 space-y-3">
+              {/* Search Field */}
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-450">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </span>
+                <input 
+                  type="text" 
+                  value={lessonsSearchQuery}
+                  onChange={e => setLessonsSearchQuery(e.target.value)}
+                  placeholder="Buscar por aula, turma, mês ou ano..."
+                  className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple transition-all duration-200 placeholder-gray-400"
+                />
               </div>
-            ) : filteredLessons.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[58vh] overflow-y-auto pr-2 custom-scrollbar">
-                {filteredLessons.map((lesson, idx) => (
-                  <div key={idx} className="bg-gray-50/50 hover:bg-white rounded-xl border border-gray-200/80 p-4 transition-all duration-200 shadow-sm hover:shadow flex flex-col justify-between gap-4">
-                    <div>
-                      {/* Top badges */}
-                      <div className="flex justify-between items-start gap-2 mb-2">
-                        <span className="text-[10px] font-extrabold uppercase bg-brand-blue/10 text-brand-blue px-2 py-0.5 rounded-full tracking-wider">
-                          {lesson.className}
-                        </span>
-                        {lesson.date ? (
-                          <span className="text-[10px] font-bold text-gray-500 bg-white px-2 py-0.5 rounded-md border border-gray-150">
-                            📅 {new Date(lesson.date + 'T00:00:00').toLocaleDateString('pt-BR')}
-                          </span>
-                        ) : (
-                          <span className="text-[10px] font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded-md border border-red-150">
-                            Sem Data Calculada
-                          </span>
-                        )}
-                      </div>
+              
+              {/* Select Dropdowns and Actions */}
+              <div className="flex flex-wrap items-center gap-3">
+                {/* Class selector */}
+                <div className="flex-1 min-w-[140px]">
+                  <select
+                    value={searchFileClass}
+                    onChange={e => setSearchFileClass(e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple transition-all duration-200"
+                  >
+                    <option value="">Todas as Turmas</option>
+                    {CLASS_NAMES.map(c => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                </div>
 
-                      {/* Header block */}
-                      <h4 className="font-bold text-gray-800 text-sm leading-snug line-clamp-2" title={lesson.fileName}>
-                        {lesson.fileName}
-                      </h4>
-                      <p className="text-[11px] text-gray-400 font-medium mt-1">
-                        Tamanho do arquivo: {formatBytes(lesson.sizeBytes)}
-                      </p>
-                    </div>
+                {/* Month selector */}
+                <div className="flex-1 min-w-[120px]">
+                  <select
+                    value={searchFileMonth}
+                    onChange={e => setSearchFileMonth(e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple transition-all duration-200"
+                  >
+                    <option value="">Todos os Meses</option>
+                    {MONTHS_PT.map((m, idx) => (
+                      <option key={idx} value={idx}>{m}</option>
+                    ))}
+                  </select>
+                </div>
 
-                    {/* Actions */}
+                {/* Year selector */}
+                <div className="flex-1 min-w-[100px]">
+                  <select
+                    value={searchFileYear}
+                    onChange={e => setSearchFileYear(e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple transition-all duration-200"
+                  >
+                    <option value="">Todos os Anos</option>
+                    <option value="2025">2025</option>
+                    <option value="2026">2026</option>
+                    <option value="2027">2027</option>
+                  </select>
+                </div>
+
+                {/* Sorting options */}
+                <div className="flex-1 min-w-[140px]">
+                  <select
+                    value={lessonsSortOrder}
+                    onChange={e => setLessonsSortOrder(e.target.value as any)}
+                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple transition-all duration-200"
+                  >
+                    <option value="recent">Mais recentes</option>
+                    <option value="oldest">Mais antigos</option>
+                    <option value="az">Nome A-Z</option>
+                    <option value="za">Nome Z-A</option>
+                  </select>
+                </div>
+
+                {/* Reset filters & sync */}
+                <div className="flex items-center gap-2">
+                  {(searchFileClass !== '' || searchFileMonth !== '' || searchFileYear !== '' || lessonsSearchQuery !== '') && (
                     <button
-                      onClick={() => handleDownloadWord(lesson.date, lesson.className)}
-                      className="w-full bg-brand-blue hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-xs transition shadow-sm flex items-center justify-center gap-1.5"
+                      onClick={() => {
+                        setSearchFileClass('');
+                        setSearchFileMonth('');
+                        setSearchFileYear('');
+                        setLessonsSearchQuery('');
+                      }}
+                      className="text-xs text-brand-purple hover:text-purple-700 font-bold px-3 py-2 rounded-xl hover:bg-purple-50 transition-all duration-205"
                     >
-                      📥 Baixar Arquivo Word
+                      Limpar Filtros
                     </button>
-                  </div>
+                  )}
+
+                  {/* Sync list button */}
+                  <button
+                    onClick={fetchAvailableLessons}
+                    disabled={loadingLessons}
+                    className="p-2 text-gray-400 hover:text-gray-600 rounded-xl hover:bg-white transition-all duration-200 border border-gray-200 bg-white disabled:opacity-50 flex items-center justify-center"
+                    title="Atualizar lista de arquivos"
+                  >
+                    <svg className={`w-3.5 h-3.5 ${loadingLessons ? 'animate-spin text-brand-purple' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89M9 11l3-3m0 0l3 3m-3-3v12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Main Content Area: Loader / Error / Empty / Grid */}
+            {loadingLessons ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <CardSkeleton key={i} />
                 ))}
               </div>
+            ) : lessonsError ? (
+              <div className="text-center py-16 bg-red-50/10 border border-dashed border-red-150 rounded-2xl flex flex-col items-center justify-center p-6">
+                <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center mb-3">
+                  <svg className="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                </div>
+                <h4 className="text-sm font-bold text-gray-900 mb-1">Erro ao carregar arquivos</h4>
+                <p className="text-xs text-gray-500 mb-4 max-w-sm">{lessonsError}</p>
+                <button
+                  onClick={fetchAvailableLessons}
+                  className="px-4 py-2 bg-brand-purple text-white rounded-xl text-xs font-bold hover:bg-purple-700 transition active:scale-95 shadow-sm"
+                >
+                  Tentar novamente
+                </button>
+              </div>
+            ) : sortedLessons.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-h-[58vh] overflow-y-auto pr-2 custom-scrollbar">
+                {sortedLessons.map((lesson, idx) => {
+                  const details = getLessonCardDetails(lesson);
+                  const isNew = isNewLesson(lesson.createdAt);
+                  const isDownloading = downloadingLessonsMap[lesson.fileName] || false;
+
+                  return (
+                    <div 
+                      key={idx} 
+                      className="bg-white hover:bg-gray-50/20 rounded-2xl border border-gray-150 p-5 transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 flex flex-col justify-between gap-5 relative group"
+                    >
+                      <div className="space-y-4">
+                        {/* Top header row with Class badge and Novo tag */}
+                        <div className="flex justify-between items-center gap-2">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold bg-brand-purple/10 text-brand-purple rounded-full">
+                            <span className="text-xs leading-none">{details.emoji}</span>
+                            <span>{details.cleanClassName}</span>
+                          </span>
+                          
+                          {isNew && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-md">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                              Novo
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Title and Subtitle */}
+                        <div>
+                          <h4 className="font-bold text-gray-900 text-lg leading-tight truncate" title={details.title}>
+                            {details.title}
+                          </h4>
+                          <p className="text-xs text-gray-400 font-semibold mt-1">
+                            {details.subtitle}
+                          </p>
+                        </div>
+
+                        {/* Secondary metadata list */}
+                        <div className="space-y-2 border-t border-gray-50 pt-3">
+                          {/* Publish Date */}
+                          <div className="flex items-center gap-2.5 text-xs text-gray-500">
+                            <svg className="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.2">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <span className="font-medium text-gray-500">Publicado em {details.formattedDate}</span>
+                          </div>
+
+                          {/* File Type */}
+                          <div className="flex items-center gap-2.5 text-xs text-gray-500">
+                            <svg className="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.2">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <span className="font-medium text-gray-500">Documento Word</span>
+                          </div>
+
+                          {/* File Size */}
+                          <div className="flex items-center gap-2.5 text-xs text-gray-500">
+                            <svg className="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.2">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                            </svg>
+                            <span className="font-medium text-gray-500">{formatBytes(lesson.sizeBytes)}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Download Button */}
+                      <button
+                        onClick={() => handleDownloadWord(lesson.date, lesson.className)}
+                        disabled={isDownloading}
+                        className="w-full bg-brand-blue hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition duration-200 shadow-sm hover:shadow active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
+                      >
+                        {isDownloading ? (
+                          <>
+                            <svg className="animate-spin -ml-1 mr-1.5 h-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                            </svg>
+                            <span>Baixando...</span>
+                          </>
+                        ) : (
+                          <>
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            <span>Baixar</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
             ) : (
-              <div className="text-center py-16">
-                <p className="text-4xl mb-3">📂</p>
-                <p className="text-gray-400 text-sm">Nenhum arquivo Word de aula localizado para os filtros selecionados.</p>
+              <div className="text-center py-16 bg-gray-50/20 border border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center p-6">
+                <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3">
+                  <svg className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                  </svg>
+                </div>
+                <h4 className="text-sm font-bold text-gray-900 mb-1">Nenhum arquivo encontrado</h4>
+                <p className="text-xs text-gray-500 max-w-xs px-4">Tente ajustar seus termos de busca ou filtros para localizar a aula desejada.</p>
               </div>
             )}
           </div>

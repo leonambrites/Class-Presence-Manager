@@ -338,11 +338,12 @@ export const dbService = {
 
     async listLessonFiles() {
         const sql = getSql();
-        const result = await sql`SELECT filename, size_bytes, url FROM lessons`;
+        const result = await sql`SELECT filename, size_bytes, url, created_at FROM lessons`;
         return result.map((r: any) => ({
             fileName: r.filename,
             sizeBytes: Number(r.size_bytes || 0),
-            folder: r.url ? 'Vercel Blob' : 'Database'
+            folder: r.url ? 'Vercel Blob' : 'Database',
+            createdAt: r.created_at
         }));
     }
 };
