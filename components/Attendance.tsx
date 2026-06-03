@@ -136,21 +136,21 @@ const Attendance: React.FC<AttendanceProps> = ({
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
                 <h2 className="text-3xl font-bold text-brand-dark mb-4 sm:mb-0">Marcar Presença</h2>
                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-                    <div className="bg-white border border-gray-200 px-4 py-2 rounded-lg shadow-sm flex items-center gap-2">
-                        <label htmlFor="attendance-date-picker" className="text-sm font-bold text-gray-550">Data da Aula:</label>
+                    <div className="bg-white border border-gray-200 px-4 py-2 rounded-lg shadow-sm flex items-center gap-2 shrink-0">
+                        <label htmlFor="attendance-date-picker" className="text-sm font-bold text-gray-550 whitespace-nowrap">Data da Aula:</label>
                         <input
                             id="attendance-date-picker"
                             type="date"
                             value={date}
                             onChange={(e) => setDate(e.target.value)}
-                            className="border border-gray-300 rounded px-2 py-0.5 text-sm font-semibold text-gray-800 focus:outline-none focus:ring-2 focus:ring-brand-blue bg-white"
+                            className="border border-gray-300 rounded px-2 py-0.5 text-sm font-semibold text-gray-800 focus:outline-none focus:ring-2 focus:ring-brand-blue bg-white shrink-0"
                         />
                         {selectedDay.name ? (
-                            <span className={`ml-2 px-2 py-0.5 text-xs font-semibold rounded-full ${selectedDay.important ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}`}>
+                            <span className={`ml-2 px-2 py-0.5 text-xs font-semibold rounded-full whitespace-nowrap ${selectedDay.important ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}`}>
                                 {selectedDay.name}
                             </span>
                         ) : (
-                            <span className="ml-2 px-2 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-800">
+                            <span className="ml-2 px-2 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-800 whitespace-nowrap">
                                 Fora do dia de Aula
                             </span>
                         )}
