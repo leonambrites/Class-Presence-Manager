@@ -234,14 +234,30 @@ app.get('/api/download-lesson', async (req, res) => {
         return res.status(400).json({ error: 'Missing fileName parameter' });
     }
 
-    const dataPathCapitalized = path.join(process.cwd(), 'data', 'Topics');
-    const dataPathLowercase = path.join(process.cwd(), 'data', 'topics');
-    
-    let filePath = path.join(dataPathCapitalized, String(fileName));
     console.log(`[DOWNLOAD] Requesting file name: ${fileName}`);
-    console.log(`[DOWNLOAD] Checking path: ${filePath}`);
 
     try {
+        // 1. Try fetching from PostgreSQL database first
+        try {
+            const dbFile = await dbService.getLessonFile(String(fileName));
+            if (dbFile) {
+                console.log(`[DOWNLOAD] File found in database: ${fileName}`);
+                const buffer = Buffer.from(dbFile.filecontent, 'base64');
+                res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+                res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+                return res.send(buffer);
+            }
+        } catch (dbErr) {
+            console.error('[DOWNLOAD] Error reading from database:', dbErr);
+        }
+
+        // 2. Fallback to local files if database doesn't have it (e.g. pre-packaged files)
+        const dataPathCapitalized = path.join(process.cwd(), 'data', 'Topics');
+        const dataPathLowercase = path.join(process.cwd(), 'data', 'topics');
+        
+        let filePath = path.join(dataPathCapitalized, String(fileName));
+        console.log(`[DOWNLOAD] Checking path: ${filePath}`);
+
         let fileExists = fs.existsSync(filePath);
         if (!fileExists) {
             const fallbackPath = path.join(dataPathLowercase, String(fileName));
@@ -446,6 +462,18 @@ app.get('/api/available-lessons', async (req, res) => {
         
         scanDir(dataPathCapitalized, 'Topics');
         scanDir(dataPathLowercase, 'topics');
+
+        // Fetch files stored in PostgreSQL
+        try {
+            const dbFiles = await dbService.listLessonFiles();
+            for (const dbFile of dbFiles) {
+                if (!files.some(existing => existing.fileName === dbFile.fileName)) {
+                    files.push(dbFile);
+                }
+            }
+        } catch (dbErr) {
+            console.error('[AVAILABLE LESSONS] Error reading from database:', dbErr);
+        }
         
         const MONTHS_PT = [
           'JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO',
@@ -510,16 +538,28 @@ app.post('/api/upload-lesson', async (req, res) => {
         if (!fileName || !fileContent) {
             return res.status(400).json({ error: 'Missing fileName or fileContent' });
         }
+
+        // Calculate size in bytes
+        const sizeBytes = Math.round((String(fileContent).length * 3) / 4);
+
+        // 1. Save persistently to PostgreSQL
+        await dbService.saveLessonFile(String(fileName), String(fileContent), sizeBytes);
+        console.log(`[UPLOAD] File saved to database: ${fileName}`);
         
-        const dataPath = path.join(process.cwd(), 'data', 'Topics');
-        if (!fs.existsSync(dataPath)) {
-            fs.mkdirSync(dataPath, { recursive: true });
+        // 2. Try saving to local file system as a fallback (succeeds locally, will fail on Vercel)
+        try {
+            const dataPath = path.join(process.cwd(), 'data', 'Topics');
+            if (!fs.existsSync(dataPath)) {
+                fs.mkdirSync(dataPath, { recursive: true });
+            }
+            
+            const filePath = path.join(dataPath, String(fileName));
+            const buffer = Buffer.from(String(fileContent), 'base64');
+            fs.writeFileSync(filePath, buffer);
+            console.log(`[UPLOAD] File saved locally: ${filePath}`);
+        } catch (fsErr) {
+            console.warn('[UPLOAD] Local file system write skipped (possibly Vercel read-only FS):', fsErr);
         }
-        
-        const filePath = path.join(dataPath, String(fileName));
-        const buffer = Buffer.from(String(fileContent), 'base64');
-        fs.writeFileSync(filePath, buffer);
-        console.log(`[UPLOAD] File saved successfully: ${filePath}`);
         
         // Auto topic creation in DB
         if (date) {

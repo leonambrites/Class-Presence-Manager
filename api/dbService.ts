@@ -308,5 +308,31 @@ export const dbService = {
             console.error("Seed transaction failed:", error);
             throw error;
         }
+    },
+
+    async saveLessonFile(filename: string, filecontent: string, sizeBytes: number) {
+        const sql = getSql();
+        await sql`
+            INSERT INTO lessons (filename, filecontent, size_bytes, created_at)
+            VALUES (${filename}, ${filecontent}, ${sizeBytes}, ${getTimestamp()})
+            ON CONFLICT (filename) 
+            DO UPDATE SET filecontent = EXCLUDED.filecontent, size_bytes = EXCLUDED.size_bytes, created_at = EXCLUDED.created_at
+        `;
+    },
+
+    async getLessonFile(filename: string) {
+        const sql = getSql();
+        const result = await sql`SELECT filecontent FROM lessons WHERE filename = ${filename}`;
+        return result.length > 0 ? result[0] : null;
+    },
+
+    async listLessonFiles() {
+        const sql = getSql();
+        const result = await sql`SELECT filename, size_bytes FROM lessons`;
+        return result.map((r: any) => ({
+            fileName: r.filename,
+            sizeBytes: Number(r.size_bytes || 0),
+            folder: 'Database'
+        }));
     }
 };

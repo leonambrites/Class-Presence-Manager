@@ -128,6 +128,16 @@ export const initDb = async () => {
             )
         `;
 
+        // Lessons Table (for storing uploaded docx files persistently on Vercel)
+        await sql`
+            CREATE TABLE IF NOT EXISTS lessons (
+                filename TEXT PRIMARY KEY,
+                filecontent TEXT NOT NULL,
+                size_bytes INTEGER DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `;
+
         console.log("Vercel Postgres Database initialized successfully.");
     } catch (error) {
         console.error("Error initializing Vercel Postgres database:", error);
