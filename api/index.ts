@@ -2,7 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
-import { handleUpload } from '@vercel/blob/client';
+import { generateClientTokenFromReadWriteToken } from '@vercel/blob/client';
 
 // Load local variables for local development
 dotenv.config({ path: '.env.local' });
@@ -538,50 +538,33 @@ app.get('/api/available-lessons', async (req, res) => {
     }
 });
 
-// Token signing endpoint for Vercel Blob client-side uploads
-app.post('/api/upload-lesson/vercel-blob', async (req, res) => {
-    const logPath = path.join(process.cwd(), 'backend_debug.log');
-    const log = (msg: string) => {
-        try {
-            fs.appendFileSync(logPath, `[${new Date().toISOString()}] ${msg}\n`);
-        } catch (e) {
-            console.error('Logging failed:', e);
-        }
-    };
-
+// Token generation endpoint for Vercel Blob client-side uploads
+app.post('/api/upload-lesson/get-token', async (req, res) => {
     try {
-        log(`Incoming request to /api/upload-lesson/vercel-blob`);
-        log(`Headers: ${JSON.stringify(req.headers)}`);
-        log(`Body: ${JSON.stringify(req.body)}`);
-        
-        const token = process.env.BLOB_READ_WRITE_TOKEN;
-        log(`Token exists: ${!!token}, length: ${token ? token.length : 0}`);
-        
-        const jsonResponse = await handleUpload({
-            token,
-            body: req.body,
-            request: req,
-            onBeforeGenerateToken: async (pathname) => {
-                log(`onBeforeGenerateToken called for pathname: ${pathname}`);
-                return {
-                    tokenPayload: JSON.stringify({
-                        // optional payload
-                    })
-                };
-            },
-            onUploadCompleted: async ({ blob, tokenPayload }) => {
-                log(`onUploadCompleted called: ${blob.url}`);
-            }
-        });
-        log(`handleUpload succeeded, responding 200: ${JSON.stringify(jsonResponse)}`);
-        res.status(200).json(jsonResponse);
-    } catch (error) {
-        const errMessage = error instanceof Error ? error.message : String(error);
-        log(`[BLOB UPLOAD ERROR] ${errMessage}`);
-        if (error instanceof Error && error.stack) {
-            log(`Stack: ${error.stack}`);
+        const { pathname } = req.body;
+        if (!pathname) {
+            return res.status(400).json({ error: 'Missing pathname' });
         }
-        res.status(400).json({ error: errMessage });
+
+        const token = process.env.BLOB_READ_WRITE_TOKEN;
+        if (!token) {
+            console.error('[BLOB TOKEN] BLOB_READ_WRITE_TOKEN is not set');
+            return res.status(500).json({ error: 'Blob storage not configured' });
+        }
+
+        console.log(`[BLOB TOKEN] Generating client token for: ${pathname}`);
+
+        const clientToken = await generateClientTokenFromReadWriteToken({
+            token,
+            pathname,
+        });
+
+        console.log(`[BLOB TOKEN] Client token generated successfully for: ${pathname}`);
+        res.status(200).json({ clientToken });
+    } catch (error) {
+        console.error('[BLOB TOKEN ERROR]', error);
+        const errMessage = error instanceof Error ? error.message : String(error);
+        res.status(500).json({ error: `Failed to generate upload token: ${errMessage}` });
     }
 });
 
