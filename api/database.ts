@@ -138,6 +138,12 @@ export const initDb = async () => {
             )
         `;
 
+        try {
+            await sql`ALTER TABLE lessons ADD COLUMN url TEXT`;
+        } catch (e) {
+            // Column likely already exists
+        }
+
         console.log("Vercel Postgres Database initialized successfully.");
     } catch (error) {
         console.error("Error initializing Vercel Postgres database:", error);

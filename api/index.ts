@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
+import { handleUpload } from '@vercel/blob/client';
 
 // Load local variables for local development
 dotenv.config({ path: '.env.local' });
@@ -241,11 +242,17 @@ app.get('/api/download-lesson', async (req, res) => {
         try {
             const dbFile = await dbService.getLessonFile(String(fileName));
             if (dbFile) {
-                console.log(`[DOWNLOAD] File found in database: ${fileName}`);
-                const buffer = Buffer.from(dbFile.filecontent, 'base64');
-                res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-                res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
-                return res.send(buffer);
+                if (dbFile.url) {
+                    console.log(`[DOWNLOAD] File found in database with Vercel Blob URL: ${dbFile.url}`);
+                    return res.redirect(dbFile.url);
+                }
+                if (dbFile.filecontent) {
+                    console.log(`[DOWNLOAD] File found in database with base64 content: ${fileName}`);
+                    const buffer = Buffer.from(dbFile.filecontent, 'base64');
+                    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+                    res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+                    return res.send(buffer);
+                }
             }
         } catch (dbErr) {
             console.error('[DOWNLOAD] Error reading from database:', dbErr);
@@ -528,6 +535,66 @@ app.get('/api/available-lessons', async (req, res) => {
     } catch (error) {
         console.error('[AVAILABLE LESSONS] Error reading directory:', error);
         res.status(500).json({ error: 'Failed to retrieve available lessons' });
+    }
+});
+
+// Token signing endpoint for Vercel Blob client-side uploads
+app.post('/api/upload-lesson/vercel-blob', async (req, res) => {
+    try {
+        const jsonResponse = await handleUpload({
+            body: req.body,
+            request: req,
+            onBeforeGenerateToken: async (pathname) => {
+                return {
+                    allowedContentTypes: [
+                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                        'application/msword'
+                    ],
+                    tokenPayload: JSON.stringify({
+                        // optional payload
+                    })
+                };
+            },
+            onUploadCompleted: async ({ blob, tokenPayload }) => {
+                // local fallback won't trigger this, but registration will be handled client-side
+                console.log('[BLOB UPLOAD COMPLETED]', blob.url);
+            }
+        });
+        res.status(200).json(jsonResponse);
+    } catch (error) {
+        console.error('[BLOB UPLOAD ERROR]', error);
+        res.status(400).json({ error: error instanceof Error ? error.message : 'Failed to generate token' });
+    }
+});
+
+// Register uploaded Vercel Blob metadata and associate it with a Topic
+app.post('/api/upload-lesson/register', async (req, res) => {
+    try {
+        const { fileName, url, sizeBytes, date, title, description } = req.body;
+        if (!fileName || !url) {
+            return res.status(400).json({ error: 'Missing fileName or url' });
+        }
+
+        // Save blob url info to Database
+        await dbService.saveLessonBlobUrl(fileName, url, Number(sizeBytes || 0));
+        console.log(`[UPLOAD REGISTRATION] Registered Vercel Blob: ${fileName} -> ${url}`);
+
+        // Auto topic creation in DB
+        if (date) {
+            const allData = await dbService.getAllData();
+            const exists = allData.topics.some((t: any) => t.date === date);
+            if (!exists) {
+                const finalTitle = title ? String(title) : `Aula - ${String(fileName).replace('.docx', '')}`;
+                const finalDesc = description ? String(description) : `Arquivo de aula enviado pelo Pastor.`;
+                await dbService.addTopic(date, finalTitle, finalDesc);
+                console.log(`[UPLOAD REGISTRATION] Created new topic in DB for date: ${date}`);
+            }
+        }
+
+        res.status(200).json({ success: true, message: 'Lesson registered successfully' });
+    } catch (error) {
+        console.error('[UPLOAD REGISTRATION ERROR]', error);
+        res.status(500).json({ error: 'Failed to register lesson' });
     }
 });
 

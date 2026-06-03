@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Topic, UserRole } from '../types';
 import { CLASS_NAMES } from '../constants';
 import Modal from './Modal';
+import { upload } from '@vercel/blob/client';
 
 interface TopicsProps {
   topics: Topic[];
@@ -305,32 +306,39 @@ const Topics: React.FC<TopicsProps> = ({
     e.preventDefault();
     if (!uploadingTopic || !directFile) return;
 
-    if (directFile.size > 3.2 * 1024 * 1024) {
-      alert(`O arquivo "${directFile.name}" é muito grande (${(directFile.size / (1024 * 1024)).toFixed(1)} MB). O limite máximo de envio é de 3.2 MB para evitar erros de limite no servidor Vercel. Por favor, compacte as imagens do documento no MS Word (Compactar Imagens) e tente novamente.`);
+    if (directFile.size > 50 * 1024 * 1024) {
+      alert(`O arquivo "${directFile.name}" é muito grande (${(directFile.size / (1024 * 1024)).toFixed(1)} MB). O limite máximo de envio é de 50 MB.`);
       return;
     }
 
     setDirectUploading(true);
     try {
-      const base64Content = await fileToBase64(directFile);
       const generatedName = getLessonFileName(uploadingTopic.date, uploadingClass);
 
+      // 1. Upload to Vercel Blob directly from client
+      const blob = await upload(generatedName, directFile, {
+        access: 'public',
+        handleUploadUrl: '/api/upload-lesson/vercel-blob',
+      });
+
+      // 2. Register metadata in Neon Database
       const payload = {
         fileName: generatedName,
-        fileContent: base64Content,
+        url: blob.url,
+        sizeBytes: directFile.size,
         date: uploadingTopic.date,
         title: uploadingTopic.title,
         description: uploadingTopic.description
       };
 
-      const response = await fetch('/api/upload-lesson', {
+      const response = await fetch('/api/upload-lesson/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
 
       if (response.ok) {
-        alert('Aula enviada com sucesso! O arquivo físico oficial já está vinculado e disponível para download.');
+        alert('Aula enviada com sucesso! O arquivo físico oficial já está vinculado e disponível para download via Vercel Blob.');
         setUploadingTopic(null);
         setDirectFile(null);
         if (activeTab === 'files') {
@@ -338,11 +346,11 @@ const Topics: React.FC<TopicsProps> = ({
         }
       } else {
         const errorData = await response.json();
-        alert(`Erro ao fazer upload: ${errorData.error || 'Tente novamente.'}`);
+        alert(`Erro ao registrar upload: ${errorData.error || 'Tente novamente.'}`);
       }
     } catch (err) {
       console.error(err);
-      alert('Ocorreu um erro no processamento do arquivo.');
+      alert('Ocorreu um erro no envio ou processamento do arquivo. Detalhes: ' + (err instanceof Error ? err.message : String(err)));
     } finally {
       setDirectUploading(false);
     }
@@ -404,9 +412,9 @@ const Topics: React.FC<TopicsProps> = ({
       newStatuses[file.name] = 'uploading';
       setBulkUploadStatus({ ...newStatuses });
 
-      if (file.size > 3.2 * 1024 * 1024) {
+      if (file.size > 50 * 1024 * 1024) {
         newStatuses[file.name] = 'error';
-        results.push(`❌ "${file.name}": Arquivo muito grande (${(file.size / (1024 * 1024)).toFixed(1)} MB). O limite de envio no Vercel é de 3.2 MB. Por favor, compacte as imagens do arquivo no Word e tente novamente.`);
+        results.push(`❌ "${file.name}": Arquivo muito grande (${(file.size / (1024 * 1024)).toFixed(1)} MB). O limite de envio é de 50 MB.`);
         setBulkUploadStatus({ ...newStatuses });
         continue;
       }
@@ -425,18 +433,23 @@ const Topics: React.FC<TopicsProps> = ({
           continue;
         }
 
-        // Convert and upload
-        const base64Content = await fileToBase64(file);
+        // 1. Upload directly to Vercel Blob from client
+        const blob = await upload(file.name, file, {
+          access: 'public',
+          handleUploadUrl: '/api/upload-lesson/vercel-blob',
+        });
         
+        // 2. Register metadata in Neon Database
         const payload = {
           fileName: file.name,
-          fileContent: base64Content,
+          url: blob.url,
+          sizeBytes: file.size,
           date: parsed.date,
           title: `Aula ${parsed.sundayNum} de ${parsed.monthName.toLowerCase()} - ${parsed.className}`,
           description: `Aula oficial carregada para a turma ${parsed.className} correspondente ao ${parsed.sundayNum}º domingo de ${parsed.monthName.toLowerCase()} de ${parsed.year}.`
         };
 
-        const response = await fetch('/api/upload-lesson', {
+        const response = await fetch('/api/upload-lesson/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -448,11 +461,11 @@ const Topics: React.FC<TopicsProps> = ({
         } else {
           newStatuses[file.name] = 'error';
           const errorData = await response.json();
-          results.push(`❌ "${file.name}": Falha no servidor - ${errorData.error}`);
+          results.push(`❌ "${file.name}": Falha ao registrar - ${errorData.error}`);
         }
       } catch (err) {
         newStatuses[file.name] = 'error';
-        results.push(`❌ "${file.name}": Erro de leitura ou rede.`);
+        results.push(`❌ "${file.name}": Erro de envio ou rede: ${err instanceof Error ? err.message : String(err)}`);
       }
       setBulkUploadStatus({ ...newStatuses });
     }

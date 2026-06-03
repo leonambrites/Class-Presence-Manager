@@ -320,19 +320,29 @@ export const dbService = {
         `;
     },
 
+    async saveLessonBlobUrl(filename: string, url: string, sizeBytes: number) {
+        const sql = getSql();
+        await sql`
+            INSERT INTO lessons (filename, url, filecontent, size_bytes, created_at)
+            VALUES (${filename}, ${url}, '', ${sizeBytes}, ${getTimestamp()})
+            ON CONFLICT (filename) 
+            DO UPDATE SET url = EXCLUDED.url, size_bytes = EXCLUDED.size_bytes, created_at = EXCLUDED.created_at
+        `;
+    },
+
     async getLessonFile(filename: string) {
         const sql = getSql();
-        const result = await sql`SELECT filecontent FROM lessons WHERE filename = ${filename}`;
+        const result = await sql`SELECT filecontent, url FROM lessons WHERE filename = ${filename}`;
         return result.length > 0 ? result[0] : null;
     },
 
     async listLessonFiles() {
         const sql = getSql();
-        const result = await sql`SELECT filename, size_bytes FROM lessons`;
+        const result = await sql`SELECT filename, size_bytes, url FROM lessons`;
         return result.map((r: any) => ({
             fileName: r.filename,
             sizeBytes: Number(r.size_bytes || 0),
-            folder: 'Database'
+            folder: r.url ? 'Vercel Blob' : 'Database'
         }));
     }
 };
