@@ -541,15 +541,15 @@ app.get('/api/available-lessons', async (req, res) => {
 // Token signing endpoint for Vercel Blob client-side uploads
 app.post('/api/upload-lesson/vercel-blob', async (req, res) => {
     try {
+        const token = process.env.BLOB_READ_WRITE_TOKEN;
+        console.log(`[BLOB SIGNING] Token exists: ${!!token}, length: ${token ? token.length : 0}`);
+        
         const jsonResponse = await handleUpload({
+            token,
             body: req.body,
             request: req,
             onBeforeGenerateToken: async (pathname) => {
                 return {
-                    allowedContentTypes: [
-                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                        'application/msword'
-                    ],
                     tokenPayload: JSON.stringify({
                         // optional payload
                     })
