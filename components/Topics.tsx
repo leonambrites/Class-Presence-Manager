@@ -329,7 +329,7 @@ const Topics: React.FC<TopicsProps> = ({
 
       // 2. Upload directly to Vercel Blob using the client token
       const blob = await put(generatedName, directFile, {
-        access: 'public',
+        access: 'private',
         token: clientToken,
       });
 
@@ -459,7 +459,7 @@ const Topics: React.FC<TopicsProps> = ({
 
         // 2. Upload directly to Vercel Blob using the client token
         const blob = await put(file.name, file, {
-          access: 'public',
+          access: 'private',
           token: clientToken,
         });
         
