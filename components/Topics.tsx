@@ -72,6 +72,53 @@ const isNewLesson = (createdAtString: string) => {
   }
 };
 
+const normalizeClassName = (name: string): string => {
+  const lower = name.toLowerCase().trim();
+  if (lower.includes('maternal')) return 'Maternal';
+  if (lower.includes('2') || lower.includes('3')) return '2 a 3 anos';
+  if (lower.includes('4') || lower.includes('5')) return '4 a 5 anos';
+  if (lower.includes('6') || lower.includes('7')) return '6 a 7 anos';
+  if (lower.includes('8') || lower.includes('9') || lower.includes('10')) return '8 a 10 anos';
+  if (lower.includes('seeds')) return 'Seeds';
+  return name;
+};
+
+const getClassBadgeStyle = (className: string) => {
+    switch (className) {
+        case 'Maternal':
+            return 'bg-rose-50 border-rose-200 text-rose-700 hover:bg-rose-100';
+        case '2 a 3 anos':
+            return 'bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100';
+        case '4 a 5 anos':
+            return 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100';
+        case '6 a 7 anos':
+            return 'bg-sky-50 border-sky-200 text-sky-700 hover:bg-sky-100';
+        case '8 a 10 anos':
+            return 'bg-violet-50 border-violet-200 text-violet-700 hover:bg-violet-100';
+        case 'Seeds':
+            return 'bg-fuchsia-50 border-fuchsia-200 text-fuchsia-700 hover:bg-fuchsia-100';
+        default:
+            return 'bg-blue-50 border-blue-200 text-brand-blue hover:bg-blue-100';
+    }
+};
+
+const formatLessonDateLong = (dateStr: string) => {
+  if (!dateStr) return 'Sem data';
+  try {
+    const d = new Date(dateStr + 'T00:00:00');
+    const day = d.getDate();
+    const monthNames = [
+      'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
+      'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'
+    ];
+    const month = monthNames[d.getMonth()];
+    const year = d.getFullYear();
+    return `${day} de ${month} de ${year}`;
+  } catch {
+    return dateStr;
+  }
+};
+
 
 const CardSkeleton = () => (
   <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm space-y-4 animate-pulse">
@@ -1206,53 +1253,29 @@ const Topics: React.FC<TopicsProps> = ({
                       <div className="space-y-4">
                         {/* Top header row with Class badge and Novo tag */}
                         <div className="flex justify-between items-center gap-2">
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold bg-brand-purple/10 text-brand-purple rounded-full">
+                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold border rounded-full ${getClassBadgeStyle(normalizeClassName(lesson.className))}`}>
                             <span className="text-xs leading-none">{details.emoji}</span>
                             <span>{details.cleanClassName}</span>
                           </span>
                           
                           {isNew && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-md">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-md">
                               Novo
                             </span>
                           )}
                         </div>
 
-                        {/* Title and Subtitle */}
-                        <div>
+                        {/* Title and Lesson Date (Temporal Info) */}
+                        <div className="space-y-2">
                           <h4 className="font-bold text-gray-900 text-lg leading-tight truncate" title={details.title}>
                             {details.title}
                           </h4>
-                          <p className="text-xs text-gray-400 font-semibold mt-1">
-                            {details.subtitle}
-                          </p>
-                        </div>
-
-                        {/* Secondary metadata list */}
-                        <div className="space-y-2 border-t border-gray-50 pt-3">
-                          {/* Publish Date */}
-                          <div className="flex items-center gap-2.5 text-xs text-gray-500">
-                            <svg className="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.2">
+                          
+                          <div className="flex items-center gap-2 text-xs text-gray-500">
+                            <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
-                            <span className="font-medium text-gray-500">Publicado em {details.formattedDate}</span>
-                          </div>
-
-                          {/* File Type */}
-                          <div className="flex items-center gap-2.5 text-xs text-gray-500">
-                            <svg className="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.2">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            <span className="font-medium text-gray-500">Documento Word</span>
-                          </div>
-
-                          {/* File Size */}
-                          <div className="flex items-center gap-2.5 text-xs text-gray-500">
-                            <svg className="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.2">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                            </svg>
-                            <span className="font-medium text-gray-500">{formatBytes(lesson.sizeBytes)}</span>
+                            <span className="font-medium text-gray-500">{formatLessonDateLong(lesson.date)}</span>
                           </div>
                         </div>
                       </div>
@@ -1276,7 +1299,7 @@ const Topics: React.FC<TopicsProps> = ({
                             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                             </svg>
-                            <span>Baixar</span>
+                            <span>Baixar material</span>
                           </>
                         )}
                       </button>
