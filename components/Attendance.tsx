@@ -217,7 +217,7 @@ const Attendance: React.FC<AttendanceProps> = ({
                         <span className="text-xl mt-0.5">⚠️</span>
                         <div>
                             <p className="font-bold text-amber-900">Marcação de Presença Desabilitada</p>
-                            <p className="text-sm text-amber-800">A chamada online e cadastro de novos alunos só podem ser realizados às **Quartas-feiras** ou **Domingos**. Hoje o painel está aberto apenas para consulta.</p>
+                            <p className="text-sm text-amber-800">A chamada online e cadastro de novos alunos só podem ser realizados às <strong>Quartas-feiras</strong> ou <strong>Domingos</strong>. Hoje o painel está aberto apenas para consulta.</p>
                         </div>
                     </div>
                 )}
