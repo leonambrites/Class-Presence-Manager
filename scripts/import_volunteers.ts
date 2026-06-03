@@ -5,6 +5,9 @@ import csv from 'csv-parser';
 import dotenv from 'dotenv';
 import { neon } from '@neondatabase/serverless';
 
+import { Readable } from 'stream';
+import { decodeBuffer } from './encoding';
+
 dotenv.config();
 
 const csvFilePath = path.join(__dirname, '../equipe.csv');
@@ -33,7 +36,11 @@ const importVolunteers = async () => {
     const volunteersToInsert: any[] = [];
     console.log('Lendo dados do arquivo CSV...');
 
-    fs.createReadStream(csvFilePath)
+    const fileBuffer = fs.readFileSync(csvFilePath);
+    const decodedContent = decodeBuffer(fileBuffer);
+    const contentStream = Readable.from([decodedContent]);
+
+    contentStream
         // Adjust the mapHeaders to handle potential BOM and trailing spaces exactly
         .pipe(csv({ separator: ';', mapHeaders: ({ header }) => header.trim().replace(/^[\uFEFF\u200B]+/, '') }))
         .on('data', (row: CsvRow) => {

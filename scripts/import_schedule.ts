@@ -5,6 +5,9 @@ import csv from 'csv-parser';
 import dotenv from 'dotenv';
 import { neon } from '@neondatabase/serverless';
 
+import { Readable } from 'stream';
+import { decodeBuffer } from './encoding';
+
 dotenv.config({ path: '.env.local' });
 dotenv.config();
 
@@ -59,7 +62,11 @@ const importSchedule = async () => {
     const entriesToInsert: any[] = [];
     console.log('Lendo dados do arquivo CSV...');
 
-    fs.createReadStream(csvFilePath, { encoding: 'latin1' })
+    const fileBuffer = fs.readFileSync(csvFilePath);
+    const decodedContent = decodeBuffer(fileBuffer);
+    const contentStream = Readable.from([decodedContent]);
+
+    contentStream
         // Use tab separator instead of ;
         .pipe(csv({ separator: '\t', mapHeaders: ({ header }) => header.trim().toLowerCase().replace(/^[\uFEFF\u200B]+/, '') }))
         .on('data', (row: any) => {

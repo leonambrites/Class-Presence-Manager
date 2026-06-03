@@ -5,6 +5,9 @@ import csv from 'csv-parser';
 import { dbService } from '../api/dbService';
 import { StudentType } from '../types';
 
+import { Readable } from 'stream';
+import { decodeBuffer } from './encoding';
+
 // O caminho para o arquivo alunos.csv na raiz do projeto
 const csvFilePath = path.join(__dirname, '../alunos.csv');
 
@@ -40,7 +43,11 @@ const importStudents = async () => {
 
     console.log('Lendo dados do arquivo CSV...');
 
-    fs.createReadStream(csvFilePath)
+    const fileBuffer = fs.readFileSync(csvFilePath);
+    const decodedContent = decodeBuffer(fileBuffer);
+    const contentStream = Readable.from([decodedContent]);
+
+    contentStream
         .pipe(csv({ separator: ';', mapHeaders: ({ header }) => header.trim().replace(/^[\uFEFF\u200B]+/, '') }))
         .on('data', (row: CsvRow) => {
             console.log("Raw Row data:", JSON.stringify(row));

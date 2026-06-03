@@ -8,7 +8,6 @@ interface DashboardProps {
     students: Student[];
     selectedClass: string;
     onClassChange: (className: string) => void;
-    onSaveData: () => Promise<void>;
     userRole: UserRole;
 }
 
@@ -34,7 +33,18 @@ const getDayFromDate = (dateString: string): 'Sunday' | 'Wednesday' | null => {
     return null;
 }
 
-const DailyView: React.FC<DashboardProps & { startDate: string; setStartDate: (date: string) => void; endDate: string; setEndDate: (date: string) => void }> = ({ students, selectedClass, onClassChange, startDate, setStartDate, endDate, setEndDate }) => {
+interface DailyViewProps {
+    students: Student[];
+    selectedClass: string;
+    onClassChange: (className: string) => void;
+    startDate: string;
+    setStartDate: (date: string) => void;
+    endDate: string;
+    setEndDate: (date: string) => void;
+    setDownloadFn: (fn: (() => void) | null) => void;
+}
+
+const DailyView: React.FC<DailyViewProps> = ({ students, selectedClass, onClassChange, startDate, setStartDate, endDate, setEndDate, setDownloadFn }) => {
     const studentsToDisplay = selectedClass === 'All'
         ? students
         : students.filter(s => s.class === selectedClass);
@@ -125,6 +135,57 @@ const DailyView: React.FC<DashboardProps & { startDate: string; setStartDate: (d
         });
         return occurrences.sort((a, b) => b.date.localeCompare(a.date) || a.student.name.localeCompare(b.student.name));
     }, [studentsToDisplay, startDate, endDate]);
+
+    React.useEffect(() => {
+        setDownloadFn(() => () => {
+            let csvContent = '\uFEFF'; // UTF-8 BOM so Excel opens it with accents correctly
+            
+            // Headers/Title for Daily view
+            csvContent += `Dashboard - Visão Diária\n`;
+            csvContent += `Período;${startDate} a ${endDate}\n`;
+            csvContent += `Turma;${selectedClass === 'All' ? 'Todas as Turmas' : selectedClass}\n\n`;
+
+            // Stats
+            csvContent += `Métrica;Valor\n`;
+            csvContent += `Total Presentes;${totalPresent}\n`;
+            csvContent += `Membros Presentes;${presentMembers}\n`;
+            csvContent += `Visitantes Presentes;${presentVisitors}\n\n`;
+
+            // Class Breakdown (only if selectedClass === 'All')
+            if (selectedClass === 'All') {
+                csvContent += `Presença por Turma\n`;
+                CLASS_NAMES.forEach(className => {
+                    csvContent += `${className};${getClassPresence(className)}\n`;
+                });
+                csvContent += `\n`;
+            }
+
+            // Student Presence List
+            csvContent += `Código Diário;Nome;Turma;Idade;Data;Tipo\n`;
+            presentOccurrences.forEach(occ => {
+                const student = occ.student;
+                const displayCode = occ.dailyCode || '-';
+                const age = calculateAge(student.birthday, student.age);
+                const dateStr = new Date(occ.date + 'T00:00:00').toLocaleDateString('pt-BR');
+                csvContent += `${displayCode};"${student.name.replace(/"/g, '""')}";${student.class};${age};${dateStr};${student.type}\n`;
+            });
+
+            // Create a blob and download it
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            const fileName = `dashboard_diario_${startDate}_a_${endDate}.csv`;
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', fileName);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+        
+        return () => setDownloadFn(null);
+    }, [students, selectedClass, startDate, endDate, totalPresent, presentMembers, presentVisitors, presentOccurrences]);
 
     return (
         <div>
@@ -286,7 +347,14 @@ const DailyView: React.FC<DashboardProps & { startDate: string; setStartDate: (d
     );
 };
 
-const MonthlyView: React.FC<DashboardProps> = ({ students, selectedClass, onClassChange }) => {
+interface MonthlyViewProps {
+    students: Student[];
+    selectedClass: string;
+    onClassChange: (className: string) => void;
+    setDownloadFn: (fn: (() => void) | null) => void;
+}
+
+const MonthlyView: React.FC<MonthlyViewProps> = ({ students, selectedClass, onClassChange, setDownloadFn }) => {
     const [month, setMonth] = useState(new Date().getMonth() + 1);
     const [year, setYear] = useState(new Date().getFullYear());
     const [dayTypeFilter, setDayTypeFilter] = useState<'All' | 'Sunday' | 'Wednesday'>('All');
@@ -384,6 +452,45 @@ const MonthlyView: React.FC<DashboardProps> = ({ students, selectedClass, onClas
         return <span className="ml-1 text-brand-blue">{direction === 'asc' ? '▲' : '▼'}</span>;
     };
 
+    React.useEffect(() => {
+        setDownloadFn(() => () => {
+            let csvContent = '\uFEFF'; // UTF-8 BOM so Excel opens it with accents correctly
+            
+            const monthName = new Date(year, month - 1).toLocaleString('pt-BR', { month: 'long' });
+            csvContent += `Dashboard - Visão Mensal\n`;
+            csvContent += `Mês/Ano;${monthName}/${year}\n`;
+            csvContent += `Filtro de Culto;${dayTypeFilter === 'All' ? 'Todos' : dayTypeFilter === 'Sunday' ? 'Domingos' : 'Quartas-feiras'}\n`;
+            csvContent += `Turma;${selectedClass === 'All' ? 'Todas as Turmas' : selectedClass}\n\n`;
+
+            // Stats
+            csvContent += `Métrica;Valor\n`;
+            csvContent += `Presenças no Mês;${monthlyStats.totalPresences}\n`;
+            csvContent += `Média Diária;${averageDailyAttendance}\n`;
+            csvContent += `Alunos Únicos;${monthlyStats.uniqueAttendees.size}\n\n`;
+
+            // Student Attendance List
+            csvContent += `Aluno;Turma;Dias Presente\n`;
+            studentAttendanceList.forEach(item => {
+                csvContent += `"${item.name.replace(/"/g, '""')}";${item.class};${item.count}\n`;
+            });
+
+            // Create a blob and download it
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            const fileName = `dashboard_mensal_${month}_${year}.csv`;
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', fileName);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        return () => setDownloadFn(null);
+    }, [students, selectedClass, month, year, dayTypeFilter, monthlyStats, studentAttendanceList, averageDailyAttendance]);
+
     return (
         <div>
             <div className="flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-center mb-6">
@@ -474,6 +581,7 @@ const Dashboard: React.FC<DashboardProps> = (props) => {
     sevenDaysAgo.setDate(today.getDate() - 7);
     const [startDate, setStartDate] = useState(sevenDaysAgo.toISOString().split('T')[0]);
     const [endDate, setEndDate] = useState(today.toISOString().split('T')[0]);
+    const [downloadFn, setDownloadFn] = useState<(() => void) | null>(null);
 
     return (
         <div className="p-4 md:p-8">
@@ -496,43 +604,25 @@ const Dashboard: React.FC<DashboardProps> = (props) => {
                     setStartDate={setStartDate}
                     endDate={endDate}
                     setEndDate={setEndDate}
+                    setDownloadFn={setDownloadFn}
                 />
             ) : (
-                <MonthlyView {...props} />
+                <MonthlyView {...props} setDownloadFn={setDownloadFn} />
             )}
 
             {/* Footer Actions */}
-            <div className="mt-12 border-t pt-8 flex flex-col sm:flex-row justify-end gap-4 items-center">
-                {props.onSaveData && (
+            <div className="mt-12 border-t pt-8 flex justify-end gap-4 items-center">
+                {downloadFn && (
                     <button
-                        onClick={props.onSaveData}
-                        className="w-full sm:w-auto px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition shadow-sm font-semibold flex items-center justify-center gap-2"
+                        onClick={downloadFn}
+                        className="w-full sm:w-auto px-6 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition shadow-sm font-semibold flex items-center justify-center gap-2"
                     >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
-                        Salvar Dados na Planilha
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                        Exportar Dashboard para Excel
                     </button>
                 )}
-
-                <button
-                    onClick={async () => {
-                        if (window.confirm("ATENÇÃO: Isso apagará TODOS os dados da planilha e restaurará os dados originais de fábrica (arquivo constants.ts). Tem certeza absoluta?")) {
-                            try {
-                                const res = await fetch('/api/seed', { method: 'POST' });
-                                if (res.ok) {
-                                    alert("Dados restaurados com sucesso! A página será recarregada.");
-                                    window.location.reload();
-                                } else {
-                                    alert("Erro ao restaurar dados.");
-                                }
-                            } catch (e) {
-                                alert("Erro de conexão.");
-                            }
-                        }
-                    }}
-                    className="text-sm text-red-500 hover:text-red-700 hover:underline"
-                >
-                    Restaurar Dados de Fábrica
-                </button>
             </div>
         </div>
     );
