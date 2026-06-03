@@ -5,10 +5,9 @@ import { calculateAge } from '../utils';
 interface StudentProfileProps {
     student: Student;
     onClose: () => void;
-    allServiceDates: string[];
 }
 
-const StudentProfile: React.FC<StudentProfileProps> = ({ student, onClose, allServiceDates }) => {
+const StudentProfile: React.FC<StudentProfileProps> = ({ student, onClose }) => {
     const stats = useMemo(() => {
         const totalPresences = student.attendance.filter(a => a.present).length;
         const totalRecords = student.attendance.length;
@@ -21,19 +20,11 @@ const StudentProfile: React.FC<StudentProfileProps> = ({ student, onClose, allSe
 
         const lastAttendance = presentDates.length > 0 ? presentDates[0] : null;
 
-        const missedServicesCount = (() => {
-            if (student.attendance.length === 0) {
-                return allServiceDates.length;
-            }
-            const attMap = new Map(student.attendance.map(a => [a.date, a.present]));
-            let count = 0;
-            for (const date of allServiceDates) {
-                if (attMap.get(date) === true) {
-                    break;
-                }
-                count++;
-            }
-            return count;
+        const daysSinceLastAttendance = (() => {
+            if (!lastAttendance) return null;
+            const last = new Date(lastAttendance + 'T00:00:00');
+            const now = new Date();
+            return Math.floor((now.getTime() - last.getTime()) / (1000 * 60 * 60 * 24));
         })();
 
         // Monthly chart data (last 6 months)
@@ -55,8 +46,8 @@ const StudentProfile: React.FC<StudentProfileProps> = ({ student, onClose, allSe
         }
         const maxMonthly = Math.max(...monthlyData.map(m => m.count), 1);
 
-        return { totalPresences, attendanceRate, lastAttendance, missedServicesCount, monthlyData, maxMonthly };
-    }, [student, allServiceDates]);
+        return { totalPresences, attendanceRate, lastAttendance, daysSinceLastAttendance, monthlyData, maxMonthly };
+    }, [student]);
 
     const sortedHistory = useMemo(() => {
         return [...student.attendance]
@@ -121,10 +112,19 @@ const StudentProfile: React.FC<StudentProfileProps> = ({ student, onClose, allSe
                         <p className="text-xs text-gray-500 mt-1">Frequência</p>
                     </div>
                     <div className="text-center">
-                        <span className={`text-3xl font-bold ${stats.missedServicesCount >= 8 ? 'text-brand-red animate-pulse' : stats.missedServicesCount > 0 ? 'text-brand-yellow' : 'text-brand-green'}`}>
-                            {stats.missedServicesCount}
-                        </span>
-                        <p className="text-xs text-gray-500 mt-1">Cultos Ausentes</p>
+                        {stats.lastAttendance ? (
+                            <>
+                                <span className={`text-3xl font-bold ${(stats.daysSinceLastAttendance ?? 999) >= 30 ? 'text-brand-red animate-pulse' : (stats.daysSinceLastAttendance ?? 999) >= 14 ? 'text-brand-yellow' : 'text-brand-green'}`}>
+                                    {stats.daysSinceLastAttendance}d
+                                </span>
+                                <p className="text-xs text-gray-500 mt-1">Desde última</p>
+                            </>
+                        ) : (
+                            <>
+                                <span className="text-3xl font-bold text-gray-300">—</span>
+                                <p className="text-xs text-gray-500 mt-1">Sem registros</p>
+                            </>
+                        )}
                     </div>
                 </div>
 

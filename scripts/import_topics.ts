@@ -5,6 +5,9 @@ import csv from 'csv-parser';
 import dotenv from 'dotenv';
 import { neon } from '@neondatabase/serverless';
 
+import { Readable } from 'stream';
+import { decodeBuffer } from './encoding';
+
 dotenv.config();
 
 const csvFilePath = path.join(__dirname, '../tema_aulas.csv');
@@ -41,7 +44,11 @@ const importTopics = async () => {
     const topicsToInsert: any[] = [];
     console.log('Lendo dados do arquivo CSV...');
 
-    fs.createReadStream(csvFilePath)
+    const fileBuffer = fs.readFileSync(csvFilePath);
+    const decodedContent = decodeBuffer(fileBuffer);
+    const contentStream = Readable.from([decodedContent]);
+
+    contentStream
         .pipe(csv({ separator: ';', mapHeaders: ({ header }) => header.trim().replace(/^[\uFEFF\u200B]+/, '') }))
         .on('data', (row: CsvRow) => {
             if (!row.date || row.date.trim() === '') return;

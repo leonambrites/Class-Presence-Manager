@@ -736,7 +736,6 @@ const App: React.FC = () => {
                     students={students}
                     selectedClass={selectedClass}
                     onClassChange={setSelectedClass}
-                    onSaveData={handleSaveData}
                     userRole={userRole!}
                 />;
             case View.Attendance:
@@ -776,7 +775,7 @@ const App: React.FC = () => {
             case View.Admin:
                 return <Admin userRole={userRole!} />;
             default:
-                return <Dashboard students={students} selectedClass={selectedClass} onClassChange={setSelectedClass} onSaveData={handleSaveData} userRole={userRole!} />;
+                return <Dashboard students={students} selectedClass={selectedClass} onClassChange={setSelectedClass} userRole={userRole!} />;
         }
     };
 
