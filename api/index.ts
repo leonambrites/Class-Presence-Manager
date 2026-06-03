@@ -243,8 +243,24 @@ app.get('/api/download-lesson', async (req, res) => {
             const dbFile = await dbService.getLessonFile(String(fileName));
             if (dbFile) {
                 if (dbFile.url) {
-                    console.log(`[DOWNLOAD] File found in database with Vercel Blob URL: ${dbFile.url}`);
-                    return res.redirect(dbFile.url);
+                    console.log(`[DOWNLOAD] File found in database with Vercel Blob URL: ${dbFile.url}. Fetching from private store...`);
+                    const token = process.env.BLOB_READ_WRITE_TOKEN;
+                    const blobRes = await fetch(dbFile.url, {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    });
+                    if (!blobRes.ok) {
+                        throw new Error(`Failed to fetch from private Vercel Blob: ${blobRes.statusText}`);
+                    }
+                    const contentType = blobRes.headers.get('content-type') || 'application/octet-stream';
+                    const contentDisposition = blobRes.headers.get('content-disposition') || `attachment; filename="${fileName}"`;
+                    res.setHeader('Content-Type', contentType);
+                    res.setHeader('Content-Disposition', contentDisposition);
+
+                    const arrayBuffer = await blobRes.arrayBuffer();
+                    const buffer = Buffer.from(arrayBuffer);
+                    return res.send(buffer);
                 }
                 if (dbFile.filecontent) {
                     console.log(`[DOWNLOAD] File found in database with base64 content: ${fileName}`);
