@@ -540,15 +540,29 @@ app.get('/api/available-lessons', async (req, res) => {
 
 // Token signing endpoint for Vercel Blob client-side uploads
 app.post('/api/upload-lesson/vercel-blob', async (req, res) => {
+    const logPath = path.join(process.cwd(), 'backend_debug.log');
+    const log = (msg: string) => {
+        try {
+            fs.appendFileSync(logPath, `[${new Date().toISOString()}] ${msg}\n`);
+        } catch (e) {
+            console.error('Logging failed:', e);
+        }
+    };
+
     try {
+        log(`Incoming request to /api/upload-lesson/vercel-blob`);
+        log(`Headers: ${JSON.stringify(req.headers)}`);
+        log(`Body: ${JSON.stringify(req.body)}`);
+        
         const token = process.env.BLOB_READ_WRITE_TOKEN;
-        console.log(`[BLOB SIGNING] Token exists: ${!!token}, length: ${token ? token.length : 0}`);
+        log(`Token exists: ${!!token}, length: ${token ? token.length : 0}`);
         
         const jsonResponse = await handleUpload({
             token,
             body: req.body,
             request: req,
             onBeforeGenerateToken: async (pathname) => {
+                log(`onBeforeGenerateToken called for pathname: ${pathname}`);
                 return {
                     tokenPayload: JSON.stringify({
                         // optional payload
@@ -556,14 +570,18 @@ app.post('/api/upload-lesson/vercel-blob', async (req, res) => {
                 };
             },
             onUploadCompleted: async ({ blob, tokenPayload }) => {
-                // local fallback won't trigger this, but registration will be handled client-side
-                console.log('[BLOB UPLOAD COMPLETED]', blob.url);
+                log(`onUploadCompleted called: ${blob.url}`);
             }
         });
+        log(`handleUpload succeeded, responding 200: ${JSON.stringify(jsonResponse)}`);
         res.status(200).json(jsonResponse);
     } catch (error) {
-        console.error('[BLOB UPLOAD ERROR]', error);
-        res.status(400).json({ error: error instanceof Error ? error.message : 'Failed to generate token' });
+        const errMessage = error instanceof Error ? error.message : String(error);
+        log(`[BLOB UPLOAD ERROR] ${errMessage}`);
+        if (error instanceof Error && error.stack) {
+            log(`Stack: ${error.stack}`);
+        }
+        res.status(400).json({ error: errMessage });
     }
 });
 
