@@ -550,7 +550,7 @@ const Schedule: React.FC<ScheduleProps> = ({
                 >
                     <div className="space-y-4">
                         <p className="text-xs text-gray-500">Selecione uma turma para ver os detalhes da equipe de voluntários:</p>
-                        <div className="space-y-2.5 max-h-[300px] overflow-y-auto pr-1">
+                        <div className="space-y-2.5 max-h-[500px] overflow-y-auto pr-1">
                             {schedule
                                 .filter(s => s.date && s.date.split('T')[0] === selectedDayString)
                                 .filter(s => selectedClass === 'All' || s.className === selectedClass)

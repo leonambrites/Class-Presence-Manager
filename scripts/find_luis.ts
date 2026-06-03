@@ -7,11 +7,8 @@ const getSql = () => neon(process.env.DATABASE_URL!);
 
 async function run() {
     const sql = getSql();
-    const miguels = await sql`SELECT name, has_allergy, allergy_description, class, age FROM students WHERE name ILIKE '%Miguel%'`;
-    console.log('Todos Miguels:', miguels);
-
-    const all = await sql`SELECT name FROM students`;
-    console.log('Total students:', all.length);
+    const uniqueTeams = await sql`SELECT DISTINCT team FROM volunteers`;
+    console.log('Unique team values in volunteers table:', uniqueTeams);
 }
 
 run().catch(console.error);
