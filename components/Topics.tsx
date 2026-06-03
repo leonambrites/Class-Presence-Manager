@@ -305,6 +305,11 @@ const Topics: React.FC<TopicsProps> = ({
     e.preventDefault();
     if (!uploadingTopic || !directFile) return;
 
+    if (directFile.size > 3.2 * 1024 * 1024) {
+      alert(`O arquivo "${directFile.name}" é muito grande (${(directFile.size / (1024 * 1024)).toFixed(1)} MB). O limite máximo de envio é de 3.2 MB para evitar erros de limite no servidor Vercel. Por favor, compacte as imagens do documento no MS Word (Compactar Imagens) e tente novamente.`);
+      return;
+    }
+
     setDirectUploading(true);
     try {
       const base64Content = await fileToBase64(directFile);
@@ -398,6 +403,13 @@ const Topics: React.FC<TopicsProps> = ({
       const file = bulkFiles[i];
       newStatuses[file.name] = 'uploading';
       setBulkUploadStatus({ ...newStatuses });
+
+      if (file.size > 3.2 * 1024 * 1024) {
+        newStatuses[file.name] = 'error';
+        results.push(`❌ "${file.name}": Arquivo muito grande (${(file.size / (1024 * 1024)).toFixed(1)} MB). O limite de envio no Vercel é de 3.2 MB. Por favor, compacte as imagens do arquivo no Word e tente novamente.`);
+        setBulkUploadStatus({ ...newStatuses });
+        continue;
+      }
 
       try {
         const parsed = parseLessonFileName(file.name);
