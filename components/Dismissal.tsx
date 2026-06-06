@@ -140,7 +140,7 @@ const Dismissal: React.FC<DismissalProps> = ({ students, onDismiss, selectedClas
               <li key={`${student.id}-${item.date}`} className="py-4">
                 <div className="flex flex-col sm:flex-row justify-between sm:items-center">
                   <div>
-                    <p className="font-medium text-lg text-gray-800">{student.name} {item.dailyCode && <span className="ml-2 px-2 py-0.5 text-xs font-bold bg-brand-blue/10 text-brand-blue rounded-full">#{item.dailyCode}</span>}</p>
+                    <p className="font-medium text-lg text-gray-800">{item.dailyCode && <span className="mr-2 px-2 py-0.5 text-xs font-bold bg-brand-blue/10 text-brand-blue rounded-full">#{item.dailyCode}</span>}{student.name}</p>
                     <p className="text-sm text-gray-500">
                       {student.class}
                       {startDate !== endDate && (
