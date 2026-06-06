@@ -23,14 +23,15 @@ const Dismissal: React.FC<DismissalProps> = ({ students, onDismiss, selectedClas
     : students.filter(s => s.class === selectedClass);
 
   const presentStudents = useMemo(() => {
-    const list: { student: Student; date: string; dismissedBy?: string | null }[] = [];
+    const list: { student: Student; date: string; dismissedBy?: string | null; dailyCode?: number | null }[] = [];
     studentsForClass.forEach(student => {
       student.attendance.forEach(att => {
         if (att.date >= startDate && att.date <= endDate && att.present) {
           list.push({
             student,
             date: att.date,
-            dismissedBy: att.dismissedBy
+            dismissedBy: att.dismissedBy,
+            dailyCode: att.dailyCode
           });
         }
       });
@@ -139,7 +140,7 @@ const Dismissal: React.FC<DismissalProps> = ({ students, onDismiss, selectedClas
               <li key={`${student.id}-${item.date}`} className="py-4">
                 <div className="flex flex-col sm:flex-row justify-between sm:items-center">
                   <div>
-                    <p className="font-medium text-lg text-gray-800">{student.name}</p>
+                    <p className="font-medium text-lg text-gray-800">{student.name} {item.dailyCode && <span className="ml-2 px-2 py-0.5 text-xs font-bold bg-brand-blue/10 text-brand-blue rounded-full">#{item.dailyCode}</span>}</p>
                     <p className="text-sm text-gray-500">
                       {student.class}
                       {startDate !== endDate && (
