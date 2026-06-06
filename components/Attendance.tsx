@@ -257,7 +257,7 @@ const Attendance: React.FC<AttendanceProps> = ({
                                 return (
                                     <li key={student.id} className="py-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                                         <div>
-                                            <p className="font-bold text-gray-800">{student.name} {attRecord?.dailyCode && <span className="ml-2 px-2 py-0.5 text-xs font-bold bg-brand-blue/10 text-brand-blue rounded-full">#{attRecord.dailyCode}</span>}</p>
+                                            <p className="font-bold text-gray-800">{student.name} {isPresent && attRecord?.dailyCode && <span className="ml-2 px-2 py-0.5 text-xs font-bold bg-brand-blue/10 text-brand-blue rounded-full">#{attRecord.dailyCode}</span>}</p>
                                             <p className="text-xs text-gray-500">{calculateAge(student.birthday, student.age)} anos</p>
                                         </div>
                                         
@@ -371,7 +371,7 @@ const Attendance: React.FC<AttendanceProps> = ({
                                         return (
                                             <li key={visitor.id} className="py-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                                                 <div>
-                                                    <p className="font-bold text-gray-800">{visitor.name} {attRecord?.dailyCode && <span className="ml-2 px-2 py-0.5 text-xs font-bold bg-brand-blue/10 text-brand-blue rounded-full">#{attRecord.dailyCode}</span>}</p>
+                                                    <p className="font-bold text-gray-800">{visitor.name} {isPresent && attRecord?.dailyCode && <span className="ml-2 px-2 py-0.5 text-xs font-bold bg-brand-blue/10 text-brand-blue rounded-full">#{attRecord.dailyCode}</span>}</p>
                                                     <p className="text-xs text-gray-500">{visitor.class} - {calculateAge(visitor.birthday, visitor.age)} anos</p>
                                                 </div>
                                                 <div className="flex items-center justify-end flex-wrap gap-2.5">

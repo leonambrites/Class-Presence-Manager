@@ -109,19 +109,24 @@ export const dbService = {
         const existing = await sql`SELECT id FROM attendance WHERE student_id = ${studentId} AND date = ${date}`;
 
         if (existing.length > 0) {
-            await sql`
-                UPDATE attendance 
-                SET present = ${present}, day = ${day}, dismissed_by = ${present ? null : undefined}
-                WHERE student_id = ${studentId} AND date = ${date}
-            `;
-            if (!present) {
-                await sql`UPDATE attendance SET dismissed_by = NULL WHERE student_id = ${studentId} AND date = ${date}`;
+            if (present) {
+                await sql`
+                    UPDATE attendance 
+                    SET present = TRUE, day = ${day}, daily_code = ${dailyCode || null}, dismissed_by = NULL
+                    WHERE student_id = ${studentId} AND date = ${date}
+                `;
+            } else {
+                await sql`
+                    UPDATE attendance 
+                    SET present = FALSE, dismissed_by = NULL, daily_code = NULL, ready_to_leave = FALSE
+                    WHERE student_id = ${studentId} AND date = ${date}
+                `;
             }
         } else {
             if (present) {
                 await sql`
                     INSERT INTO attendance (id, student_id, date, present, day, dismissed_by, daily_code, created_at)
-                    VALUES (${String(Date.now())}, ${studentId}, ${date}, ${present}, ${day}, NULL, ${dailyCode || null}, ${getTimestamp()})
+                    VALUES (${String(Date.now())}, ${studentId}, ${date}, TRUE, ${day}, NULL, ${dailyCode || null}, ${getTimestamp()})
                 `;
             }
         }

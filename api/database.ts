@@ -96,6 +96,12 @@ export const initDb = async () => {
             // Column likely already exists
         }
 
+        try {
+            await sql`UPDATE attendance SET daily_code = NULL WHERE present = FALSE`;
+        } catch (e) {
+            // Clean up query failed
+        }
+
         // Schedule Table
         await sql`
             CREATE TABLE IF NOT EXISTS schedule (
