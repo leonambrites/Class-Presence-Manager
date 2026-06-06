@@ -475,7 +475,7 @@ const App: React.FC = () => {
     const handleDismiss = useCallback(async (studentId: string, responsibleName: string, date: string) => {
         const updatedStudents = students.map(s => {
             if (s.id === studentId) {
-                return { ...s, attendance: s.attendance.map(a => a.date === date ? { ...a, dismissedBy: responsibleName, readyToLeave: false } : a) };
+                return { ...s, attendance: s.attendance.map(a => a.date === date ? { ...a, dismissedBy: responsibleName, readyToLeave: false, dailyCode: null } : a) };
             }
             return s;
         });

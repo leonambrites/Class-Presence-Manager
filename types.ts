@@ -9,7 +9,7 @@ export interface Attendance {
   present: boolean;
   dismissedBy?: string | null;
   day?: 'Sunday' | 'Wednesday';
-  dailyCode?: number;
+  dailyCode?: number | null;
   readyToLeave?: boolean;
 }
 
