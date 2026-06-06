@@ -221,7 +221,7 @@ const App: React.FC = () => {
 
         const updatedStudents = students.map(s => {
             if (s.id === studentId) {
-                return { ...s, attendance: s.attendance.map(a => a.date === date ? { ...a, present: false } : a) };
+                return { ...s, attendance: s.attendance.map(a => a.date === date ? { ...a, present: false, dismissedBy: null, dailyCode: null, readyToLeave: false } : a) };
             }
             return s;
         });
