@@ -131,7 +131,7 @@ export const dbService = {
         const sql = getSql();
         const result = await sql`
             UPDATE attendance 
-            SET dismissed_by = ${responsibleName}, ready_to_leave = FALSE
+            SET dismissed_by = ${responsibleName}, ready_to_leave = FALSE, daily_code = NULL
             WHERE student_id = ${studentId} AND date = ${date}
             RETURNING id
         `;
