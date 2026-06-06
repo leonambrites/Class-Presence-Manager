@@ -187,17 +187,19 @@ const Attendance: React.FC<AttendanceProps> = ({
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {awaitingReleaseStudents.map(student => (
-                      <div key={student.id} className="bg-white rounded-lg p-3 border border-amber-200/80 shadow-sm flex items-center justify-between gap-3">
-                        <div className="min-w-0">
-                          <p className="font-bold text-gray-800 text-sm truncate">{student.name}</p>
-                          <div className="flex items-center gap-1.5 mt-0.5">
-                            <span className="text-[10px] font-bold text-gray-400">{calculateAge(student.birthday, student.age)} anos</span>
-                            <span className="text-[9px] font-extrabold bg-brand-blue/10 text-brand-blue px-1.5 py-0.2 rounded uppercase">
-                              {student.class}
-                            </span>
+                    {awaitingReleaseStudents.map(student => {
+                      const dailyCode = student.attendance.find(a => a.date === date)?.dailyCode;
+                      return (
+                        <div key={student.id} className="bg-white rounded-lg p-3 border border-amber-200/80 shadow-sm flex items-center justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="font-bold text-gray-800 text-sm truncate">{student.name} {dailyCode && <span className="ml-1.5 px-2 py-0.5 text-xs font-bold bg-brand-blue/10 text-brand-blue rounded-full">#{dailyCode}</span>}</p>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                              <span className="text-[10px] font-bold text-gray-400">{calculateAge(student.birthday, student.age)} anos</span>
+                              <span className="text-[9px] font-extrabold bg-brand-blue/10 text-brand-blue px-1.5 py-0.2 rounded uppercase">
+                                {student.class}
+                              </span>
+                            </div>
                           </div>
-                        </div>
                         
                         <button
                           onClick={() => handleStartRelease(student)}
@@ -206,7 +208,8 @@ const Attendance: React.FC<AttendanceProps> = ({
                           🚪 Liberar
                         </button>
                       </div>
-                    ))}
+                    );
+                    })}
                   </div>
                 </div>
             )}
@@ -254,7 +257,7 @@ const Attendance: React.FC<AttendanceProps> = ({
                                 return (
                                     <li key={student.id} className="py-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                                         <div>
-                                            <p className="font-bold text-gray-800">{student.name}</p>
+                                            <p className="font-bold text-gray-800">{student.name} {attRecord?.dailyCode && <span className="ml-2 px-2 py-0.5 text-xs font-bold bg-brand-blue/10 text-brand-blue rounded-full">#{attRecord.dailyCode}</span>}</p>
                                             <p className="text-xs text-gray-500">{calculateAge(student.birthday, student.age)} anos</p>
                                         </div>
                                         
@@ -368,7 +371,7 @@ const Attendance: React.FC<AttendanceProps> = ({
                                         return (
                                             <li key={visitor.id} className="py-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                                                 <div>
-                                                    <p className="font-bold text-gray-800">{visitor.name}</p>
+                                                    <p className="font-bold text-gray-800">{visitor.name} {attRecord?.dailyCode && <span className="ml-2 px-2 py-0.5 text-xs font-bold bg-brand-blue/10 text-brand-blue rounded-full">#{attRecord.dailyCode}</span>}</p>
                                                     <p className="text-xs text-gray-500">{visitor.class} - {calculateAge(visitor.birthday, visitor.age)} anos</p>
                                                 </div>
                                                 <div className="flex items-center justify-end flex-wrap gap-2.5">
