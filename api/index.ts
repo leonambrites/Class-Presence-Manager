@@ -11,13 +11,22 @@ dotenv.config({ path: '.env.local' });
 dotenv.config(); // fallback to .env if any
 
 // Configure Web Push VAPID Details
-if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
-    webpush.setVapidDetails(
-        'mailto:contato@presencamundokids.com',
-        process.env.VAPID_PUBLIC_KEY,
-        process.env.VAPID_PRIVATE_KEY
-    );
-    console.log("Web Push VAPID details configured successfully.");
+const rawPublicKey = process.env.VAPID_PUBLIC_KEY;
+const rawPrivateKey = process.env.VAPID_PRIVATE_KEY;
+
+if (rawPublicKey && rawPrivateKey) {
+    const publicKey = rawPublicKey.replace(/^["']|["']$/g, '');
+    const privateKey = rawPrivateKey.replace(/^["']|["']$/g, '');
+    try {
+        webpush.setVapidDetails(
+            'mailto:contato@presencamundokids.com',
+            publicKey,
+            privateKey
+        );
+        console.log("Web Push VAPID details configured successfully.");
+    } catch (err) {
+        console.error("Error setting VAPID details on startup:", err);
+    }
 } else {
     console.warn("VAPID_PUBLIC_KEY or VAPID_PRIVATE_KEY is missing from environment variables. Web push notifications will be disabled.");
 }
@@ -107,7 +116,7 @@ app.get('/api/data', async (req, res) => {
 
 // Get public VAPID key
 app.get('/api/push/key', (req, res) => {
-    const publicKey = process.env.VAPID_PUBLIC_KEY;
+    const publicKey = process.env.VAPID_PUBLIC_KEY?.replace(/^["']|["']$/g, '');
     if (!publicKey) {
         return res.status(500).json({ error: 'Push notifications are not configured on the server.' });
     }
