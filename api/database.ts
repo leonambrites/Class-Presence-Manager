@@ -7,7 +7,7 @@ const getSql = () => {
     if (!process.env.DATABASE_URL) {
         throw new Error("DATABASE_URL environment variable is missing.");
     }
-    return neon(process.env.DATABASE_URL);
+    return neon(process.env.DATABASE_URL.replace(/^["']|["']$/g, ''));
 };
 
 export const initDb = async () => {
