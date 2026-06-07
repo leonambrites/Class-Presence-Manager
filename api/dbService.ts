@@ -348,7 +348,29 @@ export const dbService = {
             fileName: r.filename,
             sizeBytes: Number(r.size_bytes || 0),
             folder: r.url ? 'Vercel Blob' : 'Database',
-            createdAt: r.created_at
+        }));
+    },
+
+    async addPushSubscription(id: string, subscriptionJson: string) {
+        const sql = getSql();
+        await sql`
+            INSERT INTO push_subscriptions (id, subscription_json, created_at)
+            VALUES (${id}, ${subscriptionJson}, ${getTimestamp()})
+            ON CONFLICT (id) DO UPDATE SET subscription_json = EXCLUDED.subscription_json
+        `;
+    },
+
+    async removePushSubscription(id: string) {
+        const sql = getSql();
+        await sql`DELETE FROM push_subscriptions WHERE id = ${id}`;
+    },
+
+    async getAllPushSubscriptions() {
+        const sql = getSql();
+        const result = await sql`SELECT id, subscription_json FROM push_subscriptions`;
+        return result.map((r: any) => ({
+            id: r.id,
+            subscriptionJson: r.subscription_json
         }));
     }
 };

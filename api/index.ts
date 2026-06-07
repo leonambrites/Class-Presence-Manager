@@ -2,11 +2,25 @@ import express from 'express';
 import dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
+import crypto from 'crypto';
+import webpush from 'web-push';
 import { generateClientTokenFromReadWriteToken } from '@vercel/blob/client';
 
 // Load local variables for local development
 dotenv.config({ path: '.env.local' });
 dotenv.config(); // fallback to .env if any
+
+// Configure Web Push VAPID Details
+if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+    webpush.setVapidDetails(
+        'mailto:contato@presencamundokids.com',
+        process.env.VAPID_PUBLIC_KEY,
+        process.env.VAPID_PRIVATE_KEY
+    );
+    console.log("Web Push VAPID details configured successfully.");
+} else {
+    console.warn("VAPID_PUBLIC_KEY or VAPID_PRIVATE_KEY is missing from environment variables. Web push notifications will be disabled.");
+}
 
 import { dbService } from './dbService';
 import { INITIAL_STUDENTS, INITIAL_VOLUNTEERS, INITIAL_SCHEDULE, INITIAL_TOPICS } from '../constants';
@@ -89,6 +103,49 @@ app.get('/api/data', async (req, res) => {
     }
 });
 
+// --- Web Push Endpoints ---
+
+// Get public VAPID key
+app.get('/api/push/key', (req, res) => {
+    const publicKey = process.env.VAPID_PUBLIC_KEY;
+    if (!publicKey) {
+        return res.status(500).json({ error: 'Push notifications are not configured on the server.' });
+    }
+    res.json({ publicKey });
+});
+
+// Subscribe to push notifications
+app.post('/api/push/subscribe', async (req, res) => {
+    try {
+        const { subscription } = req.body;
+        if (!subscription || !subscription.endpoint) {
+            return res.status(400).json({ error: 'Invalid subscription object.' });
+        }
+        const id = crypto.createHash('sha256').update(subscription.endpoint).digest('hex');
+        await dbService.addPushSubscription(id, JSON.stringify(subscription));
+        res.status(201).json({ message: 'Push subscription saved.' });
+    } catch (e) {
+        console.error('Error saving subscription:', e);
+        res.status(500).json({ error: 'Failed to subscribe.' });
+    }
+});
+
+// Unsubscribe from push notifications
+app.post('/api/push/unsubscribe', async (req, res) => {
+    try {
+        const { endpoint } = req.body;
+        if (!endpoint) {
+            return res.status(400).json({ error: 'Missing subscription endpoint.' });
+        }
+        const id = crypto.createHash('sha256').update(endpoint).digest('hex');
+        await dbService.removePushSubscription(id);
+        res.status(200).json({ message: 'Push subscription removed.' });
+    } catch (e) {
+        console.error('Error removing subscription:', e);
+        res.status(500).json({ error: 'Failed to unsubscribe.' });
+    }
+});
+
 // Mark/Unmark Presence
 app.post('/api/attendance', async (req, res) => {
     const { studentId, date, present, day, dailyCode } = req.body;
@@ -113,11 +170,56 @@ app.post('/api/dismissal', async (req, res) => {
     }
 });
 
+// Helper to broadcast push notification to all subscribers when child is ready to leave
+async function triggerPushBroadcast(studentId: string, date: string) {
+    try {
+        const allData = await dbService.getAllData();
+        const student = allData.students.find((s: any) => String(s.id) === String(studentId));
+        if (!student) return;
+
+        const att = student.attendance.find((a: any) => a.date === date);
+        const code = att?.dailyCode || '';
+        const name = student.name;
+        const className = student.class;
+
+        const payload = JSON.stringify({
+            title: 'Mundo Kids - Solicitação de Saída 🚪',
+            body: `Código #${code}: ${name} (${className}) está aguardando liberação.`,
+            url: '/?view=Presença'
+        });
+
+        const subscriptions = await dbService.getAllPushSubscriptions();
+        console.log(`Broadcasting push notification for ${name} (COD #${code}) to ${subscriptions.length} subscribers.`);
+
+        const promises = subscriptions.map(async (sub) => {
+            try {
+                const subObj = JSON.parse(sub.subscriptionJson);
+                await webpush.sendNotification(subObj, payload);
+            } catch (err: any) {
+                // Clean up expired (404/410) subscriptions
+                if (err.statusCode === 404 || err.statusCode === 410) {
+                    console.log(`Subscription expired, removing: ${sub.id}`);
+                    await dbService.removePushSubscription(sub.id);
+                } else {
+                    console.error(`Error sending push notification to subscriber ${sub.id}:`, err);
+                }
+            }
+        });
+
+        await Promise.all(promises);
+    } catch (error) {
+        console.error('Error in push broadcast helper:', error);
+    }
+}
+
 // Update Awaiting Release (Ready to Leave) Status
 app.post('/api/attendance/ready', async (req, res) => {
     const { studentId, date, readyToLeave } = req.body;
     try {
         await dbService.updateReadyToLeave(studentId, date, readyToLeave);
+        if (readyToLeave) {
+            triggerPushBroadcast(studentId, date).catch(console.error);
+        }
         res.status(200).json({ message: 'Ready to leave status updated' });
     } catch (error) {
         console.error("Error updating ready to leave status:", error);
