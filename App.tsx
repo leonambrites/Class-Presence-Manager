@@ -149,21 +149,54 @@ const App: React.FC = () => {
         return () => clearInterval(intervalId);
     }, [loadDataLocally]);
 
-    // Register Service Worker and check existing subscription
+    // Register Service Worker and check existing subscription / request permission
     useEffect(() => {
         if ('serviceWorker' in navigator && 'PushManager' in window) {
+            let activeReg: ServiceWorkerRegistration;
+
+            const subscribeUser = async (reg: ServiceWorkerRegistration) => {
+                try {
+                    const response = await fetch('/api/push/key');
+                    if (!response.ok) return;
+                    const { publicKey } = await response.json();
+                    const applicationServerKey = urlBase64ToUint8Array(publicKey);
+                    const newSub = await reg.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey,
+                    });
+                    await fetch('/api/push/subscribe', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ subscription: newSub }),
+                    });
+                    setIsSubscribedToPush(true);
+                } catch (error) {
+                    console.error("Auto-subscribe error:", error);
+                }
+            };
+
             navigator.serviceWorker
                 .register(new URL('./sw.js', import.meta.url))
                 .then((reg) => {
                     console.log('Service Worker registered successfully:', reg);
                     setSwRegistration(reg);
+                    activeReg = reg;
                     return reg.pushManager.getSubscription();
                 })
-                .then((subscription) => {
+                .then(async (subscription) => {
                     if (subscription) {
                         setIsSubscribedToPush(true);
                     } else {
                         setIsSubscribedToPush(false);
+                        
+                        if (Notification.permission === 'default') {
+                            const permission = await Notification.requestPermission();
+                            if (permission === 'granted') {
+                                await subscribeUser(activeReg);
+                            }
+                        } else if (Notification.permission === 'granted') {
+                            await subscribeUser(activeReg);
+                        }
                     }
                 })
                 .catch((err) => {
