@@ -139,16 +139,26 @@ const Dismissal: React.FC<DismissalProps> = ({ students, onDismiss, selectedClas
             return (
               <li key={`${student.id}-${item.date}`} className="py-4">
                 <div className="flex flex-col sm:flex-row justify-between sm:items-center">
-                  <div>
-                    <p className="font-medium text-lg text-gray-800">{item.dailyCode && <span className="mr-2 px-2 py-0.5 text-xs font-bold bg-brand-blue/10 text-brand-blue rounded-full">#{item.dailyCode}</span>}{student.name}</p>
-                    <p className="text-sm text-gray-500">
-                      {student.class}
-                      {startDate !== endDate && (
-                        <span className="ml-2 font-semibold text-brand-purple">
-                          • {new Date(item.date + 'T00:00:00').toLocaleDateString('pt-BR')}
-                        </span>
-                      )}
-                    </p>
+                  <div className="flex items-center gap-3 min-w-0">
+                    {item.dailyCode ? (
+                      <div className="w-10 h-10 flex-shrink-0 bg-brand-blue text-white rounded-lg flex flex-col items-center justify-center shadow-sm">
+                        <span className="text-[8px] font-black leading-none opacity-80">CÓD</span>
+                        <span className="text-sm font-black leading-none">{item.dailyCode}</span>
+                      </div>
+                    ) : (
+                      <div className="w-10 h-10 flex-shrink-0 bg-gray-100 rounded-lg" />
+                    )}
+                    <div className="min-w-0">
+                      <p className="font-medium text-lg text-gray-800 truncate">{student.name}</p>
+                      <p className="text-sm text-gray-500 truncate">
+                        {student.class}
+                        {startDate !== endDate && (
+                          <span className="ml-2 font-semibold text-brand-purple">
+                            • {new Date(item.date + 'T00:00:00').toLocaleDateString('pt-BR')}
+                          </span>
+                        )}
+                      </p>
+                    </div>
                   </div>
                   <div className="mt-2 sm:mt-0">
                     {getDismissalStatus(item.dismissedBy)}

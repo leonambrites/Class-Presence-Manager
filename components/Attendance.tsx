@@ -190,25 +190,33 @@ const Attendance: React.FC<AttendanceProps> = ({
                     {awaitingReleaseStudents.map(student => {
                       const dailyCode = student.attendance.find(a => a.date === date)?.dailyCode;
                       return (
-                        <div key={student.id} className="bg-white rounded-lg p-3 border border-amber-200/80 shadow-sm flex items-center justify-between gap-3">
-                          <div className="min-w-0">
-                            <p className="font-bold text-gray-800 text-sm truncate">{student.name} {dailyCode && <span className="ml-1.5 px-2 py-0.5 text-xs font-bold bg-brand-blue/10 text-brand-blue rounded-full">#{dailyCode}</span>}</p>
-                            <div className="flex items-center gap-1.5 mt-0.5">
-                              <span className="text-[10px] font-bold text-gray-400">{calculateAge(student.birthday, student.age)} anos</span>
-                              <span className="text-[9px] font-extrabold bg-brand-blue/10 text-brand-blue px-1.5 py-0.2 rounded uppercase">
-                                {student.class}
-                              </span>
+                        <div key={student.id} className="bg-white rounded-xl p-3 border border-amber-200/80 shadow-md flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-3 min-w-0">
+                            {dailyCode && (
+                              <div className="flex-shrink-0 w-12 h-12 bg-brand-blue text-white rounded-lg flex flex-col items-center justify-center shadow-md">
+                                <span className="text-[9px] font-black uppercase opacity-75 leading-none mb-0.5">CÓD</span>
+                                <span className="text-base font-black leading-none">{dailyCode}</span>
+                              </div>
+                            )}
+                            <div className="min-w-0">
+                              <p className="font-bold text-gray-900 text-sm truncate">{student.name}</p>
+                              <div className="flex items-center gap-1.5 mt-0.5">
+                                <span className="text-[10px] font-bold text-gray-400">{calculateAge(student.birthday, student.age)} anos</span>
+                                <span className="text-[9px] font-extrabold bg-brand-blue/10 text-brand-blue px-1.5 py-0.2 rounded uppercase">
+                                  {student.class}
+                                </span>
+                              </div>
                             </div>
                           </div>
-                        
-                        <button
-                          onClick={() => handleStartRelease(student)}
-                          className="bg-amber-500 hover:bg-amber-600 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition shadow-sm whitespace-nowrap flex items-center gap-1"
-                        >
-                          🚪 Liberar
-                        </button>
-                      </div>
-                    );
+                          
+                          <button
+                            onClick={() => handleStartRelease(student)}
+                            className="bg-amber-500 hover:bg-amber-600 text-white font-bold px-3 py-2 rounded-lg text-xs transition shadow-sm whitespace-nowrap flex items-center gap-1 flex-shrink-0"
+                          >
+                            🚪 Liberar
+                          </button>
+                        </div>
+                      );
                     })}
                   </div>
                 </div>
@@ -255,10 +263,20 @@ const Attendance: React.FC<AttendanceProps> = ({
                                 const isAwaitingRelease = isPresent && !!attRecord?.readyToLeave && !isDismissed;
 
                                 return (
-                                    <li key={student.id} className="py-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-                                        <div>
-                                            <p className="font-bold text-gray-800">{student.name} {isPresent && attRecord?.dailyCode && <span className="ml-2 px-2 py-0.5 text-xs font-bold bg-brand-blue/10 text-brand-blue rounded-full">#{attRecord.dailyCode}</span>}</p>
-                                            <p className="text-xs text-gray-500">{calculateAge(student.birthday, student.age)} anos</p>
+                                    <li key={student.id} className="py-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 overflow-hidden">
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            {isPresent && attRecord?.dailyCode ? (
+                                                <div className="w-10 h-10 flex-shrink-0 bg-brand-blue text-white rounded-lg flex flex-col items-center justify-center shadow-sm">
+                                                    <span className="text-[8px] font-black leading-none opacity-80">CÓD</span>
+                                                    <span className="text-sm font-black leading-none">{attRecord.dailyCode}</span>
+                                                </div>
+                                            ) : (
+                                                <div className="w-10 h-10 flex-shrink-0 bg-gray-100 rounded-lg" />
+                                            )}
+                                            <div className="min-w-0">
+                                                <p className="font-bold text-gray-800 truncate">{student.name}</p>
+                                                <p className="text-xs text-gray-500">{calculateAge(student.birthday, student.age)} anos</p>
+                                            </div>
                                         </div>
                                         
                                         <div className="flex items-center justify-end flex-wrap gap-2.5">
@@ -369,10 +387,20 @@ const Attendance: React.FC<AttendanceProps> = ({
                                         const isAwaitingRelease = isPresent && !!attRecord?.readyToLeave && !isDismissed;
 
                                         return (
-                                            <li key={visitor.id} className="py-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-                                                <div>
-                                                    <p className="font-bold text-gray-800">{visitor.name} {isPresent && attRecord?.dailyCode && <span className="ml-2 px-2 py-0.5 text-xs font-bold bg-brand-blue/10 text-brand-blue rounded-full">#{attRecord.dailyCode}</span>}</p>
-                                                    <p className="text-xs text-gray-500">{visitor.class} - {calculateAge(visitor.birthday, visitor.age)} anos</p>
+                                            <li key={visitor.id} className="py-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 overflow-hidden">
+                                                <div className="flex items-center gap-3 min-w-0">
+                                                    {isPresent && attRecord?.dailyCode ? (
+                                                        <div className="w-10 h-10 flex-shrink-0 bg-brand-blue text-white rounded-lg flex flex-col items-center justify-center shadow-sm">
+                                                            <span className="text-[8px] font-black leading-none opacity-80">CÓD</span>
+                                                            <span className="text-sm font-black leading-none">{attRecord.dailyCode}</span>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="w-10 h-10 flex-shrink-0 bg-gray-100 rounded-lg" />
+                                                    )}
+                                                    <div className="min-w-0">
+                                                        <p className="font-bold text-gray-800 truncate">{visitor.name}</p>
+                                                        <p className="text-xs text-gray-500">{visitor.class} - {calculateAge(visitor.birthday, visitor.age)} anos</p>
+                                                    </div>
                                                 </div>
                                                 <div className="flex items-center justify-end flex-wrap gap-2.5">
                                                     {/* History shortcut */}
