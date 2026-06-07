@@ -771,15 +771,31 @@ app.post('/api/upload-lesson', async (req, res) => {
 // Standalone Server Support
 if (typeof require !== 'undefined' && require.main === module) {
     const port = process.env.PORT || 3000;
-    app.listen(port, () => {
+    const server = app.listen(port, () => {
         console.log(`API Server running on port ${port}`);
+    });
+    server.on('error', (err: any) => {
+        if (err.code === 'EADDRINUSE') {
+            console.error(`\n❌ [PORT CONFLICT] A porta ${port} já está sendo usada por outro processo.`);
+            console.error(`👉 Rode: npx kill-port ${port} para liberar a porta e inicie o servidor novamente.\n`);
+        } else {
+            console.error('Server error:', err);
+        }
     });
 } else if (process.env.NODE_ENV !== 'production') {
     // Fallback for local testing if ESM
     const port = process.env.PORT || 3000;
     if (typeof process !== 'undefined' && process.argv[1] && process.argv[1].includes('index.ts')) {
-        app.listen(port, () => {
+        const server = app.listen(port, () => {
             console.log(`API Server running on port ${port}`);
+        });
+        server.on('error', (err: any) => {
+            if (err.code === 'EADDRINUSE') {
+                console.error(`\n❌ [PORT CONFLICT] A porta ${port} já está sendo usada por outro processo.`);
+                console.error(`👉 Rode: npx kill-port ${port} para liberar a porta e inicie o servidor novamente.\n`);
+            } else {
+                console.error('Server error:', err);
+            }
         });
     }
 }
