@@ -150,6 +150,15 @@ export const initDb = async () => {
             // Column likely already exists
         }
 
+        // Push Subscriptions Table
+        await sql`
+            CREATE TABLE IF NOT EXISTS push_subscriptions (
+                id VARCHAR(255) PRIMARY KEY,
+                subscription_json TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `;
+
         console.log("Vercel Postgres Database initialized successfully.");
     } catch (error) {
         console.error("Error initializing Vercel Postgres database:", error);

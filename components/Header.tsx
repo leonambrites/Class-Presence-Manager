@@ -4,10 +4,18 @@ import { DashboardIcon, CheckCircleIcon, UsersIcon, CalendarIcon, BookOpenIcon, 
 import { LOGO_URL } from '../constants';
 import { UserButton } from '@clerk/clerk-react';
 
+const BellIcon: React.FC<React.ComponentProps<'svg'>> = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+    </svg>
+);
+
 interface HeaderProps {
     currentView: View;
     onNavigate: (view: View) => void;
     userRole?: UserRole | null;
+    isSubscribedToPush?: boolean;
+    onTogglePush?: () => void;
 }
 
 const NavButton: React.FC<{
@@ -33,7 +41,7 @@ const NavButton: React.FC<{
     );
 };
 
-const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, userRole }) => {
+const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, userRole, isSubscribedToPush, onTogglePush }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     // Close menu when navigating
@@ -112,6 +120,17 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, userRole }) =>
 
                             {userRole && (
                                 <div className={`flex items-center gap-4 ${userRole !== 'Visitante' ? 'ml-4 pl-4 border-l border-gray-200' : ''}`}>
+                                    {userRole !== 'Visitante' && onTogglePush && (
+                                        <button
+                                            onClick={onTogglePush}
+                                            title={isSubscribedToPush ? "Desativar Notificações de Saída" : "Ativar Notificações de Saída"}
+                                            className={`p-2 rounded-full border transition-all ${isSubscribedToPush 
+                                                ? 'bg-green-50 border-green-200 text-brand-green hover:bg-green-100' 
+                                                : 'bg-gray-50 border-gray-200 text-gray-400 hover:text-gray-600 hover:bg-gray-100'}`}
+                                        >
+                                            <BellIcon className="h-5 w-5" />
+                                        </button>
+                                    )}
                                     <div className="text-right">
                                         <p className="text-xs text-gray-500 font-medium">Conectado como</p>
                                         <p className="text-sm font-bold text-brand-blue">{userRole}</p>
@@ -180,7 +199,23 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, userRole }) =>
                             {userRole && (
                                 <>
                                     <div className="my-2 border-t border-gray-100"></div>
-                                    <div className="px-4 py-3 mb-2 bg-blue-50 rounded-lg border border-blue-100 flex justify-between items-center">
+                                    {userRole !== 'Visitante' && onTogglePush && (
+                                        <button
+                                            onClick={onTogglePush}
+                                            className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-colors ${isSubscribedToPush 
+                                                ? 'bg-green-50 border-green-200 text-brand-green' 
+                                                : 'bg-gray-50 border-gray-200 text-gray-500'}`}
+                                        >
+                                            <div className="flex items-center">
+                                                <BellIcon className="h-6 w-6 mr-3 animate-bounce" />
+                                                <span className="font-semibold text-base">Notificações Alertas</span>
+                                            </div>
+                                            <span className="text-xs font-bold bg-white px-2 py-0.5 rounded shadow-sm">
+                                                {isSubscribedToPush ? 'ATIVADAS' : 'DESATIVADAS'}
+                                            </span>
+                                        </button>
+                                    )}
+                                    <div className="px-4 py-3 my-2 bg-blue-50 rounded-lg border border-blue-100 flex justify-between items-center">
                                         <span className="text-sm text-brand-dark font-medium">Perfil de Acesso:</span>
                                         <span className="text-sm font-bold text-brand-blue">{userRole}</span>
                                     </div>

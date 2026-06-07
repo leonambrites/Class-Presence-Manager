@@ -18,6 +18,21 @@ import {
     LOGO_URL
 } from './constants';
 
+function urlBase64ToUint8Array(base64String: string) {
+    const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+    const base64 = (base64String + padding)
+        .replace(/-/g, '+')
+        .replace(/_/g, '/');
+
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+
+    for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+}
+
 const App: React.FC = () => {
     const [view, setView] = useState<View>(View.Home);
 
@@ -30,6 +45,8 @@ const App: React.FC = () => {
     const [selectedClass, setSelectedClass] = useState<string>('All');
     const [loading, setLoading] = useState<boolean>(true);
     const [connectionStatus, setConnectionStatus] = useState<'connected' | 'disconnected' | 'syncing' | 'offline'>('syncing');
+    const [isSubscribedToPush, setIsSubscribedToPush] = useState<boolean>(false);
+    const [swRegistration, setSwRegistration] = useState<ServiceWorkerRegistration | null>(null);
 
     // Clerk hooks
     const { user, isLoaded } = useUser();
@@ -131,6 +148,129 @@ const App: React.FC = () => {
 
         return () => clearInterval(intervalId);
     }, [loadDataLocally]);
+
+    // Register Service Worker and check existing subscription
+    useEffect(() => {
+        if ('serviceWorker' in navigator && 'PushManager' in window) {
+            navigator.serviceWorker
+                .register(new URL('./sw.js', import.meta.url))
+                .then((reg) => {
+                    console.log('Service Worker registered successfully:', reg);
+                    setSwRegistration(reg);
+                    return reg.pushManager.getSubscription();
+                })
+                .then((subscription) => {
+                    if (subscription) {
+                        setIsSubscribedToPush(true);
+                    } else {
+                        setIsSubscribedToPush(false);
+                    }
+                })
+                .catch((err) => {
+                    console.error('Service Worker registration failed:', err);
+                });
+        }
+    }, []);
+
+    // Listen to messages from the Service Worker
+    useEffect(() => {
+        const handleServiceWorkerMessage = (event: MessageEvent) => {
+            if (event.data && event.data.type === 'NAVIGATE') {
+                const url = new URL(event.data.url, window.location.origin);
+                const viewParam = url.searchParams.get('view');
+                if (viewParam === 'Presença') {
+                    setView(View.Attendance);
+                } else if (viewParam === 'Home') {
+                    setView(View.Home);
+                }
+            }
+        };
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.addEventListener('message', handleServiceWorkerMessage);
+        }
+        return () => {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.removeEventListener('message', handleServiceWorkerMessage);
+            }
+        };
+    }, []);
+
+    // Initial check for URL routing from push notification click
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const viewParam = urlParams.get('view');
+        if (viewParam === 'Presença') {
+            setView(View.Attendance);
+        } else if (viewParam === 'Home') {
+            setView(View.Home);
+        }
+        if (viewParam) {
+            const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+            window.history.replaceState({ path: newUrl }, '', newUrl);
+        }
+    }, []);
+
+    const togglePushSubscription = useCallback(async () => {
+        if (!('serviceWorker' in navigator) || !('PushManager' in window) || !swRegistration) {
+            showNotification("Este navegador não suporta notificações de alerta.");
+            return;
+        }
+
+        try {
+            if (isSubscribedToPush) {
+                const subscription = await swRegistration.pushManager.getSubscription();
+                if (subscription) {
+                    await subscription.unsubscribe();
+                    await fetch('/api/push/unsubscribe', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ endpoint: subscription.endpoint }),
+                    });
+                }
+                setIsSubscribedToPush(false);
+                showNotification("Notificações desativadas com sucesso.");
+            } else {
+                const permission = await Notification.requestPermission();
+                if (permission !== 'granted') {
+                    showNotification("Permissão de notificação negada. Ative nas configurações do navegador.");
+                    return;
+                }
+
+                const response = await fetch('/api/push/key');
+                if (!response.ok) {
+                    throw new Error("Não foi possível buscar a chave pública do servidor.");
+                }
+                const { publicKey } = await response.json();
+
+                const applicationServerKey = urlBase64ToUint8Array(publicKey);
+                const subscription = await swRegistration.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey,
+                });
+
+                const subResponse = await fetch('/api/push/subscribe', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ subscription }),
+                });
+
+                if (!subResponse.ok) {
+                    throw new Error("Erro ao salvar inscrição no servidor.");
+                }
+
+                setIsSubscribedToPush(true);
+                showNotification("Notificações ativadas! Você receberá alertas de liberação.");
+            }
+        } catch (error) {
+            console.error("Erro ao gerenciar notificações de push:", error);
+            showNotification("Erro ao configurar notificações: " + (error instanceof Error ? error.message : String(error)));
+        }
+    }, [isSubscribedToPush, swRegistration]);
 
     const getDayOfWeek = (dateString: string): 'Sunday' | 'Wednesday' | null => {
         const date = new Date(dateString + 'T00:00:00');
@@ -845,6 +985,8 @@ const App: React.FC = () => {
                     currentView={view}
                     onNavigate={setView}
                     userRole={userRole}
+                    isSubscribedToPush={isSubscribedToPush}
+                    onTogglePush={togglePushSubscription}
                 />
                 {/* Network Status Indicator */}
                 <div className={`w-full py-1 text-xs text-center text-white font-semibold transition-colors duration-300 ${connectionStatus === 'connected' ? 'bg-green-500' :
