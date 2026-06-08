@@ -42,23 +42,52 @@ const Admin: React.FC<AdminProps> = ({ userRole }) => {
     }, []);
 
     const handleRoleChange = async (userId: string, newRole: UserRole) => {
-        // Optimistic UI Update
         const previousUsers = [...users];
-        setUsers(users.map(u => u.id === userId ? { ...u, role: newRole } : u));
+
+        // Optimistic UI Update
+        setUsers(users.map(u => {
+            if (u.id === userId) {
+                return {
+                    ...u,
+                    role: newRole,
+                    classroom: newRole === 'Pastor' ? 'Todas' : u.classroom
+                };
+            }
+            return u;
+        }));
 
         try {
-            const res = await fetch(`/api/users/${userId}/role`, {
+            const res = await fetch(`/api/users/${userId}/metadata`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ role: newRole })
             });
 
             if (!res.ok) throw new Error("Falha ao salvar a permissão");
-
-            // Optionally show a toast here
         } catch (err) {
             console.error(err);
             alert("Erro de conexão ao salvar cargo. A alteração foi desfeita.");
+            setUsers(previousUsers); // Revert on failure
+        }
+    };
+
+    const handleClassroomChange = async (userId: string, newClassroom: string) => {
+        const previousUsers = [...users];
+
+        // Optimistic UI Update
+        setUsers(users.map(u => u.id === userId ? { ...u, classroom: newClassroom } : u));
+
+        try {
+            const res = await fetch(`/api/users/${userId}/metadata`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ classroom: newClassroom })
+            });
+
+            if (!res.ok) throw new Error("Falha ao salvar a turma");
+        } catch (err) {
+            console.error(err);
+            alert("Erro de conexão ao salvar a turma. A alteração foi desfeita.");
             setUsers(previousUsers); // Revert on failure
         }
     };
@@ -100,6 +129,9 @@ const Admin: React.FC<AdminProps> = ({ userRole }) => {
                                 </th>
                                 <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                                     Cargo e Permissões
+                                </th>
+                                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                    Turma Associada
                                 </th>
                             </tr>
                         </thead>
@@ -150,6 +182,28 @@ const Admin: React.FC<AdminProps> = ({ userRole }) => {
                                                 <option value="Ministra" className="text-gray-900 bg-white">Ministra (Presença e Saída)</option>
                                                 <option value="Visitante" className="text-gray-900 bg-white">Visitante (Sem Acesso)</option>
                                             </select>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            {user.role === 'Pastor' ? (
+                                                <span className="inline-flex items-center rounded-full bg-purple-50 px-3 py-1 text-xs font-semibold text-purple-700 ring-1 ring-inset ring-purple-600/20">
+                                                    Todas as Turmas
+                                                </span>
+                                            ) : (
+                                                <select
+                                                    value={user.classroom || ''}
+                                                    disabled={userRole !== 'Pastor'}
+                                                    onChange={(e) => handleClassroomChange(user.id, e.target.value)}
+                                                    className="text-sm rounded-lg px-2 py-1 font-medium border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-brand-blue disabled:bg-gray-100 disabled:text-gray-500"
+                                                >
+                                                    <option value="">Sem Turma</option>
+                                                    <option value="Maternal">Maternal</option>
+                                                    <option value="2 a 3 anos">2 a 3 anos</option>
+                                                    <option value="4 a 5 anos">4 a 5 anos</option>
+                                                    <option value="6 a 7 anos">6 a 7 anos</option>
+                                                    <option value="8 a 10 anos">8 a 10 anos</option>
+                                                    <option value="Seeds">Seeds</option>
+                                                </select>
+                                            )}
                                         </td>
                                     </tr>
                                 ))
