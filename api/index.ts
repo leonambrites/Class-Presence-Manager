@@ -58,13 +58,18 @@ app.get('/api/users', async (req, res) => {
         const users = await response.json();
 
         // Map to a cleaner format
-        const mappedUsers = users.map((u: any) => ({
-            id: u.id,
-            email: u.email_addresses?.[0]?.email_address || '',
-            firstName: u.first_name || '',
-            lastName: u.last_name || '',
-            role: u.public_metadata?.role || 'Ministra'
-        }));
+        const mappedUsers = users.map((u: any) => {
+            const role = u.public_metadata?.role || 'Ministra';
+            const classroom = role === 'Pastor' ? 'Todas' : (u.public_metadata?.classroom || '');
+            return {
+                id: u.id,
+                email: u.email_addresses?.[0]?.email_address || '',
+                firstName: u.first_name || '',
+                lastName: u.last_name || '',
+                role,
+                classroom
+            };
+        });
 
         res.status(200).json(mappedUsers);
     } catch (error) {
@@ -73,12 +78,20 @@ app.get('/api/users', async (req, res) => {
     }
 });
 
-// PATCH Clerk User Role
-app.patch('/api/users/:id/role', async (req, res) => {
+// PATCH Clerk User Metadata (Role and/or Classroom)
+app.patch('/api/users/:id/metadata', async (req, res) => {
     try {
         if (!CLERK_SECRET_KEY) throw new Error('Missing CLERK_SECRET_KEY');
         const { id } = req.params;
-        const { role } = req.body;
+        const { role, classroom } = req.body;
+
+        const metadataUpdate: any = {};
+        if (role !== undefined) metadataUpdate.role = role;
+        if (classroom !== undefined) {
+            metadataUpdate.classroom = role === 'Pastor' ? 'Todas' : classroom;
+        } else if (role === 'Pastor') {
+            metadataUpdate.classroom = 'Todas';
+        }
 
         const response = await fetch(`https://api.clerk.com/v1/users/${id}/metadata`, {
             method: 'PATCH',
@@ -87,7 +100,42 @@ app.patch('/api/users/:id/role', async (req, res) => {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                public_metadata: { role }
+                public_metadata: metadataUpdate
+            })
+        });
+
+        if (!response.ok) {
+            const errBody = await response.text();
+            console.error("Clerk PATCH metadata failed:", errBody);
+            throw new Error("Failed to update Clerk user metadata");
+        }
+        res.status(200).json({ message: "Metadata updated successfully" });
+    } catch (error) {
+        console.error("Error updating Clerk user metadata:", error);
+        res.status(500).json({ error: "Failed to update metadata" });
+    }
+});
+
+// PATCH Clerk User Role (Deprecated fallback)
+app.patch('/api/users/:id/role', async (req, res) => {
+    try {
+        if (!CLERK_SECRET_KEY) throw new Error('Missing CLERK_SECRET_KEY');
+        const { id } = req.params;
+        const { role } = req.body;
+
+        const metadataUpdate: any = { role };
+        if (role === 'Pastor') {
+            metadataUpdate.classroom = 'Todas';
+        }
+
+        const response = await fetch(`https://api.clerk.com/v1/users/${id}/metadata`, {
+            method: 'PATCH',
+            headers: {
+                'Authorization': `Bearer ${CLERK_SECRET_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                public_metadata: metadataUpdate
             })
         });
 
