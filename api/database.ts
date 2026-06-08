@@ -155,9 +155,30 @@ export const initDb = async () => {
             CREATE TABLE IF NOT EXISTS push_subscriptions (
                 id VARCHAR(255) PRIMARY KEY,
                 subscription_json TEXT NOT NULL,
+                user_email TEXT,
+                user_name TEXT,
+                user_role TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `;
+
+        try {
+            await sql`ALTER TABLE push_subscriptions ADD COLUMN user_email TEXT`;
+        } catch (e) {
+            // Column likely already exists
+        }
+
+        try {
+            await sql`ALTER TABLE push_subscriptions ADD COLUMN user_name TEXT`;
+        } catch (e) {
+            // Column likely already exists
+        }
+
+        try {
+            await sql`ALTER TABLE push_subscriptions ADD COLUMN user_role TEXT`;
+        } catch (e) {
+            // Column likely already exists
+        }
 
         console.log("Vercel Postgres Database initialized successfully.");
     } catch (error) {
