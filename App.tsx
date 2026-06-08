@@ -151,6 +151,8 @@ const App: React.FC = () => {
 
     // Register Service Worker and check existing subscription / request permission
     useEffect(() => {
+        if (!isLoaded) return;
+
         if ('serviceWorker' in navigator && 'PushManager' in window) {
             let activeReg: ServiceWorkerRegistration;
 
@@ -167,7 +169,12 @@ const App: React.FC = () => {
                     await fetch('/api/push/subscribe', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ subscription: newSub }),
+                        body: JSON.stringify({ 
+                            subscription: newSub,
+                            userEmail: user?.primaryEmailAddress?.emailAddress || null,
+                            userName: user?.fullName || null,
+                            userRole: userRole || null
+                        }),
                     });
                     setIsSubscribedToPush(true);
                 } catch (error) {
@@ -203,7 +210,7 @@ const App: React.FC = () => {
                     console.error('Service Worker registration failed:', err);
                 });
         }
-    }, []);
+    }, [isLoaded, user, userRole]);
 
     // Listen to messages from the Service Worker
     useEffect(() => {
@@ -289,7 +296,12 @@ const App: React.FC = () => {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ subscription }),
+                    body: JSON.stringify({ 
+                        subscription,
+                        userEmail: user?.primaryEmailAddress?.emailAddress || null,
+                        userName: user?.fullName || null,
+                        userRole: userRole || null
+                    }),
                 });
 
                 if (!subResponse.ok) {
@@ -303,7 +315,7 @@ const App: React.FC = () => {
             console.error("Erro ao gerenciar notificações de push:", error);
             showNotification("Erro ao configurar notificações: " + (error instanceof Error ? error.message : String(error)));
         }
-    }, [isSubscribedToPush, swRegistration]);
+    }, [isSubscribedToPush, swRegistration, user, userRole]);
 
     const getDayOfWeek = (dateString: string): 'Sunday' | 'Wednesday' | null => {
         const date = new Date(dateString + 'T00:00:00');

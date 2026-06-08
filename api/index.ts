@@ -126,12 +126,12 @@ app.get('/api/push/key', (req, res) => {
 // Subscribe to push notifications
 app.post('/api/push/subscribe', async (req, res) => {
     try {
-        const { subscription } = req.body;
+        const { subscription, userEmail, userName, userRole } = req.body;
         if (!subscription || !subscription.endpoint) {
             return res.status(400).json({ error: 'Invalid subscription object.' });
         }
         const id = crypto.createHash('sha256').update(subscription.endpoint).digest('hex');
-        await dbService.addPushSubscription(id, JSON.stringify(subscription));
+        await dbService.addPushSubscription(id, JSON.stringify(subscription), userEmail, userName, userRole);
         res.status(201).json({ message: 'Push subscription saved.' });
     } catch (e) {
         console.error('Error saving subscription:', e);
@@ -197,10 +197,66 @@ async function triggerPushBroadcast(studentId: string, date: string) {
             url: '/?view=Presença'
         });
 
-        const subscriptions = await dbService.getAllPushSubscriptions();
-        console.log(`Broadcasting push notification for ${name} (COD #${code}) to ${subscriptions.length} subscribers.`);
+        // 1. Find who is scaled to this class on this date
+        const scheduleToday = allData.schedule.filter((s: any) => s.date === date && s.className === className);
+        
+        // Collect volunteer IDs scaled today
+        const scaledVolunteerIds = new Set<string>();
+        scheduleToday.forEach((sch: any) => {
+            if (sch.supervisorId) scaledVolunteerIds.add(String(sch.supervisorId));
+            if (sch.deskId) scaledVolunteerIds.add(String(sch.deskId));
+            if (sch.coordinatorId) scaledVolunteerIds.add(String(sch.coordinatorId));
+            if (sch.ministerIds) {
+                sch.ministerIds.forEach((id: string) => scaledVolunteerIds.add(String(id)));
+            }
+        });
 
-        const promises = subscriptions.map(async (sub) => {
+        // Get all scaled volunteers names (lowercase, normalized)
+        const scaledVolunteersNames = new Set<string>();
+        allData.volunteers.forEach((v: any) => {
+            if (scaledVolunteerIds.has(String(v.id))) {
+                scaledVolunteersNames.add(v.name.toLowerCase().trim());
+            }
+        });
+
+        console.log(`[PUSH BROADCAST] Scaled volunteers for ${className} on ${date}:`, Array.from(scaledVolunteersNames));
+
+        const subscriptions = await dbService.getAllPushSubscriptions();
+        console.log(`[PUSH BROADCAST] Found ${subscriptions.length} total subscriptions.`);
+
+        // 2. Filter subscriptions to matching users
+        const targets = subscriptions.filter((sub) => {
+            try {
+                if (!sub.userEmail) return false;
+
+                // Coordinators and Pastors always receive all alerts
+                const role = sub.userRole || 'Ministra';
+                if (role === 'Pastor' || role === 'Coordenadora') {
+                    return true;
+                }
+
+                // Teachers must be scaled today for this class
+                const userName = (sub.userName || '').toLowerCase().trim();
+                if (scaledVolunteersNames.has(userName)) {
+                    return true;
+                }
+
+                // Fallback: name substring match
+                for (const volName of scaledVolunteersNames) {
+                    if (userName && (volName.includes(userName) || userName.includes(volName))) {
+                        return true;
+                    }
+                }
+
+                return false;
+            } catch (e) {
+                return false;
+            }
+        });
+
+        console.log(`[PUSH BROADCAST] Broadcasting for ${name} (COD #${code}) to ${targets.length} filtered subscribers.`);
+
+        const promises = targets.map(async (sub) => {
             try {
                 const subObj = JSON.parse(sub.subscriptionJson);
                 await webpush.sendNotification(subObj, payload);

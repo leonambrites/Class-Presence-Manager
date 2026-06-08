@@ -351,12 +351,16 @@ export const dbService = {
         }));
     },
 
-    async addPushSubscription(id: string, subscriptionJson: string) {
+    async addPushSubscription(id: string, subscriptionJson: string, userEmail?: string, userName?: string, userRole?: string) {
         const sql = getSql();
         await sql`
-            INSERT INTO push_subscriptions (id, subscription_json, created_at)
-            VALUES (${id}, ${subscriptionJson}, ${getTimestamp()})
-            ON CONFLICT (id) DO UPDATE SET subscription_json = EXCLUDED.subscription_json
+            INSERT INTO push_subscriptions (id, subscription_json, user_email, user_name, user_role, created_at)
+            VALUES (${id}, ${subscriptionJson}, ${userEmail || null}, ${userName || null}, ${userRole || null}, ${getTimestamp()})
+            ON CONFLICT (id) DO UPDATE SET 
+                subscription_json = EXCLUDED.subscription_json,
+                user_email = EXCLUDED.user_email,
+                user_name = EXCLUDED.user_name,
+                user_role = EXCLUDED.user_role
         `;
     },
 
@@ -367,10 +371,13 @@ export const dbService = {
 
     async getAllPushSubscriptions() {
         const sql = getSql();
-        const result = await sql`SELECT id, subscription_json FROM push_subscriptions`;
+        const result = await sql`SELECT id, subscription_json, user_email, user_name, user_role FROM push_subscriptions`;
         return result.map((r: any) => ({
             id: r.id,
-            subscriptionJson: r.subscription_json
+            subscriptionJson: r.subscription_json,
+            userEmail: r.user_email,
+            userName: r.user_name,
+            userRole: r.user_role
         }));
     }
 };
