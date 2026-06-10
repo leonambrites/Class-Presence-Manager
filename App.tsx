@@ -192,7 +192,52 @@ const App: React.FC = () => {
                 })
                 .then(async (subscription) => {
                     if (subscription) {
-                        setIsSubscribedToPush(true);
+                        // Auto-healing: Verify if the subscription's public key matches current server key
+                        try {
+                            const response = await fetch('/api/push/key');
+                            if (response.ok) {
+                                const { publicKey } = await response.json();
+                                const currentServerKey = urlBase64ToUint8Array(publicKey);
+                                const existingKey = subscription.options.applicationServerKey 
+                                    ? new Uint8Array(subscription.options.applicationServerKey) 
+                                    : null;
+                                
+                                let keysMatch = existingKey !== null && currentServerKey.length === existingKey.length;
+                                if (keysMatch && existingKey) {
+                                    for (let i = 0; i < currentServerKey.length; i++) {
+                                        if (currentServerKey[i] !== existingKey[i]) {
+                                            keysMatch = false;
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                if (!keysMatch) {
+                                    console.log('VAPID key mismatch/change detected. Re-subscribing client...');
+                                    await subscription.unsubscribe();
+                                    await subscribeUser(activeReg);
+                                } else {
+                                    // Keys match, always re-register with database to keep metadata (user email, role) synced
+                                    console.log('Push keys match. Re-syncing push subscription metadata with backend DB...');
+                                    await fetch('/api/push/subscribe', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ 
+                                            subscription: subscription,
+                                            userEmail: user?.primaryEmailAddress?.emailAddress || null,
+                                            userName: user?.fullName || null,
+                                            userRole: userRole || null
+                                        }),
+                                    });
+                                    setIsSubscribedToPush(true);
+                                }
+                            } else {
+                                setIsSubscribedToPush(true);
+                            }
+                        } catch (err) {
+                            console.error('Error validating existing push subscription, defaulting to true:', err);
+                            setIsSubscribedToPush(true);
+                        }
                     } else {
                         setIsSubscribedToPush(false);
                         
