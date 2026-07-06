@@ -5,6 +5,7 @@ import fs from 'fs';
 import crypto from 'crypto';
 import webpush from 'web-push';
 import { generateClientTokenFromReadWriteToken } from '@vercel/blob/client';
+import { ClerkExpressRequireAuth } from '@clerk/clerk-sdk-node';
 
 // Load local variables for local development
 dotenv.config({ path: '.env.local' });
@@ -41,11 +42,69 @@ initDb().catch(console.error);
 const app = express();
 app.use(express.json({ limit: '10mb' }) as any); // Increased limit for full data sync
 
+// Protect all /api endpoints
+app.use('/api', ClerkExpressRequireAuth() as any);
+
+// Role cache in memory
+const roleCache = new Map<string, { role: string; expiresAt: number }>();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
 // --- Clerk Admin Endpoints ---
 const CLERK_SECRET_KEY = process.env.CLERK_SECRET_KEY;
 
+async function getUserRole(userId: string): Promise<string> {
+    const cached = roleCache.get(userId);
+    if (cached && cached.expiresAt > Date.now()) {
+        return cached.role;
+    }
+
+    if (!CLERK_SECRET_KEY) throw new Error('Missing CLERK_SECRET_KEY');
+    const response = await fetch(`https://api.clerk.com/v1/users/${userId}`, {
+        headers: {
+            'Authorization': `Bearer ${CLERK_SECRET_KEY}`,
+            'Content-Type': 'application/json'
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to fetch user details from Clerk: ${response.statusText}`);
+    }
+
+    const userData: any = await response.json();
+    const role = userData.public_metadata?.role || 'Ministra';
+    
+    roleCache.set(userId, {
+        role,
+        expiresAt: Date.now() + CACHE_TTL
+    });
+
+    return role;
+}
+
+const checkRole = (allowedRoles: string[]) => {
+    return async (req: any, res: any, next: any) => {
+        try {
+            const userId = req.auth?.userId;
+            if (!userId) {
+                return res.status(401).json({ error: 'Unauthenticated' });
+            }
+
+            const role = await getUserRole(userId);
+            if (!allowedRoles.includes(role)) {
+                return res.status(403).json({ error: 'Forbidden: Insufficient permissions' });
+            }
+
+            req.userRole = role;
+            next();
+        } catch (error) {
+            console.error('Error in checkRole middleware:', error);
+            res.status(500).json({ error: 'Failed to authorize user' });
+        }
+    };
+};
+
 // GET Clerk Users
-app.get('/api/users', async (req, res) => {
+app.get('/api/users', checkRole(['Pastor', 'Coordenadora']) as any, async (req, res) => {
     try {
         if (!CLERK_SECRET_KEY) throw new Error('Missing CLERK_SECRET_KEY');
         const response = await fetch('https://api.clerk.com/v1/users?limit=100', {
@@ -79,11 +138,17 @@ app.get('/api/users', async (req, res) => {
 });
 
 // PATCH Clerk User Metadata (Role and/or Classroom)
-app.patch('/api/users/:id/metadata', async (req, res) => {
+app.patch('/api/users/:id/metadata', checkRole(['Pastor', 'Coordenadora']) as any, async (req, res) => {
     try {
         if (!CLERK_SECRET_KEY) throw new Error('Missing CLERK_SECRET_KEY');
         const { id } = req.params;
         const { role, classroom } = req.body;
+
+        // Enforce: Coordenadora cannot edit classroom
+        const callerRole = (req as any).userRole;
+        if (callerRole === 'Coordenadora' && classroom !== undefined) {
+            return res.status(403).json({ error: 'Forbidden: Coordenadoras cannot alter user classrooms.' });
+        }
 
         const metadataUpdate: any = {};
         if (role !== undefined) metadataUpdate.role = role;
@@ -117,7 +182,7 @@ app.patch('/api/users/:id/metadata', async (req, res) => {
 });
 
 // PATCH Clerk User Role (Deprecated fallback)
-app.patch('/api/users/:id/role', async (req, res) => {
+app.patch('/api/users/:id/role', checkRole(['Pastor', 'Coordenadora']) as any, async (req, res) => {
     try {
         if (!CLERK_SECRET_KEY) throw new Error('Missing CLERK_SECRET_KEY');
         const { id } = req.params;
@@ -150,7 +215,7 @@ app.patch('/api/users/:id/role', async (req, res) => {
 // --- API Endpoints ---
 
 // GET all data
-app.get('/api/data', async (req, res) => {
+app.get('/api/data', checkRole(['Pastor', 'Coordenadora', 'Supervisora', 'Ministra']) as any, async (req, res) => {
     try {
         const data = await dbService.getAllData();
         res.json(data);
@@ -163,7 +228,7 @@ app.get('/api/data', async (req, res) => {
 // --- Web Push Endpoints ---
 
 // Get public VAPID key
-app.get('/api/push/key', (req, res) => {
+app.get('/api/push/key', checkRole(['Pastor', 'Coordenadora', 'Supervisora', 'Ministra']) as any, (req, res) => {
     const publicKey = process.env.VAPID_PUBLIC_KEY?.replace(/^["']|["']$/g, '');
     if (!publicKey) {
         return res.status(500).json({ error: 'Push notifications are not configured on the server.' });
@@ -172,7 +237,7 @@ app.get('/api/push/key', (req, res) => {
 });
 
 // Subscribe to push notifications
-app.post('/api/push/subscribe', async (req, res) => {
+app.post('/api/push/subscribe', checkRole(['Pastor', 'Coordenadora', 'Supervisora', 'Ministra']) as any, async (req, res) => {
     try {
         const { subscription, userEmail, userName, userRole } = req.body;
         if (!subscription || !subscription.endpoint) {
@@ -188,7 +253,7 @@ app.post('/api/push/subscribe', async (req, res) => {
 });
 
 // Unsubscribe from push notifications
-app.post('/api/push/unsubscribe', async (req, res) => {
+app.post('/api/push/unsubscribe', checkRole(['Pastor', 'Coordenadora', 'Supervisora', 'Ministra']) as any, async (req, res) => {
     try {
         const { endpoint } = req.body;
         if (!endpoint) {
@@ -204,7 +269,7 @@ app.post('/api/push/unsubscribe', async (req, res) => {
 });
 
 // Mark/Unmark Presence
-app.post('/api/attendance', async (req, res) => {
+app.post('/api/attendance', checkRole(['Pastor', 'Coordenadora', 'Supervisora', 'Ministra']) as any, async (req, res) => {
     const { studentId, date, present, day, dailyCode } = req.body;
     try {
         await dbService.updateAttendance(studentId, date, present, day, dailyCode);
@@ -216,7 +281,7 @@ app.post('/api/attendance', async (req, res) => {
 });
 
 // Record Dismissal
-app.post('/api/dismissal', async (req, res) => {
+app.post('/api/dismissal', checkRole(['Pastor', 'Coordenadora', 'Supervisora', 'Ministra']) as any, async (req, res) => {
     const { studentId, responsibleName, date } = req.body;
     try {
         await dbService.updateDismissal(studentId, date, responsibleName);
@@ -326,7 +391,7 @@ async function triggerPushBroadcast(studentId: string, date: string) {
 }
 
 // Update Awaiting Release (Ready to Leave) Status
-app.post('/api/attendance/ready', async (req, res) => {
+app.post('/api/attendance/ready', checkRole(['Pastor', 'Coordenadora', 'Supervisora', 'Ministra']) as any, async (req, res) => {
     const { studentId, date, readyToLeave } = req.body;
     try {
         await dbService.updateReadyToLeave(studentId, date, readyToLeave);
@@ -341,7 +406,7 @@ app.post('/api/attendance/ready', async (req, res) => {
 });
 
 // Undo/Reset Dismissal
-app.post('/api/attendance/undo-dismissal', async (req, res) => {
+app.post('/api/attendance/undo-dismissal', checkRole(['Pastor', 'Coordenadora', 'Supervisora', 'Ministra']) as any, async (req, res) => {
     const { studentId, date } = req.body;
     try {
         await dbService.resetDismissal(studentId, date);
@@ -353,7 +418,7 @@ app.post('/api/attendance/undo-dismissal', async (req, res) => {
 });
 
 // Add Student
-app.post('/api/students', async (req, res) => {
+app.post('/api/students', checkRole(['Pastor', 'Coordenadora', 'Supervisora']) as any, async (req, res) => {
     const newStudent = req.body;
     try {
         // Ensure ID exists if not passed
@@ -368,7 +433,7 @@ app.post('/api/students', async (req, res) => {
 });
 
 // Update Student (Edit or Make Member)
-app.put('/api/students/:id', async (req, res) => {
+app.put('/api/students/:id', checkRole(['Pastor', 'Coordenadora', 'Supervisora']) as any, async (req, res) => {
     const { id } = req.params;
     try {
         const payload = req.body;
@@ -395,7 +460,7 @@ app.put('/api/students/:id', async (req, res) => {
 });
 
 // Delete Student
-app.delete('/api/students/:id', async (req, res) => {
+app.delete('/api/students/:id', checkRole(['Pastor', 'Coordenadora', 'Supervisora']) as any, async (req, res) => {
     const { id } = req.params;
     try {
         await dbService.deleteStudent(id);
@@ -407,7 +472,7 @@ app.delete('/api/students/:id', async (req, res) => {
 });
 
 // Add Topic
-app.post('/api/topics', async (req, res) => {
+app.post('/api/topics', checkRole(['Pastor']) as any, async (req, res) => {
     const { id, date, title, description } = req.body;
     try {
         await dbService.addTopic(date, title, description, id);
@@ -419,7 +484,7 @@ app.post('/api/topics', async (req, res) => {
 });
 
 // Update Topic
-app.put('/api/topics/:id', async (req, res) => {
+app.put('/api/topics/:id', checkRole(['Pastor']) as any, async (req, res) => {
     const { id } = req.params;
     const { date, title, description } = req.body;
     try {
@@ -432,7 +497,7 @@ app.put('/api/topics/:id', async (req, res) => {
 });
 
 // Delete Topic
-app.delete('/api/topics/:id', async (req, res) => {
+app.delete('/api/topics/:id', checkRole(['Pastor']) as any, async (req, res) => {
     const { id } = req.params;
     try {
         await dbService.deleteTopic(id);
@@ -444,7 +509,7 @@ app.delete('/api/topics/:id', async (req, res) => {
 });
 
 // Download Lesson Plan (serves physical docx in /data/topics or compiles a fallback doc file)
-app.get('/api/download-lesson', async (req, res) => {
+app.get('/api/download-lesson', checkRole(['Pastor', 'Coordenadora', 'Supervisora', 'Ministra']) as any, async (req, res) => {
     const { fileName, title, description, date, className } = req.query;
     if (!fileName) {
         return res.status(400).json({ error: 'Missing fileName parameter' });
@@ -568,7 +633,7 @@ app.get('/api/download-lesson', async (req, res) => {
 });
 
 // --- Volunteers CRUD ---
-app.post('/api/volunteers', async (req, res) => {
+app.post('/api/volunteers', checkRole(['Pastor', 'Coordenadora', 'Supervisora']) as any, async (req, res) => {
     try {
         await dbService.addVolunteer(req.body);
         res.status(201).json({ message: 'Volunteer created' });
@@ -578,7 +643,7 @@ app.post('/api/volunteers', async (req, res) => {
     }
 });
 
-app.put('/api/volunteers/:id', async (req, res) => {
+app.put('/api/volunteers/:id', checkRole(['Pastor', 'Coordenadora', 'Supervisora']) as any, async (req, res) => {
     try {
         const { id } = req.params;
         await dbService.updateVolunteer(id, req.body);
@@ -589,7 +654,7 @@ app.put('/api/volunteers/:id', async (req, res) => {
     }
 });
 
-app.delete('/api/volunteers/:id', async (req, res) => {
+app.delete('/api/volunteers/:id', checkRole(['Pastor', 'Coordenadora', 'Supervisora']) as any, async (req, res) => {
     try {
         const { id } = req.params;
         await dbService.deleteVolunteer(id);
@@ -601,7 +666,7 @@ app.delete('/api/volunteers/:id', async (req, res) => {
 });
 
 // --- Schedule CRUD ---
-app.post('/api/schedule', async (req, res) => {
+app.post('/api/schedule', checkRole(['Pastor', 'Coordenadora']) as any, async (req, res) => {
     try {
         await dbService.addSchedule(req.body);
         res.status(201).json({ message: 'Schedule created' });
@@ -611,7 +676,7 @@ app.post('/api/schedule', async (req, res) => {
     }
 });
 
-app.put('/api/schedule/:id', async (req, res) => {
+app.put('/api/schedule/:id', checkRole(['Pastor', 'Coordenadora', 'Supervisora']) as any, async (req, res) => {
     try {
         const { id } = req.params;
         await dbService.updateSchedule(id, req.body);
@@ -622,7 +687,7 @@ app.put('/api/schedule/:id', async (req, res) => {
     }
 });
 
-app.delete('/api/schedule/:id', async (req, res) => {
+app.delete('/api/schedule/:id', checkRole(['Pastor', 'Coordenadora']) as any, async (req, res) => {
     try {
         const { id } = req.params;
         await dbService.deleteSchedule(id);
@@ -634,7 +699,7 @@ app.delete('/api/schedule/:id', async (req, res) => {
 });
 
 // Save All Data (Manual Sync/Overwrite)
-app.post('/api/save-all', async (req, res) => {
+app.post('/api/save-all', checkRole(['Pastor', 'Coordenadora']) as any, async (req, res) => {
     try {
         const { students, volunteers, schedule, topics } = req.body;
 
@@ -656,7 +721,7 @@ app.post('/api/save-all', async (req, res) => {
 });
 
 // Seed Database from Constants
-app.post('/api/seed', async (req, res) => {
+app.post('/api/seed', checkRole(['Pastor']) as any, async (req, res) => {
     try {
         await dbService.seedDatabase({
             students: INITIAL_STUDENTS,
@@ -672,7 +737,7 @@ app.post('/api/seed', async (req, res) => {
 });
 
 // Get List of Available Lesson Files
-app.get('/api/available-lessons', async (req, res) => {
+app.get('/api/available-lessons', checkRole(['Pastor', 'Coordenadora', 'Supervisora', 'Ministra']) as any, async (req, res) => {
     try {
         const dataPathCapitalized = path.join(process.cwd(), 'data', 'Topics');
         const dataPathLowercase = path.join(process.cwd(), 'data', 'topics');
@@ -772,7 +837,7 @@ app.get('/api/available-lessons', async (req, res) => {
 });
 
 // Token generation endpoint for Vercel Blob client-side uploads
-app.post('/api/upload-lesson/get-token', async (req, res) => {
+app.post('/api/upload-lesson/get-token', checkRole(['Pastor']) as any, async (req, res) => {
     try {
         const { pathname } = req.body;
         if (!pathname) {
@@ -802,7 +867,7 @@ app.post('/api/upload-lesson/get-token', async (req, res) => {
 });
 
 // Register uploaded Vercel Blob metadata and associate it with a Topic
-app.post('/api/upload-lesson/register', async (req, res) => {
+app.post('/api/upload-lesson/register', checkRole(['Pastor']) as any, async (req, res) => {
     try {
         const { fileName, url, sizeBytes, date, title, description } = req.body;
         if (!fileName || !url) {
@@ -833,7 +898,7 @@ app.post('/api/upload-lesson/register', async (req, res) => {
 });
 
 // Upload a Lesson File
-app.post('/api/upload-lesson', async (req, res) => {
+app.post('/api/upload-lesson', checkRole(['Pastor']) as any, async (req, res) => {
     try {
         const { fileName, fileContent, date, title, description } = req.body;
         if (!fileName || !fileContent) {
@@ -912,6 +977,15 @@ if (typeof require !== 'undefined' && require.main === module) {
         });
     }
 }
+
+// Error handler for Clerk auth errors and other unhandled errors
+app.use((err: any, req: any, res: any, next: any) => {
+    if (err.message && err.message.includes('Unauthenticated')) {
+        return res.status(401).json({ error: 'Unauthenticated' });
+    }
+    console.error('Unhandled error:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
+});
 
 export default app;
 if (typeof module !== 'undefined') {
