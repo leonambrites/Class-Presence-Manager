@@ -9,7 +9,7 @@ import Volunteers from './components/Volunteers';
 import Topics from './components/Topics';
 import Reports from './components/Reports';
 import Admin from './components/Admin';
-import { SignedIn, SignedOut, SignIn, useUser } from '@clerk/clerk-react';
+import { SignedIn, SignedOut, SignIn, useUser, useAuth } from '@clerk/clerk-react';
 import {
     INITIAL_STUDENTS,
     INITIAL_VOLUNTEERS,
