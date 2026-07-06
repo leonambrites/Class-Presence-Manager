@@ -11,6 +11,7 @@ interface TopicsProps {
   onDeleteTopic: (id: string) => void;
   onImportTopics: (imported: Omit<Topic, 'id'>[]) => void;
   userRole: UserRole;
+  fetchWithAuth: (url: RequestInfo | URL, options?: RequestInit) => Promise<Response>;
 }
 
 interface AvailableLesson {
@@ -157,7 +158,8 @@ const Topics: React.FC<TopicsProps> = ({
   onEditTopic, 
   onDeleteTopic, 
   onImportTopics, 
-  userRole 
+  userRole,
+  fetchWithAuth
 }) => {
   // Navigation Tabs state
   const [activeTab, setActiveTab] = useState<'history' | 'files'>('history');
@@ -210,7 +212,7 @@ const Topics: React.FC<TopicsProps> = ({
     setLoadingLessons(true);
     setLessonsError(null);
     try {
-      const response = await fetch('/api/available-lessons');
+      const response = await fetchWithAuth('/api/available-lessons');
       if (response.ok) {
         const data = await response.json();
         setAvailableLessons(data.lessons || []);
@@ -463,7 +465,7 @@ const Topics: React.FC<TopicsProps> = ({
       const generatedName = getLessonFileName(uploadingTopic.date, uploadingClass);
 
       // 1. Get a client token from the server
-      const tokenRes = await fetch('/api/upload-lesson/get-token', {
+      const tokenRes = await fetchWithAuth('/api/upload-lesson/get-token', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ pathname: generatedName }),
@@ -490,7 +492,7 @@ const Topics: React.FC<TopicsProps> = ({
         description: uploadingTopic.description
       };
 
-      const response = await fetch('/api/upload-lesson/register', {
+      const response = await fetchWithAuth('/api/upload-lesson/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -593,7 +595,7 @@ const Topics: React.FC<TopicsProps> = ({
         }
 
         // 1. Get a client token from the server
-        const tokenRes = await fetch('/api/upload-lesson/get-token', {
+        const tokenRes = await fetchWithAuth('/api/upload-lesson/get-token', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ pathname: file.name }),
@@ -620,7 +622,7 @@ const Topics: React.FC<TopicsProps> = ({
           description: `Aula oficial carregada para a turma ${parsed.className} correspondente ao ${parsed.sundayNum}º domingo de ${parsed.monthName.toLowerCase()} de ${parsed.year}.`
         };
 
-        const response = await fetch('/api/upload-lesson/register', {
+        const response = await fetchWithAuth('/api/upload-lesson/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)

@@ -50,9 +50,30 @@ const App: React.FC = () => {
 
     // Clerk hooks
     const { user, isLoaded } = useUser();
+    const { getToken } = useAuth();
 
     // Map the local userRole based on the publicMetadata from Clerk Cloud Session
     const userRole = (user?.publicMetadata?.role as UserRole) || 'Ministra'; // Default fallback
+
+    const fetchWithAuth = async (url: RequestInfo | URL, options: RequestInit = {}) => {
+        try {
+            const token = await getToken();
+            const headers: HeadersInit = {
+                ...options.headers,
+                'Authorization': `Bearer ${token}`
+            };
+            if (options.body && typeof options.body === 'string' && !(headers as any)['Content-Type']) {
+                (headers as any)['Content-Type'] = 'application/json';
+            }
+            return fetch(url, {
+                ...options,
+                headers
+            });
+        } catch (err) {
+            console.error('Error generating Clerk token for request:', err);
+            return fetch(url, options);
+        }
+    };
 
     const showNotification = (message: string) => {
         setNotification(message);
@@ -95,7 +116,7 @@ const App: React.FC = () => {
         if (!silent && connectionStatus !== 'offline') setConnectionStatus('syncing');
 
         try {
-            const response = await fetch('/api/data');
+            const response = await fetchWithAuth('/api/data');
 
             // Check if response is valid JSON (backend might return HTML 404 if not running)
             const contentType = response.headers.get("content-type");
@@ -158,7 +179,7 @@ const App: React.FC = () => {
 
             const subscribeUser = async (reg: ServiceWorkerRegistration) => {
                 try {
-                    const response = await fetch('/api/push/key');
+                    const response = await fetchWithAuth('/api/push/key');
                     if (!response.ok) return;
                     const { publicKey } = await response.json();
                     const applicationServerKey = urlBase64ToUint8Array(publicKey);
@@ -166,7 +187,7 @@ const App: React.FC = () => {
                         userVisibleOnly: true,
                         applicationServerKey,
                     });
-                    await fetch('/api/push/subscribe', {
+                    await fetchWithAuth('/api/push/subscribe', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ 
@@ -194,7 +215,7 @@ const App: React.FC = () => {
                     if (subscription) {
                         // Auto-healing: Verify if the subscription's public key matches current server key
                         try {
-                            const response = await fetch('/api/push/key');
+                            const response = await fetchWithAuth('/api/push/key');
                             if (response.ok) {
                                 const { publicKey } = await response.json();
                                 const currentServerKey = urlBase64ToUint8Array(publicKey);
@@ -219,7 +240,7 @@ const App: React.FC = () => {
                                 } else {
                                     // Keys match, always re-register with database to keep metadata (user email, role) synced
                                     console.log('Push keys match. Re-syncing push subscription metadata with backend DB...');
-                                    await fetch('/api/push/subscribe', {
+                                    await fetchWithAuth('/api/push/subscribe', {
                                         method: 'POST',
                                         headers: { 'Content-Type': 'application/json' },
                                         body: JSON.stringify({ 
@@ -307,7 +328,7 @@ const App: React.FC = () => {
                 const subscription = await swRegistration.pushManager.getSubscription();
                 if (subscription) {
                     await subscription.unsubscribe();
-                    await fetch('/api/push/unsubscribe', {
+                    await fetchWithAuth('/api/push/unsubscribe', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -324,7 +345,7 @@ const App: React.FC = () => {
                     return;
                 }
 
-                const response = await fetch('/api/push/key');
+                const response = await fetchWithAuth('/api/push/key');
                 if (!response.ok) {
                     throw new Error("Não foi possível buscar a chave pública do servidor.");
                 }
@@ -336,7 +357,7 @@ const App: React.FC = () => {
                     applicationServerKey,
                 });
 
-                const subResponse = await fetch('/api/push/subscribe', {
+                const subResponse = await fetchWithAuth('/api/push/subscribe', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -431,7 +452,7 @@ const App: React.FC = () => {
 
         if (connectionStatus === 'connected') {
             try {
-                await fetch('/api/attendance', {
+                await fetchWithAuth('/api/attendance', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ studentId, date, present: true, day: dayOfWeek, dailyCode: assignedCode })
@@ -461,7 +482,7 @@ const App: React.FC = () => {
 
         if (connectionStatus === 'connected') {
             try {
-                await fetch('/api/attendance', {
+                await fetchWithAuth('/api/attendance', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ studentId, date, present: false, day: dayOfWeek })
@@ -490,7 +511,7 @@ const App: React.FC = () => {
 
         if (connectionStatus === 'connected') {
             try {
-                await fetch('/api/students', {
+                await fetchWithAuth('/api/students', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(newStudent)
@@ -527,7 +548,7 @@ const App: React.FC = () => {
 
         if (connectionStatus === 'connected') {
             try {
-                await fetch('/api/students', {
+                await fetchWithAuth('/api/students', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(newStudent)
@@ -615,7 +636,7 @@ const App: React.FC = () => {
 
         if (connectionStatus === 'connected') {
             try {
-                await fetch('/api/topics', {
+                await fetchWithAuth('/api/topics', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(newTopic)
@@ -686,7 +707,7 @@ const App: React.FC = () => {
         if (connectionStatus === 'connected') {
             try {
                 await Promise.all(newTopics.map(t => 
-                    fetch('/api/topics', {
+                    fetchWithAuth('/api/topics', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(t)
@@ -715,7 +736,7 @@ const App: React.FC = () => {
 
         if (connectionStatus === 'connected') {
             try {
-                await fetch('/api/dismissal', {
+                await fetchWithAuth('/api/dismissal', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ studentId, responsibleName, date })
@@ -743,7 +764,7 @@ const App: React.FC = () => {
 
         if (connectionStatus === 'connected') {
             try {
-                await fetch('/api/attendance/ready', {
+                await fetchWithAuth('/api/attendance/ready', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ studentId, date, readyToLeave })
@@ -771,7 +792,7 @@ const App: React.FC = () => {
 
         if (connectionStatus === 'connected') {
             try {
-                await fetch('/api/attendance/undo-dismissal', {
+                await fetchWithAuth('/api/attendance/undo-dismissal', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ studentId, date })
@@ -794,7 +815,7 @@ const App: React.FC = () => {
 
         if (connectionStatus === 'connected') {
             try {
-                await fetch('/api/volunteers', {
+                await fetchWithAuth('/api/volunteers', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(volunteerProps)
@@ -860,7 +881,7 @@ const App: React.FC = () => {
 
         if (connectionStatus === 'connected') {
             try {
-                await fetch('/api/schedule', {
+                await fetchWithAuth('/api/schedule', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(newEntry)
@@ -929,7 +950,7 @@ const App: React.FC = () => {
         showNotification("Salvando dados na planilha...");
 
         try {
-            const response = await fetch('/api/save-all', {
+            const response = await fetchWithAuth('/api/save-all', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -1044,12 +1065,13 @@ const App: React.FC = () => {
                         onDeleteTopic={handleDeleteTopic} 
                         onImportTopics={handleImportTopics} 
                         userRole={userRole!} 
+                        fetchWithAuth={fetchWithAuth}
                     />
                 );
             case View.Reports:
                 return <Reports students={students} volunteers={volunteers} schedule={schedule} />;
             case View.Admin:
-                return <Admin userRole={userRole!} />;
+                return <Admin userRole={userRole!} fetchWithAuth={fetchWithAuth} />;
             default:
                 return <Dashboard students={students} selectedClass={selectedClass} onClassChange={setSelectedClass} userRole={userRole!} />;
         }

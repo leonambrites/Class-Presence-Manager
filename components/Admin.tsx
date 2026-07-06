@@ -4,9 +4,10 @@ import { ShieldIcon } from './icons';
 
 interface AdminProps {
     userRole: UserRole;
+    fetchWithAuth: (url: RequestInfo | URL, options?: RequestInit) => Promise<Response>;
 }
 
-const Admin: React.FC<AdminProps> = ({ userRole }) => {
+const Admin: React.FC<AdminProps> = ({ userRole, fetchWithAuth }) => {
     const [users, setUsers] = useState<ClerkUser[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -26,7 +27,7 @@ const Admin: React.FC<AdminProps> = ({ userRole }) => {
         setLoading(true);
         setError(null);
         try {
-            const res = await fetch('/api/users');
+            const res = await fetchWithAuth('/api/users');
             if (!res.ok) throw new Error("Erro ao carregar usuários");
             const data = await res.json();
             setUsers(data);
@@ -57,9 +58,8 @@ const Admin: React.FC<AdminProps> = ({ userRole }) => {
         }));
 
         try {
-            const res = await fetch(`/api/users/${userId}/metadata`, {
+            const res = await fetchWithAuth(`/api/users/${userId}/metadata`, {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ role: newRole })
             });
 
@@ -78,9 +78,8 @@ const Admin: React.FC<AdminProps> = ({ userRole }) => {
         setUsers(users.map(u => u.id === userId ? { ...u, classroom: newClassroom } : u));
 
         try {
-            const res = await fetch(`/api/users/${userId}/metadata`, {
+            const res = await fetchWithAuth(`/api/users/${userId}/metadata`, {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ classroom: newClassroom })
             });
 
