@@ -11,6 +11,7 @@ const Admin: React.FC<AdminProps> = ({ userRole, fetchWithAuth }) => {
     const [users, setUsers] = useState<ClerkUser[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('active');
 
     // Only Pastor and Coordenadora can see this page
     if (userRole !== 'Pastor' && userRole !== 'Coordenadora') {
@@ -90,6 +91,56 @@ const Admin: React.FC<AdminProps> = ({ userRole, fetchWithAuth }) => {
             setUsers(previousUsers); // Revert on failure
         }
     };
+    const handleToggleActive = async (userId: string, currentStatus: boolean) => {
+        const previousUsers = [...users];
+        const newStatus = !currentStatus;
+
+        // Optimistic UI Update
+        setUsers(users.map(u => u.id === userId ? { ...u, active: newStatus } : u));
+
+        try {
+            const res = await fetchWithAuth(`/api/users/${userId}/metadata`, {
+                method: 'PATCH',
+                body: JSON.stringify({ active: newStatus })
+            });
+
+            if (!res.ok) throw new Error("Falha ao salvar o status");
+        } catch (err) {
+            console.error(err);
+            alert("Erro ao alterar o status do acesso. A alteração foi desfeita.");
+            setUsers(previousUsers); // Revert on failure
+        }
+    };
+
+    const handleDeleteUser = async (userId: string, userName: string) => {
+        if (!window.confirm(`Tem certeza que deseja excluir permanentemente o acesso de ${userName}? Esta ação não pode ser desfeita.`)) {
+            return;
+        }
+
+        const previousUsers = [...users];
+        setUsers(users.filter(u => u.id !== userId));
+
+        try {
+            const res = await fetchWithAuth(`/api/users/${userId}`, {
+                method: 'DELETE'
+            });
+
+            if (!res.ok) {
+                const errData = await res.json();
+                throw new Error(errData.error || "Falha ao excluir o acesso");
+            }
+        } catch (err: any) {
+            console.error(err);
+            alert(err.message || "Erro de conexão ao excluir o acesso. A alteração foi desfeita.");
+            setUsers(previousUsers); // Revert on failure
+        }
+    };
+
+    const filteredUsers = users.filter(user => {
+        if (statusFilter === 'active') return user.active !== false;
+        if (statusFilter === 'inactive') return user.active === false;
+        return true;
+    });
 
     return (
         <div className="space-y-6 animate-fadeIn mt-4">
@@ -101,12 +152,34 @@ const Admin: React.FC<AdminProps> = ({ userRole, fetchWithAuth }) => {
                     </h2>
                     <p className="text-sm text-gray-500 mt-1">Gerencie as permissões e cargos de quem utiliza o painel administrativo.</p>
                 </div>
-                <button
-                    onClick={fetchUsers}
-                    className="px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors"
-                >
-                    Recarregar Dados
-                </button>
+                <div className="flex items-center gap-3 self-end md:self-auto">
+                    <div className="flex bg-gray-100 rounded-lg p-0.5 border border-gray-200">
+                        <button
+                            onClick={() => setStatusFilter('active')}
+                            className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${statusFilter === 'active' ? 'bg-white text-brand-blue shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+                        >
+                            Ativos
+                        </button>
+                        <button
+                            onClick={() => setStatusFilter('inactive')}
+                            className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${statusFilter === 'inactive' ? 'bg-white text-brand-blue shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+                        >
+                            Inativos
+                        </button>
+                        <button
+                            onClick={() => setStatusFilter('all')}
+                            className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${statusFilter === 'all' ? 'bg-white text-brand-blue shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+                        >
+                            Todos
+                        </button>
+                    </div>
+                    <button
+                        onClick={fetchUsers}
+                        className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-xs rounded-lg transition-colors border border-gray-200"
+                    >
+                        Recarregar Dados
+                    </button>
+                </div>
             </div>
 
             {error && (
@@ -132,24 +205,30 @@ const Admin: React.FC<AdminProps> = ({ userRole, fetchWithAuth }) => {
                                 <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                                     Turma Associada
                                 </th>
+                                <th scope="col" className="px-6 py-4 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                    Status
+                                </th>
+                                <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                    Ações
+                                </th>
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
                             {loading && users.length === 0 ? (
                                 <tr>
-                                    <td colSpan={3} className="px-6 py-8 text-center text-gray-500">
+                                    <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
                                         <div className="flex items-center justify-center gap-2">
                                             <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-brand-blue"></div>
                                             Buscando contas salvas no Clerk...
                                         </div>
                                     </td>
                                 </tr>
-                            ) : users.length === 0 ? (
+                            ) : filteredUsers.length === 0 ? (
                                 <tr>
-                                    <td colSpan={3} className="px-6 py-8 text-center text-gray-500">Nenhum usuário cadastrado encontrado.</td>
+                                    <td colSpan={6} className="px-6 py-8 text-center text-gray-500">Nenhum acesso correspondente encontrado.</td>
                                 </tr>
                             ) : (
-                                users.map(user => (
+                                filteredUsers.map(user => (
                                     <tr key={user.id} className="hover:bg-gray-50 transition-colors">
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center">
@@ -202,6 +281,30 @@ const Admin: React.FC<AdminProps> = ({ userRole, fetchWithAuth }) => {
                                                     <option value="8 a 10 anos">8 a 10 anos</option>
                                                 </select>
                                             )}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-center">
+                                            <button
+                                                onClick={() => handleToggleActive(user.id, user.active ?? true)}
+                                                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border transition ${
+                                                    user.active !== false
+                                                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                                                        : 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100'
+                                                }`}
+                                            >
+                                                <span className={`w-1.5 h-1.5 rounded-full ${user.active !== false ? 'bg-emerald-500' : 'bg-red-500'}`} />
+                                                {user.active !== false ? 'Ativo' : 'Inativo'}
+                                            </button>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-right">
+                                            <button
+                                                onClick={() => handleDeleteUser(user.id, `${user.firstName} ${user.lastName}`)}
+                                                className="p-1 text-gray-400 hover:text-red-600 rounded transition duration-150"
+                                                title="Excluir Acesso"
+                                            >
+                                                <svg className="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            </button>
                                         </td>
                                     </tr>
                                 ))
