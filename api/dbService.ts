@@ -53,6 +53,8 @@ export const dbService = {
                 hasAllergy: s.has_allergy,
                 allergyDescription: s.allergy_description || '',
                 photo: s.photo || '',
+                imageUseAllowed: s.image_use_allowed || false,
+                imageUseDocument: s.image_use_document || '',
                 attendance: attendanceData
                     .filter((a: any) => String(a.student_id) === String(s.id))
                     .map((a: any) => ({
@@ -101,7 +103,7 @@ export const dbService = {
     async addStudent(student: any) {
         const sql = getSql();
         await sql`
-            INSERT INTO students (id, name, class, age, guardianName, phone, type, birthday, has_allergy, allergy_description, mother_name, father_name, has_other_guardian, other_guardian_name, other_guardian_relationship, photo, created_at, updated_at)
+            INSERT INTO students (id, name, class, age, guardianName, phone, type, birthday, has_allergy, allergy_description, mother_name, father_name, has_other_guardian, other_guardian_name, other_guardian_relationship, photo, image_use_allowed, image_use_document, created_at, updated_at)
             VALUES (
                 ${String(student.id)}, ${student.name}, ${student.class}, ${student.age}, 
                 ${student.guardianName || ''}, ${student.phone}, ${student.type}, ${student.birthday}, 
@@ -110,6 +112,7 @@ export const dbService = {
                 ${student.hasOtherGuardian || false}, ${student.otherGuardianName || ''},
                 ${student.otherGuardianRelationship || ''},
                 ${student.photo || ''},
+                ${student.imageUseAllowed || false}, ${student.imageUseDocument || ''},
                 ${getTimestamp()}, ${getTimestamp()}
             )
         `;
@@ -126,6 +129,8 @@ export const dbService = {
                 has_other_guardian = ${data.hasOtherGuardian || false}, other_guardian_name = ${data.otherGuardianName || ''},
                 other_guardian_relationship = ${data.otherGuardianRelationship || ''},
                 photo = ${data.photo || ''},
+                image_use_allowed = ${data.imageUseAllowed || false},
+                image_use_document = ${data.imageUseDocument || ''},
                 updated_at = ${getTimestamp()}
             WHERE id = ${String(id)}
             RETURNING id

@@ -175,6 +175,7 @@ const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStude
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Turma</th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contato (Responsável)</th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Alergia</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Uso de Imagem</th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status Hoje</th>
                 <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
               </tr>
@@ -214,6 +215,11 @@ const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStude
                     ) : (
                       <span className="text-sm text-gray-400">-</span>
                     )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full ${student.imageUseAllowed ? 'bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20' : 'bg-red-50 text-red-700 ring-1 ring-inset ring-red-600/20'}`}>
+                      {student.imageUseAllowed ? 'Autorizado' : 'Não Autorizado'}
+                    </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {student.attendance.some(a => a.date === today && a.present) ?
@@ -261,6 +267,9 @@ const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStude
                       {student.hasAllergy && (
                         <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-700 tracking-wider">ALERGIA</span>
                       )}
+                      {student.imageUseAllowed && (
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700 tracking-wider">IMAGEM</span>
+                      )}
                       <InactivityBadge days={daysSince} />
                     </div>
                     <p className="text-sm text-gray-500">
@@ -280,6 +289,7 @@ const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStude
                   {student.hasAllergy && (
                     <p className="text-sm text-gray-600">Alergia: <span className="font-medium text-red-600">{student.allergyDescription}</span></p>
                   )}
+                  <p className="text-sm text-gray-600">Uso de imagem: <span className={`font-semibold ${student.imageUseAllowed ? 'text-emerald-600' : 'text-red-500'}`}>{student.imageUseAllowed ? 'Autorizado' : 'Não Autorizado'}</span></p>
                 </div>
                 <div className="flex justify-end items-center mt-3 border-t pt-3 space-x-4">
                   {userRole !== 'Ministra' && activeTab === StudentType.Visitante && (

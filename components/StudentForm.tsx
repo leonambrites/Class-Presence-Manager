@@ -44,6 +44,13 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
   const [customRelationship, setCustomRelationship] = useState('');
   const [photo, setPhoto] = useState('');
   
+  // Image permission inputs
+  const [imageUseAllowed, setImageUseAllowed] = useState(false);
+  const [imageUseDocument, setImageUseDocument] = useState('');
+  const [imageUseDocumentName, setImageUseDocumentName] = useState('');
+  
+  const pdfInputRef = React.useRef<HTMLInputElement>(null);
+  
   const [error, setError] = useState('');
 
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,6 +63,27 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
       console.error("Erro ao processar foto:", err);
       setError("Falha ao carregar e redimensionar a foto.");
     }
+  };
+
+  const handlePdfChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.type !== 'application/pdf') {
+      setError('Por favor, selecione apenas arquivos em formato PDF.');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setError('O arquivo PDF deve ter no máximo 5MB.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImageUseDocument(reader.result as string);
+      setImageUseDocumentName(file.name);
+      setError('');
+    };
+    reader.readAsDataURL(file);
   };
 
   useEffect(() => {
@@ -88,6 +116,9 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
         setCustomRelationship('');
       }
       setPhoto(initialData.photo || '');
+      setImageUseAllowed(initialData.imageUseAllowed || false);
+      setImageUseDocument(initialData.imageUseDocument || '');
+      setImageUseDocumentName(initialData.imageUseDocument ? 'documento_assinado.pdf' : '');
     } else {
       setName('');
       setStudentClass(CLASS_NAMES[0]);
@@ -102,6 +133,9 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
       setOtherGuardianRelationship('');
       setCustomRelationship('');
       setPhoto('');
+      setImageUseAllowed(false);
+      setImageUseDocument('');
+      setImageUseDocumentName('');
     }
   }, [initialData]);
 
@@ -127,6 +161,11 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
       }
     }
     
+    if (imageUseAllowed && !imageUseDocument) {
+      setError('Por favor, envie o documento em PDF de autorização assinado pelo responsável.');
+      return;
+    }
+
     setError('');
 
     // Calculate age based on birthday
@@ -158,7 +197,9 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
       hasOtherGuardian,
       otherGuardianName: hasOtherGuardian ? otherGuardianName : '',
       otherGuardianRelationship: hasOtherGuardian ? finalRelationship : '',
-      photo
+      photo,
+      imageUseAllowed,
+      imageUseDocument: imageUseAllowed ? imageUseDocument : ''
     });
   };
 
@@ -331,6 +372,79 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
               required={hasAllergy}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-blue focus:border-brand-blue sm:text-sm"
             />
+          </div>
+        )}
+      </div>
+
+      {/* Imagem Permission Section */}
+      <div className="bg-gray-50 p-4 rounded-md border border-gray-200">
+        <div className="flex items-center gap-3">
+          <input
+            type="checkbox"
+            id="imageUseAllowed"
+            checked={imageUseAllowed}
+            onChange={(e) => {
+              setImageUseAllowed(e.target.checked);
+              if (!e.target.checked) {
+                setImageUseDocument('');
+                setImageUseDocumentName('');
+              }
+            }}
+            className="w-5 h-5 text-brand-blue rounded focus:ring-brand-blue cursor-pointer"
+          />
+          <label htmlFor="imageUseAllowed" className="text-sm font-semibold text-gray-800 cursor-pointer select-none">
+            Autoriza o uso de imagem da criança?
+          </label>
+        </div>
+
+        {imageUseAllowed && (
+          <div className="mt-4 pl-8 border-l-2 border-brand-blue ml-2 space-y-3 transition-all">
+            <label className="block text-sm font-medium text-gray-700">Termo de Autorização Assinado (PDF)</label>
+            <div className="flex items-center gap-3 flex-wrap">
+              <input
+                type="file"
+                accept="application/pdf"
+                onChange={handlePdfChange}
+                className="hidden"
+                ref={pdfInputRef}
+              />
+              <button
+                type="button"
+                onClick={() => pdfInputRef.current?.click()}
+                className="px-4 py-2 bg-brand-blue text-white rounded-lg hover:bg-blue-600 transition text-sm font-semibold flex items-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                {imageUseDocument ? 'Substituir PDF' : 'Selecionar PDF'}
+              </button>
+              {imageUseDocumentName && (
+                <span className="text-sm text-gray-600 truncate max-w-[250px] font-medium" title={imageUseDocumentName}>
+                  📎 {imageUseDocumentName}
+                </span>
+              )}
+            </div>
+            {imageUseDocument && (
+              <div className="flex gap-4 text-xs font-semibold mt-1">
+                <a
+                  href={imageUseDocument}
+                  download={imageUseDocumentName || 'autorizacao.pdf'}
+                  className="text-brand-blue hover:underline flex items-center gap-1"
+                >
+                  Visualizar / Baixar PDF
+                </a>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setImageUseDocument('');
+                    setImageUseDocumentName('');
+                  }}
+                  className="text-red-500 hover:underline"
+                >
+                  Remover PDF
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

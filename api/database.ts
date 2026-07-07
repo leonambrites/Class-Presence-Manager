@@ -32,6 +32,8 @@ export const initDb = async () => {
                 other_guardian_name TEXT,
                 other_guardian_relationship TEXT,
                 photo TEXT,
+                image_use_allowed BOOLEAN DEFAULT FALSE,
+                image_use_document TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
@@ -45,8 +47,10 @@ export const initDb = async () => {
             await sql`ALTER TABLE students ADD COLUMN IF NOT EXISTS other_guardian_name TEXT`;
             await sql`ALTER TABLE students ADD COLUMN IF NOT EXISTS other_guardian_relationship TEXT`;
             await sql`ALTER TABLE students ADD COLUMN IF NOT EXISTS photo TEXT`;
+            await sql`ALTER TABLE students ADD COLUMN IF NOT EXISTS image_use_allowed BOOLEAN DEFAULT FALSE`;
+            await sql`ALTER TABLE students ADD COLUMN IF NOT EXISTS image_use_document TEXT`;
         } catch (err) {
-            console.error("Migration error adding guardian columns to students table:", err);
+            console.error("Migration error adding guardian and image use columns to students table:", err);
         }
 
         // Attendance Table
