@@ -192,7 +192,7 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
             className="w-5 h-5 text-brand-blue rounded focus:ring-brand-blue cursor-pointer"
           />
           <label htmlFor="hasOtherGuardian" className="text-sm font-semibold text-gray-800 cursor-pointer select-none">
-            Outro responsável buscará o aluno?
+            Outro Responsável
           </label>
         </div>
 
