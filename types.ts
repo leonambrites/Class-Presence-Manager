@@ -82,6 +82,7 @@ export interface ClerkUser {
   lastName: string;
   role: UserRole;
   classroom?: string | null;
+  active?: boolean;
 }
 
 export type UserRole = 'Pastor' | 'Coordenadora' | 'Supervisora' | 'Ministra' | 'Visitante';

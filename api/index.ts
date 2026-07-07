@@ -46,16 +46,16 @@ app.use(express.json({ limit: '10mb' }) as any); // Increased limit for full dat
 app.use('/api', ClerkExpressRequireAuth() as any);
 
 // Role cache in memory
-const roleCache = new Map<string, { role: string; expiresAt: number }>();
+const roleCache = new Map<string, { role: string; active: boolean; expiresAt: number }>();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 // --- Clerk Admin Endpoints ---
 const CLERK_SECRET_KEY = process.env.CLERK_SECRET_KEY;
 
-async function getUserRole(userId: string): Promise<string> {
+async function getUserStatus(userId: string): Promise<{ role: string; active: boolean }> {
     const cached = roleCache.get(userId);
     if (cached && cached.expiresAt > Date.now()) {
-        return cached.role;
+        return { role: cached.role, active: cached.active };
     }
 
     if (!CLERK_SECRET_KEY) throw new Error('Missing CLERK_SECRET_KEY');
@@ -72,13 +72,15 @@ async function getUserRole(userId: string): Promise<string> {
 
     const userData: any = await response.json();
     const role = userData.public_metadata?.role || 'Ministra';
+    const active = userData.public_metadata?.active !== false;
     
     roleCache.set(userId, {
         role,
+        active,
         expiresAt: Date.now() + CACHE_TTL
     });
 
-    return role;
+    return { role, active };
 }
 
 const checkRole = (allowedRoles: string[]) => {
@@ -89,7 +91,11 @@ const checkRole = (allowedRoles: string[]) => {
                 return res.status(401).json({ error: 'Unauthenticated' });
             }
 
-            const role = await getUserRole(userId);
+            const { role, active } = await getUserStatus(userId);
+            if (!active) {
+                return res.status(403).json({ error: 'Forbidden: Sua conta está inativa. Entre em contato com a coordenação.' });
+            }
+
             if (!allowedRoles.includes(role)) {
                 return res.status(403).json({ error: 'Forbidden: Insufficient permissions' });
             }
@@ -120,13 +126,15 @@ app.get('/api/users', checkRole(['Pastor', 'Coordenadora']) as any, async (req, 
         const mappedUsers = users.map((u: any) => {
             const role = u.public_metadata?.role || 'Ministra';
             const classroom = role === 'Pastor' ? 'Todas' : (u.public_metadata?.classroom || '');
+            const active = u.public_metadata?.active !== false;
             return {
                 id: u.id,
                 email: u.email_addresses?.[0]?.email_address || '',
                 firstName: u.first_name || '',
                 lastName: u.last_name || '',
                 role,
-                classroom
+                classroom,
+                active
             };
         });
 
@@ -137,12 +145,12 @@ app.get('/api/users', checkRole(['Pastor', 'Coordenadora']) as any, async (req, 
     }
 });
 
-// PATCH Clerk User Metadata (Role and/or Classroom)
+// PATCH Clerk User Metadata (Role, Classroom, Active Status)
 app.patch('/api/users/:id/metadata', checkRole(['Pastor', 'Coordenadora']) as any, async (req, res) => {
     try {
         if (!CLERK_SECRET_KEY) throw new Error('Missing CLERK_SECRET_KEY');
         const { id } = req.params;
-        const { role, classroom } = req.body;
+        const { role, classroom, active } = req.body;
 
         // Enforce: Coordenadora cannot edit classroom
         const callerRole = (req as any).userRole;
@@ -152,6 +160,7 @@ app.patch('/api/users/:id/metadata', checkRole(['Pastor', 'Coordenadora']) as an
 
         const metadataUpdate: any = {};
         if (role !== undefined) metadataUpdate.role = role;
+        if (active !== undefined) metadataUpdate.active = active;
         if (classroom !== undefined) {
             metadataUpdate.classroom = role === 'Pastor' ? 'Todas' : classroom;
         } else if (role === 'Pastor') {
@@ -174,10 +183,49 @@ app.patch('/api/users/:id/metadata', checkRole(['Pastor', 'Coordenadora']) as an
             console.error("Clerk PATCH metadata failed:", errBody);
             throw new Error("Failed to update Clerk user metadata");
         }
+
+        // Clear user from role cache to apply active status/role immediately
+        roleCache.delete(id);
+
         res.status(200).json({ message: "Metadata updated successfully" });
     } catch (error) {
         console.error("Error updating Clerk user metadata:", error);
         res.status(500).json({ error: "Failed to update metadata" });
+    }
+});
+
+// DELETE Clerk User
+app.delete('/api/users/:id', checkRole(['Pastor', 'Coordenadora']) as any, async (req, res) => {
+    try {
+        if (!CLERK_SECRET_KEY) throw new Error('Missing CLERK_SECRET_KEY');
+        const { id } = req.params;
+
+        // Prevent self deletion
+        const callerId = req.auth?.userId;
+        if (callerId === id) {
+            return res.status(400).json({ error: "Você não pode excluir seu próprio acesso." });
+        }
+
+        const response = await fetch(`https://api.clerk.com/v1/users/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${CLERK_SECRET_KEY}`
+            }
+        });
+
+        if (!response.ok) {
+            const errBody = await response.text();
+            console.error("Clerk DELETE user failed:", errBody);
+            throw new Error("Failed to delete Clerk user");
+        }
+
+        // Clear from role cache
+        roleCache.delete(id);
+
+        res.status(200).json({ message: "User deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting Clerk user:", error);
+        res.status(500).json({ error: "Failed to delete user" });
     }
 });
 
