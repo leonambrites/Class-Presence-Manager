@@ -24,6 +24,7 @@ const Volunteers: React.FC<VolunteersProps> = ({ volunteers, onAddVolunteer, onE
     const [type, setType] = useState('');
     const [team, setTeam] = useState('');
     const [photo, setPhoto] = useState('');
+    const [email, setEmail] = useState('');
     const [error, setError] = useState('');
 
     const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -103,6 +104,7 @@ const Volunteers: React.FC<VolunteersProps> = ({ volunteers, onAddVolunteer, onE
         setType('');
         setTeam('');
         setPhoto('');
+        setEmail('');
         setError('');
         setIsModalOpen(true);
     };
@@ -115,6 +117,7 @@ const Volunteers: React.FC<VolunteersProps> = ({ volunteers, onAddVolunteer, onE
         setType(volunteer.type || '');
         setTeam(volunteer.team || '');
         setPhoto(volunteer.photo || '');
+        setEmail(volunteer.email || '');
         setError('');
         setIsModalOpen(true);
     };
@@ -129,7 +132,8 @@ const Volunteers: React.FC<VolunteersProps> = ({ volunteers, onAddVolunteer, onE
             phone,
             type,
             team,
-            photo
+            photo,
+            email
         };
 
         if (editingVolunteer) {
@@ -337,6 +341,11 @@ const Volunteers: React.FC<VolunteersProps> = ({ volunteers, onAddVolunteer, onE
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Contato (Telefone)</label>
                         <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-blue focus:border-brand-blue sm:text-sm" placeholder="(DD) 90000-0000" />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">E-mail de Login (Clerk)</label>
+                        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-blue focus:border-brand-blue sm:text-sm" placeholder="Ex: nome@email.com" />
+                        <p className="text-[10px] text-gray-400 mt-1">Utilizado para associar automaticamente as escalas e habilitar filtros personalizados.</p>
                     </div>
                     <div className="flex justify-end space-x-3 pt-4 border-t">
                         <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition">Cancelar</button>

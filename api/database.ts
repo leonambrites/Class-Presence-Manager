@@ -74,6 +74,7 @@ export const initDb = async () => {
                 type TEXT,
                 team TEXT,
                 photo TEXT,
+                email TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `;
@@ -85,6 +86,7 @@ export const initDb = async () => {
             await sql`ALTER TABLE volunteers ADD COLUMN IF NOT EXISTS type TEXT`;
             await sql`ALTER TABLE volunteers ADD COLUMN IF NOT EXISTS team TEXT`;
             await sql`ALTER TABLE volunteers ADD COLUMN IF NOT EXISTS photo TEXT`;
+            await sql`ALTER TABLE volunteers ADD COLUMN IF NOT EXISTS email TEXT`;
         } catch (e) {
             // Columns likely already exist
         }
