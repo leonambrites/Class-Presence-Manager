@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CLASS_NAMES } from '../constants';
 import { Student } from '../types';
-import { calculateAge } from '../utils';
+import { calculateAge, resizeImageToBase64 } from '../utils';
 
 interface StudentFormProps {
   onSubmit: (formData: { 
@@ -18,6 +18,7 @@ interface StudentFormProps {
     hasOtherGuardian?: boolean;
     otherGuardianName?: string;
     otherGuardianRelationship?: string;
+    photo?: string;
   }) => void;
   onCancel: () => void;
   initialData?: Partial<Student> | null;
@@ -38,8 +39,21 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
   const [otherGuardianName, setOtherGuardianName] = useState('');
   const [otherGuardianRelationship, setOtherGuardianRelationship] = useState('');
   const [customRelationship, setCustomRelationship] = useState('');
+  const [photo, setPhoto] = useState('');
   
   const [error, setError] = useState('');
+
+  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const base64 = await resizeImageToBase64(file, 200, 200);
+      setPhoto(base64);
+    } catch (err) {
+      console.error("Erro ao processar foto:", err);
+      setError("Falha ao carregar e redimensionar a foto.");
+    }
+  };
 
   useEffect(() => {
     if (initialData) {
@@ -70,6 +84,7 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
         setOtherGuardianRelationship('');
         setCustomRelationship('');
       }
+      setPhoto(initialData.photo || '');
     } else {
       setName('');
       setStudentClass(CLASS_NAMES[0]);
@@ -83,6 +98,7 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
       setOtherGuardianName('');
       setOtherGuardianRelationship('');
       setCustomRelationship('');
+      setPhoto('');
     }
   }, [initialData]);
 
@@ -138,13 +154,34 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
       fatherName,
       hasOtherGuardian,
       otherGuardianName: hasOtherGuardian ? otherGuardianName : '',
-      otherGuardianRelationship: hasOtherGuardian ? finalRelationship : ''
+      otherGuardianRelationship: hasOtherGuardian ? finalRelationship : '',
+      photo
     });
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && <p className="text-red-500 text-sm font-semibold">{error}</p>}
+      
+      {/* Photo Upload Section */}
+      <div className="flex flex-col items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
+        <label className="block text-sm font-semibold text-gray-700 w-full text-center">Foto da Criança</label>
+        <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-brand-blue bg-gray-200 flex items-center justify-center group shadow-inner">
+          {photo ? (
+            <img src={photo} alt="Avatar da criança" className="w-full h-full object-cover" />
+          ) : (
+            <span className="text-gray-400 text-3xl select-none">👤</span>
+          )}
+          <label className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-[10px] font-black uppercase tracking-wider cursor-pointer transition duration-200 select-none">
+            Alterar
+            <input type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
+          </label>
+        </div>
+        {photo && (
+          <button type="button" onClick={() => setPhoto('')} className="text-xs text-red-500 hover:text-red-700 transition font-medium">Remover Foto</button>
+        )}
+      </div>
+
       <div>
         <label className="block text-sm font-medium text-gray-700">Nome do Aluno</label>
         <input type="text" value={name} onChange={(e) => setName(e.target.value)} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-blue focus:border-brand-blue sm:text-sm" />

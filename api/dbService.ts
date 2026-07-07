@@ -52,6 +52,7 @@ export const dbService = {
                 age: s.age ? Number(s.age) : 0,
                 hasAllergy: s.has_allergy,
                 allergyDescription: s.allergy_description || '',
+                photo: s.photo || '',
                 attendance: attendanceData
                     .filter((a: any) => String(a.student_id) === String(s.id))
                     .map((a: any) => ({
@@ -71,7 +72,8 @@ export const dbService = {
             class: v.class || '',
             phone: v.phone || '',
             type: v.type || '',
-            team: v.team || ''
+            team: v.team || '',
+            photo: v.photo || ''
         }));
 
         const formattedSchedule = scheduleData.map((s: any) => ({
@@ -98,7 +100,7 @@ export const dbService = {
     async addStudent(student: any) {
         const sql = getSql();
         await sql`
-            INSERT INTO students (id, name, class, age, guardianName, phone, type, birthday, has_allergy, allergy_description, mother_name, father_name, has_other_guardian, other_guardian_name, other_guardian_relationship, created_at, updated_at)
+            INSERT INTO students (id, name, class, age, guardianName, phone, type, birthday, has_allergy, allergy_description, mother_name, father_name, has_other_guardian, other_guardian_name, other_guardian_relationship, photo, created_at, updated_at)
             VALUES (
                 ${String(student.id)}, ${student.name}, ${student.class}, ${student.age}, 
                 ${student.guardianName || ''}, ${student.phone}, ${student.type}, ${student.birthday}, 
@@ -106,6 +108,7 @@ export const dbService = {
                 ${student.motherName || ''}, ${student.fatherName || ''},
                 ${student.hasOtherGuardian || false}, ${student.otherGuardianName || ''},
                 ${student.otherGuardianRelationship || ''},
+                ${student.photo || ''},
                 ${getTimestamp()}, ${getTimestamp()}
             )
         `;
@@ -121,6 +124,7 @@ export const dbService = {
                 mother_name = ${data.motherName || ''}, father_name = ${data.fatherName || ''},
                 has_other_guardian = ${data.hasOtherGuardian || false}, other_guardian_name = ${data.otherGuardianName || ''},
                 other_guardian_relationship = ${data.otherGuardianRelationship || ''},
+                photo = ${data.photo || ''},
                 updated_at = ${getTimestamp()}
             WHERE id = ${String(id)}
             RETURNING id
@@ -224,15 +228,15 @@ export const dbService = {
     async addVolunteer(volunteer: any) {
         const sql = getSql();
         await sql`
-            INSERT INTO volunteers (id, name, class, phone, type, team, created_at)
-            VALUES (${String(Date.now())}, ${volunteer.name}, ${volunteer.class || ''}, ${volunteer.phone || ''}, ${volunteer.type || ''}, ${volunteer.team || ''}, ${getTimestamp()})
+            INSERT INTO volunteers (id, name, class, phone, type, team, photo, created_at)
+            VALUES (${String(Date.now())}, ${volunteer.name}, ${volunteer.class || ''}, ${volunteer.phone || ''}, ${volunteer.type || ''}, ${volunteer.team || ''}, ${volunteer.photo || ''}, ${getTimestamp()})
         `;
     },
 
     async updateVolunteer(id: string, volunteer: any) {
         const sql = getSql();
         const result = await sql`
-            UPDATE volunteers SET name = ${volunteer.name}, class = ${volunteer.class || ''}, phone = ${volunteer.phone || ''}, type = ${volunteer.type || ''}, team = ${volunteer.team || ''} WHERE id = ${String(id)}
+            UPDATE volunteers SET name = ${volunteer.name}, class = ${volunteer.class || ''}, phone = ${volunteer.phone || ''}, type = ${volunteer.type || ''}, team = ${volunteer.team || ''}, photo = ${volunteer.photo || ''} WHERE id = ${String(id)}
             RETURNING id
         `;
         if (result.length === 0) throw new Error("Volunteer not found");

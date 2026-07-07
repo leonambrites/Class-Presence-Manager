@@ -31,6 +31,7 @@ export const initDb = async () => {
                 has_other_guardian BOOLEAN DEFAULT FALSE,
                 other_guardian_name TEXT,
                 other_guardian_relationship TEXT,
+                photo TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
@@ -43,6 +44,7 @@ export const initDb = async () => {
             await sql`ALTER TABLE students ADD COLUMN IF NOT EXISTS has_other_guardian BOOLEAN DEFAULT FALSE`;
             await sql`ALTER TABLE students ADD COLUMN IF NOT EXISTS other_guardian_name TEXT`;
             await sql`ALTER TABLE students ADD COLUMN IF NOT EXISTS other_guardian_relationship TEXT`;
+            await sql`ALTER TABLE students ADD COLUMN IF NOT EXISTS photo TEXT`;
         } catch (err) {
             console.error("Migration error adding guardian columns to students table:", err);
         }
@@ -71,16 +73,18 @@ export const initDb = async () => {
                 phone TEXT,
                 type TEXT,
                 team TEXT,
+                photo TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `;
 
         // Migration for existing Volunteers table
         try {
-            await sql`ALTER TABLE volunteers ADD COLUMN class TEXT`;
-            await sql`ALTER TABLE volunteers ADD COLUMN phone TEXT`;
-            await sql`ALTER TABLE volunteers ADD COLUMN type TEXT`;
-            await sql`ALTER TABLE volunteers ADD COLUMN team TEXT`;
+            await sql`ALTER TABLE volunteers ADD COLUMN IF NOT EXISTS class TEXT`;
+            await sql`ALTER TABLE volunteers ADD COLUMN IF NOT EXISTS phone TEXT`;
+            await sql`ALTER TABLE volunteers ADD COLUMN IF NOT EXISTS type TEXT`;
+            await sql`ALTER TABLE volunteers ADD COLUMN IF NOT EXISTS team TEXT`;
+            await sql`ALTER TABLE volunteers ADD COLUMN IF NOT EXISTS photo TEXT`;
         } catch (e) {
             // Columns likely already exist
         }

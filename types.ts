@@ -30,6 +30,7 @@ export interface Student {
   hasOtherGuardian?: boolean;
   otherGuardianName?: string;
   otherGuardianRelationship?: string;
+  photo?: string;
 }
 
 export interface Volunteer {
@@ -39,6 +40,7 @@ export interface Volunteer {
   phone?: string;
   type?: string;
   team?: string;
+  photo?: string;
 }
 
 export interface ScheduleEntry {

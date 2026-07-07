@@ -64,12 +64,21 @@ const StudentProfile: React.FC<StudentProfileProps> = ({ student, onClose }) => 
                 {/* Header */}
                 <div className="bg-gradient-to-r from-brand-blue to-blue-600 text-white p-6 rounded-t-2xl">
                     <div className="flex justify-between items-start">
-                        <div>
-                            <h2 className="text-2xl font-bold">{student.name}</h2>
-                            <p className="text-blue-100 mt-1">{student.class} — {calculateAge(student.birthday, student.age)} anos</p>
-                            {student.birthday && (
-                                <p className="text-blue-200 text-sm mt-0.5">🎂 {new Date(student.birthday + 'T00:00:00').toLocaleDateString('pt-BR')}</p>
-                            )}
+                        <div className="flex items-center gap-4">
+                            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white/80 bg-white/10 flex items-center justify-center flex-shrink-0">
+                                {student.photo ? (
+                                    <img src={student.photo} alt={student.name} className="w-full h-full object-cover" />
+                                ) : (
+                                    <span className="text-white/80 text-3xl select-none">👤</span>
+                                )}
+                            </div>
+                            <div>
+                                <h2 className="text-2xl font-bold">{student.name}</h2>
+                                <p className="text-blue-100 mt-1">{student.class} — {calculateAge(student.birthday, student.age)} anos</p>
+                                {student.birthday && (
+                                    <p className="text-blue-200 text-sm mt-0.5">🎂 {new Date(student.birthday + 'T00:00:00').toLocaleDateString('pt-BR')}</p>
+                                )}
+                            </div>
                         </div>
                         <button onClick={onClose} className="text-white/70 hover:text-white text-2xl font-bold leading-none">&times;</button>
                     </div>
