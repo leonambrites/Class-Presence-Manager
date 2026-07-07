@@ -103,15 +103,28 @@ const App: React.FC = () => {
 
     const loadDataLocally = useCallback(() => {
         try {
-            const lsStudents = localStorage.getItem('students');
-            const lsVolunteers = localStorage.getItem('volunteers');
-            const lsSchedule = localStorage.getItem('schedule');
-            const lsTopics = localStorage.getItem('topics');
+            let lsStudentsStr = localStorage.getItem('students');
+            let lsScheduleStr = localStorage.getItem('schedule');
+            const lsVolunteersStr = localStorage.getItem('volunteers');
+            const lsTopicsStr = localStorage.getItem('topics');
 
-            setStudents(lsStudents ? JSON.parse(lsStudents) : INITIAL_STUDENTS);
-            setVolunteers(lsVolunteers ? JSON.parse(lsVolunteers) : INITIAL_VOLUNTEERS);
-            setSchedule(lsSchedule ? JSON.parse(lsSchedule) : INITIAL_SCHEDULE);
-            setTopics(lsTopics ? JSON.parse(lsTopics) : INITIAL_TOPICS);
+            let parsedStudents = lsStudentsStr ? JSON.parse(lsStudentsStr) : INITIAL_STUDENTS;
+            let parsedSchedule = lsScheduleStr ? JSON.parse(lsScheduleStr) : INITIAL_SCHEDULE;
+
+            // Remove obsolete 'Seeds' data from localStorage dynamically
+            if (Array.isArray(parsedStudents) && parsedStudents.some((s: any) => s.class === 'Seeds')) {
+                parsedStudents = parsedStudents.filter((s: any) => s.class !== 'Seeds');
+                localStorage.setItem('students', JSON.stringify(parsedStudents));
+            }
+            if (Array.isArray(parsedSchedule) && parsedSchedule.some((s: any) => s.className === 'Seeds')) {
+                parsedSchedule = parsedSchedule.filter((s: any) => s.className !== 'Seeds');
+                localStorage.setItem('schedule', JSON.stringify(parsedSchedule));
+            }
+
+            setStudents(parsedStudents);
+            setVolunteers(lsVolunteersStr ? JSON.parse(lsVolunteersStr) : INITIAL_VOLUNTEERS);
+            setSchedule(parsedSchedule);
+            setTopics(lsTopicsStr ? JSON.parse(lsTopicsStr) : INITIAL_TOPICS);
         } catch (e) {
             console.error("Error loading local data", e);
             setStudents(INITIAL_STUDENTS);

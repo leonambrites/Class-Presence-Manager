@@ -34,8 +34,6 @@ const getClassBadgeStyle = (className: string) => {
             return 'bg-sky-50 border-sky-200 text-sky-700 hover:bg-sky-100';
         case '8 a 10 anos':
             return 'bg-violet-50 border-violet-200 text-violet-700 hover:bg-violet-100';
-        case 'Seeds':
-            return 'bg-fuchsia-50 border-fuchsia-200 text-fuchsia-700 hover:bg-fuchsia-100';
         default:
             return 'bg-blue-50 border-blue-200 text-brand-blue hover:bg-blue-100';
     }
@@ -430,7 +428,6 @@ const Schedule: React.FC<ScheduleProps> = ({
                                         else if (entry.className === '4 a 5 anos') dotColor = 'bg-emerald-400 border border-emerald-500';
                                         else if (entry.className === '6 a 7 anos') dotColor = 'bg-sky-400 border border-sky-500';
                                         else if (entry.className === '8 a 10 anos') dotColor = 'bg-violet-400 border border-violet-500';
-                                        else if (entry.className === 'Seeds') dotColor = 'bg-fuchsia-400 border border-fuchsia-500';
                                         
                                         return (
                                             <span 

@@ -200,7 +200,6 @@ const Admin: React.FC<AdminProps> = ({ userRole, fetchWithAuth }) => {
                                                     <option value="4 a 5 anos">4 a 5 anos</option>
                                                     <option value="6 a 7 anos">6 a 7 anos</option>
                                                     <option value="8 a 10 anos">8 a 10 anos</option>
-                                                    <option value="Seeds">Seeds</option>
                                                 </select>
                                             )}
                                         </td>
