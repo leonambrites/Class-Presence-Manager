@@ -68,16 +68,60 @@ const Attendance: React.FC<AttendanceProps> = ({
         });
     }, [students, selectedClass, date]);
 
-    const filteredMembers = studentsForClass
-        .filter(s =>
-            s.type === StudentType.Membro &&
-            (s.name.toLowerCase().includes(searchTerm.toLowerCase()) || s.phone.includes(searchTerm))
-        )
-        .sort((a, b) => a.name.localeCompare(b.name));
+    const filteredMembers = useMemo(() => {
+        return studentsForClass
+            .filter(s =>
+                s.type === StudentType.Membro &&
+                (s.name.toLowerCase().includes(searchTerm.toLowerCase()) || s.phone.includes(searchTerm))
+            )
+            .sort((a, b) => {
+                const attA = a.attendance.find(att => att.date === date);
+                const attB = b.attendance.find(att => att.date === date);
+                
+                const presentA = attA?.present || false;
+                const presentB = attB?.present || false;
+                
+                if (presentA !== presentB) {
+                    return presentA ? -1 : 1;
+                }
+                
+                if (presentA && presentB) {
+                    const codeA = attA?.dailyCode || 999999;
+                    const codeB = attB?.dailyCode || 999999;
+                    if (codeA !== codeB) {
+                        return codeA - codeB;
+                    }
+                }
+                
+                return a.name.localeCompare(b.name);
+            });
+    }, [studentsForClass, date, searchTerm]);
 
-    const visitors = studentsForClass
-        .filter(s => s.type === StudentType.Visitante)
-        .sort((a, b) => a.name.localeCompare(b.name));
+    const visitors = useMemo(() => {
+        return studentsForClass
+            .filter(s => s.type === StudentType.Visitante)
+            .sort((a, b) => {
+                const attA = a.attendance.find(att => att.date === date);
+                const attB = b.attendance.find(att => att.date === date);
+                
+                const presentA = attA?.present || false;
+                const presentB = attB?.present || false;
+                
+                if (presentA !== presentB) {
+                    return presentA ? -1 : 1;
+                }
+                
+                if (presentA && presentB) {
+                    const codeA = attA?.dailyCode || 999999;
+                    const codeB = attB?.dailyCode || 999999;
+                    if (codeA !== codeB) {
+                        return codeA - codeB;
+                    }
+                }
+                
+                return a.name.localeCompare(b.name);
+            });
+    }, [studentsForClass, date]);
 
     const getStudentStatus = (student: Student) => {
         const attendanceForDate = student.attendance.find(a => a.date === date);
@@ -201,7 +245,7 @@ const Attendance: React.FC<AttendanceProps> = ({
                                     <span className="text-gray-400 text-xl select-none">👤</span>
                                   )}
                                 </div>
-                                <div className="absolute -bottom-1 -right-1 bg-brand-blue text-white rounded-full px-1.5 py-0.5 text-[8px] font-black border border-white leading-none shadow-sm scale-90">
+                                <div className="absolute -bottom-1.5 -right-1.5 bg-brand-blue text-white rounded-full px-1.5 py-0.5 text-[9px] font-black border border-white leading-none shadow-md">
                                   #{dailyCode}
                                 </div>
                               </div>
@@ -290,7 +334,7 @@ const Attendance: React.FC<AttendanceProps> = ({
                                                             <span className="text-gray-400 text-lg select-none">👤</span>
                                                         )}
                                                     </div>
-                                                    <div className="absolute -bottom-1 -right-1 bg-brand-blue text-white rounded-full px-1 py-0.5 text-[8px] font-black border border-white leading-none shadow-sm scale-90">
+                                                    <div className="absolute -bottom-1.5 -right-1.5 bg-brand-blue text-white rounded-full px-1.5 py-0.5 text-[9px] font-black border border-white leading-none shadow-md">
                                                         #{attRecord.dailyCode}
                                                     </div>
                                                 </div>
@@ -304,8 +348,15 @@ const Attendance: React.FC<AttendanceProps> = ({
                                                 </div>
                                             )}
                                             <div className="min-w-0">
-                                                <p className="font-bold text-gray-800 truncate">{student.name}</p>
-                                                <p className="text-xs text-gray-500">{calculateAge(student.birthday, student.age)} anos</p>
+                                                <div className="flex items-center gap-2 flex-wrap">
+                                                    <p className="font-bold text-gray-800 truncate">{student.name}</p>
+                                                    {isPresent && attRecord?.dailyCode && (
+                                                        <span className="inline-flex items-center bg-blue-50 text-brand-blue text-[10px] font-black px-1.5 py-0.5 rounded border border-blue-200 leading-none shadow-sm uppercase tracking-wide shrink-0">
+                                                            Nº {attRecord.dailyCode}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <p className="text-xs text-gray-500 mt-0.5">{calculateAge(student.birthday, student.age)} anos</p>
                                             </div>
                                         </div>
                                         
@@ -428,7 +479,7 @@ const Attendance: React.FC<AttendanceProps> = ({
                                                                     <span className="text-gray-400 text-lg select-none">👤</span>
                                                                 )}
                                                             </div>
-                                                            <div className="absolute -bottom-1 -right-1 bg-brand-blue text-white rounded-full px-1 py-0.5 text-[8px] font-black border border-white leading-none shadow-sm scale-90">
+                                                            <div className="absolute -bottom-1.5 -right-1.5 bg-brand-blue text-white rounded-full px-1.5 py-0.5 text-[9px] font-black border border-white leading-none shadow-md">
                                                                 #{attRecord.dailyCode}
                                                             </div>
                                                         </div>
@@ -442,8 +493,15 @@ const Attendance: React.FC<AttendanceProps> = ({
                                                         </div>
                                                     )}
                                                     <div className="min-w-0">
-                                                        <p className="font-bold text-gray-800 truncate">{visitor.name}</p>
-                                                        <p className="text-xs text-gray-500">{visitor.class} - {calculateAge(visitor.birthday, visitor.age)} anos</p>
+                                                        <div className="flex items-center gap-2 flex-wrap">
+                                                            <p className="font-bold text-gray-800 truncate">{visitor.name}</p>
+                                                            {isPresent && attRecord?.dailyCode && (
+                                                                <span className="inline-flex items-center bg-blue-50 text-brand-blue text-[10px] font-black px-1.5 py-0.5 rounded border border-blue-200 leading-none shadow-sm uppercase tracking-wide shrink-0">
+                                                                    Nº {attRecord.dailyCode}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        <p className="text-xs text-gray-500 mt-0.5">{visitor.class} - {calculateAge(visitor.birthday, visitor.age)} anos</p>
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center justify-end flex-wrap gap-2.5">
