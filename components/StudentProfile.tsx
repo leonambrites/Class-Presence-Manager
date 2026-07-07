@@ -87,13 +87,32 @@ const StudentProfile: React.FC<StudentProfileProps> = ({ student, onClose }) => 
 
                 {/* Contact Info */}
                 <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                            <span className="text-gray-500">Responsável</span>
-                            <p className="font-semibold text-gray-800">{student.guardianName || '—'}</p>
-                        </div>
-                        <div>
-                            <span className="text-gray-500">Telefone</span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                        {(!student.motherName && !student.fatherName) ? (
+                            <div>
+                                <span className="text-gray-500 block">Responsável</span>
+                                <p className="font-semibold text-gray-800">{student.guardianName || '—'}</p>
+                            </div>
+                        ) : (
+                            <>
+                                <div>
+                                    <span className="text-gray-500 block">Nome da Mãe</span>
+                                    <p className="font-semibold text-gray-800">{student.motherName || '—'}</p>
+                                </div>
+                                <div>
+                                    <span className="text-gray-500 block">Nome do Pai</span>
+                                    <p className="font-semibold text-gray-800">{student.fatherName || '—'}</p>
+                                </div>
+                                {student.hasOtherGuardian && (
+                                    <div className="sm:col-span-2">
+                                        <span className="text-gray-500 block">Outro Responsável ({student.otherGuardianRelationship})</span>
+                                        <p className="font-semibold text-gray-800">{student.otherGuardianName || '—'}</p>
+                                    </div>
+                                )}
+                            </>
+                        )}
+                        <div className="sm:col-span-2">
+                            <span className="text-gray-500 block">Telefone de Contato</span>
                             <p className="font-semibold text-gray-800">{student.phone || '—'}</p>
                         </div>
                     </div>

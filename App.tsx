@@ -497,7 +497,21 @@ const App: React.FC = () => {
         }
     }, [students, connectionStatus]);
 
-    const handleAddMember = async (formData: { name: string; class: string; age: number; guardianName: string; phone: string; birthday: string, hasAllergy?: boolean, allergyDescription?: string }) => {
+    const handleAddMember = async (formData: { 
+        name: string; 
+        class: string; 
+        age: number; 
+        guardianName: string; 
+        phone: string; 
+        birthday: string;
+        hasAllergy?: boolean;
+        allergyDescription?: string;
+        motherName?: string;
+        fatherName?: string;
+        hasOtherGuardian?: boolean;
+        otherGuardianName?: string;
+        otherGuardianRelationship?: string;
+    }) => {
         const newStudent = {
             id: String(Date.now()),
             ...formData,
@@ -526,7 +540,21 @@ const App: React.FC = () => {
         }
     };
 
-    const handleAddVisitor = async (formData: { name: string; class: string; age: number; guardianName: string; phone: string; birthday: string, hasAllergy?: boolean, allergyDescription?: string }, date: string) => {
+    const handleAddVisitor = async (formData: { 
+        name: string; 
+        class: string; 
+        age: number; 
+        guardianName: string; 
+        phone: string; 
+        birthday: string;
+        hasAllergy?: boolean;
+        allergyDescription?: string;
+        motherName?: string;
+        fatherName?: string;
+        hasOtherGuardian?: boolean;
+        otherGuardianName?: string;
+        otherGuardianRelationship?: string;
+    }, date: string) => {
         const dayOfWeek = getDayOfWeek(date);
         if (!dayOfWeek) {
             showNotification("Novos visitantes só podem ser adicionados em dias de aula.");
@@ -570,7 +598,7 @@ const App: React.FC = () => {
 
         if (connectionStatus === 'connected') {
             try {
-                await fetch(`/api/students/${updatedStudent.id}`, {
+                await fetchWithAuth(`/api/students/${updatedStudent.id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(updatedStudent)
@@ -594,7 +622,7 @@ const App: React.FC = () => {
 
             if (connectionStatus === 'connected') {
                 try {
-                    await fetch(`/api/students/${studentId}`, { method: 'DELETE' });
+                    await fetchWithAuth(`/api/students/${studentId}`, { method: 'DELETE' });
                     showNotification(`${studentName} excluído.`);
                 } catch (e) {
                     setConnectionStatus('offline');
@@ -613,7 +641,7 @@ const App: React.FC = () => {
 
         if (connectionStatus === 'connected') {
             try {
-                await fetch(`/api/students/${studentId}`, {
+                await fetchWithAuth(`/api/students/${studentId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ type: StudentType.Membro })
@@ -658,7 +686,7 @@ const App: React.FC = () => {
 
         if (connectionStatus === 'connected') {
             try {
-                await fetch(`/api/topics/${id}`, {
+                await fetchWithAuth(`/api/topics/${id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ date, title, description })
@@ -683,7 +711,7 @@ const App: React.FC = () => {
 
         if (connectionStatus === 'connected') {
             try {
-                await fetch(`/api/topics/${id}`, { method: 'DELETE' });
+                await fetchWithAuth(`/api/topics/${id}`, { method: 'DELETE' });
                 showNotification(`Assunto excluído.`);
             } catch (e) {
                 setConnectionStatus('offline');
@@ -837,7 +865,7 @@ const App: React.FC = () => {
 
         if (connectionStatus === 'connected') {
             try {
-                await fetch(`/api/volunteers/${id}`, {
+                await fetchWithAuth(`/api/volunteers/${id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(volunteerProps)
@@ -862,7 +890,7 @@ const App: React.FC = () => {
 
         if (connectionStatus === 'connected') {
             try {
-                await fetch(`/api/volunteers/${id}`, { method: 'DELETE' });
+                await fetchWithAuth(`/api/volunteers/${id}`, { method: 'DELETE' });
                 showNotification(`${vName} excluído.`);
             } catch (e) {
                 setConnectionStatus('offline');
@@ -903,7 +931,7 @@ const App: React.FC = () => {
 
         if (connectionStatus === 'connected') {
             try {
-                await fetch(`/api/schedule/${entry.id}`, {
+                await fetchWithAuth(`/api/schedule/${entry.id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(entry)
@@ -927,7 +955,7 @@ const App: React.FC = () => {
 
         if (connectionStatus === 'connected') {
             try {
-                await fetch(`/api/schedule/${id}`, { method: 'DELETE' });
+                await fetchWithAuth(`/api/schedule/${id}`, { method: 'DELETE' });
                 showNotification(`Escala excluída.`);
             } catch (e) {
                 setConnectionStatus('offline');

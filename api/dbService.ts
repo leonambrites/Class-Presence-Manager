@@ -23,23 +23,47 @@ export const dbService = {
         const scheduleData = await sql`SELECT * FROM schedule`;
         const topicsData = await sql`SELECT * FROM topics`;
 
-        const formattedStudents = studentsData.map((s: any) => ({
-            ...s,
-            guardianName: s.guardianname || s.guardianName || s.mothername || s.motherName || '',
-            age: s.age ? Number(s.age) : 0,
-            hasAllergy: s.has_allergy,
-            allergyDescription: s.allergy_description || '',
-            attendance: attendanceData
-                .filter((a: any) => String(a.student_id) === String(s.id))
-                .map((a: any) => ({
-                    date: a.date,
-                    present: a.present,
-                    day: a.day,
-                    dismissedBy: a.dismissed_by,
-                    dailyCode: a.daily_code ? Number(a.daily_code) : undefined,
-                    readyToLeave: a.ready_to_leave || false
-                }))
-        }));
+        const formattedStudents = studentsData.map((s: any) => {
+            const hasOtherGuardian = s.has_other_guardian || false;
+            const otherName = s.other_guardian_name || '';
+            const motherName = s.mother_name || s.mothername || '';
+            const fatherName = s.father_name || s.fathername || '';
+            
+            // Calculate guardianName for legacy compatibility
+            let guardianName = s.guardianname || s.guardianName || '';
+            if (!guardianName) {
+                if (hasOtherGuardian && otherName) {
+                    guardianName = `${otherName} (${s.other_guardian_relationship || 'Responsável'})`;
+                } else if (motherName) {
+                    guardianName = motherName;
+                } else if (fatherName) {
+                    guardianName = fatherName;
+                }
+            }
+
+            return {
+                ...s,
+                guardianName,
+                motherName,
+                fatherName,
+                hasOtherGuardian,
+                otherGuardianName: otherName,
+                otherGuardianRelationship: s.other_guardian_relationship || '',
+                age: s.age ? Number(s.age) : 0,
+                hasAllergy: s.has_allergy,
+                allergyDescription: s.allergy_description || '',
+                attendance: attendanceData
+                    .filter((a: any) => String(a.student_id) === String(s.id))
+                    .map((a: any) => ({
+                        date: a.date,
+                        present: a.present,
+                        day: a.day,
+                        dismissedBy: a.dismissed_by,
+                        dailyCode: a.daily_code ? Number(a.daily_code) : undefined,
+                        readyToLeave: a.ready_to_leave || false
+                    }))
+            };
+        });
 
         const formattedVolunteers = volunteersData.map((v: any) => ({
             ...v,
@@ -74,11 +98,14 @@ export const dbService = {
     async addStudent(student: any) {
         const sql = getSql();
         await sql`
-            INSERT INTO students (id, name, class, age, guardianName, phone, type, birthday, has_allergy, allergy_description, created_at, updated_at)
+            INSERT INTO students (id, name, class, age, guardianName, phone, type, birthday, has_allergy, allergy_description, mother_name, father_name, has_other_guardian, other_guardian_name, other_guardian_relationship, created_at, updated_at)
             VALUES (
                 ${String(student.id)}, ${student.name}, ${student.class}, ${student.age}, 
-                ${student.guardianName}, ${student.phone}, ${student.type}, ${student.birthday}, 
+                ${student.guardianName || ''}, ${student.phone}, ${student.type}, ${student.birthday}, 
                 ${student.hasAllergy || false}, ${student.allergyDescription || ''},
+                ${student.motherName || ''}, ${student.fatherName || ''},
+                ${student.hasOtherGuardian || false}, ${student.otherGuardianName || ''},
+                ${student.otherGuardianRelationship || ''},
                 ${getTimestamp()}, ${getTimestamp()}
             )
         `;
@@ -88,9 +115,12 @@ export const dbService = {
         const sql = getSql();
         const result = await sql`
             UPDATE students
-            SET name = ${data.name}, class = ${data.class}, age = ${data.age}, guardianName = ${data.guardianName}, 
+            SET name = ${data.name}, class = ${data.class}, age = ${data.age}, guardianName = ${data.guardianName || ''}, 
                 phone = ${data.phone}, type = ${data.type}, birthday = ${data.birthday}, 
                 has_allergy = ${data.hasAllergy || false}, allergy_description = ${data.allergyDescription || ''}, 
+                mother_name = ${data.motherName || ''}, father_name = ${data.fatherName || ''},
+                has_other_guardian = ${data.hasOtherGuardian || false}, other_guardian_name = ${data.otherGuardianName || ''},
+                other_guardian_relationship = ${data.otherGuardianRelationship || ''},
                 updated_at = ${getTimestamp()}
             WHERE id = ${String(id)}
             RETURNING id

@@ -25,6 +25,11 @@ export interface Student {
   attendance: Attendance[];
   hasAllergy?: boolean;
   allergyDescription?: string;
+  motherName?: string;
+  fatherName?: string;
+  hasOtherGuardian?: boolean;
+  otherGuardianName?: string;
+  otherGuardianRelationship?: string;
 }
 
 export interface Volunteer {
