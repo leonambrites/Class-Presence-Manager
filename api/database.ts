@@ -26,10 +26,26 @@ export const initDb = async () => {
                 birthday TEXT,
                 has_allergy BOOLEAN DEFAULT FALSE,
                 allergy_description TEXT,
+                mother_name TEXT,
+                father_name TEXT,
+                has_other_guardian BOOLEAN DEFAULT FALSE,
+                other_guardian_name TEXT,
+                other_guardian_relationship TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `;
+
+        // Migrate existing databases: add new columns if they do not exist
+        try {
+            await sql`ALTER TABLE students ADD COLUMN IF NOT EXISTS mother_name TEXT`;
+            await sql`ALTER TABLE students ADD COLUMN IF NOT EXISTS father_name TEXT`;
+            await sql`ALTER TABLE students ADD COLUMN IF NOT EXISTS has_other_guardian BOOLEAN DEFAULT FALSE`;
+            await sql`ALTER TABLE students ADD COLUMN IF NOT EXISTS other_guardian_name TEXT`;
+            await sql`ALTER TABLE students ADD COLUMN IF NOT EXISTS other_guardian_relationship TEXT`;
+        } catch (err) {
+            console.error("Migration error adding guardian columns to students table:", err);
+        }
 
         // Attendance Table
         await sql`

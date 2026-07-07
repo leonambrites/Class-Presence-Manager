@@ -10,7 +10,21 @@ import { calculateAge } from '../utils';
 
 interface StudentsProps {
   students: Student[];
-  onAddStudent: (formData: { name: string; class: string; age: number; guardianName: string; phone: string; birthday: string; hasAllergy?: boolean; allergyDescription?: string; }) => void;
+  onAddStudent: (formData: { 
+    name: string; 
+    class: string; 
+    age: number; 
+    guardianName: string; 
+    phone: string; 
+    birthday: string; 
+    hasAllergy?: boolean; 
+    allergyDescription?: string;
+    motherName?: string;
+    fatherName?: string;
+    hasOtherGuardian?: boolean;
+    otherGuardianName?: string;
+    otherGuardianRelationship?: string;
+  }) => void;
   onEditStudent: (student: Student) => void;
   onDeleteStudent: (studentId: string) => void;
   onMakeMember: (studentId: string) => void;
@@ -80,7 +94,21 @@ const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStude
     }
   };
 
-  const handleFormSubmit = (formData: { name: string; class: string; age: number; guardianName: string; phone: string; birthday: string; hasAllergy?: boolean; allergyDescription?: string; }) => {
+  const handleFormSubmit = (formData: { 
+    name: string; 
+    class: string; 
+    age: number; 
+    guardianName: string; 
+    phone: string; 
+    birthday: string; 
+    hasAllergy?: boolean; 
+    allergyDescription?: string;
+    motherName?: string;
+    fatherName?: string;
+    hasOtherGuardian?: boolean;
+    otherGuardianName?: string;
+    otherGuardianRelationship?: string;
+  }) => {
     if (editingStudent) {
       onEditStudent({ ...editingStudent, ...formData });
     } else {
