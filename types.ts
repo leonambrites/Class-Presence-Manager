@@ -31,6 +31,8 @@ export interface Student {
   otherGuardianName?: string;
   otherGuardianRelationship?: string;
   photo?: string;
+  imageUseAllowed?: boolean;
+  imageUseDocument?: string;
 }
 
 export interface Volunteer {
