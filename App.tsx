@@ -9,6 +9,7 @@ import Volunteers from './components/Volunteers';
 import Topics from './components/Topics';
 import Reports from './components/Reports';
 import Admin from './components/Admin';
+import PublicRegister from './components/PublicRegister';
 import { SignedIn, SignedOut, SignIn, useUser, useAuth } from '@clerk/clerk-react';
 import {
     INITIAL_STUDENTS,
@@ -34,6 +35,12 @@ function urlBase64ToUint8Array(base64String: string) {
 }
 
 const App: React.FC = () => {
+    const isPublicRoute = window.location.pathname === '/cadastro' || window.location.hash === '#/cadastro';
+
+    if (isPublicRoute) {
+        return <PublicRegister />;
+    }
+
     const [view, setView] = useState<View>(View.Home);
 
     const [students, setStudents] = useState<Student[]>([]);

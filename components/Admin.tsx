@@ -182,6 +182,48 @@ const Admin: React.FC<AdminProps> = ({ userRole, fetchWithAuth }) => {
                 </div>
             </div>
 
+            {/* QR Code de Cadastro Card */}
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row items-center gap-6">
+                <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex-shrink-0 shadow-inner">
+                    <img
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(window.location.origin + '/cadastro')}`}
+                        alt="QR Code de Cadastro"
+                        className="w-40 h-40 object-contain"
+                    />
+                </div>
+                <div className="flex-1 space-y-3 text-center md:text-left">
+                    <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-brand-blue ring-1 ring-inset ring-blue-700/10 animate-pulse">
+                        Novo Recurso: Auto-Cadastro
+                    </span>
+                    <h3 className="text-xl font-bold text-gray-900">QR Code para Novos Alunos</h3>
+                    <p className="text-sm text-gray-500 max-w-xl leading-relaxed">
+                        Imprima ou exiba este QR Code na entrada da igreja. Os pais/responsáveis podem escaneá-lo com a câmera do celular para preencher a ficha de cadastro de seus filhos diretamente, sem precisar de login.
+                    </p>
+                    <div className="flex flex-wrap gap-3 justify-center md:justify-start pt-1">
+                        <a
+                            href={`https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(window.location.origin + '/cadastro')}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-4 py-2 bg-brand-blue text-white rounded-lg hover:bg-blue-600 transition text-xs font-semibold flex items-center gap-2 shadow-sm"
+                        >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            Imprimir / Abrir em Alta Resolução
+                        </a>
+                        <button
+                            onClick={() => {
+                                navigator.clipboard.writeText(window.location.origin + '/cadastro');
+                                alert("Link de cadastro copiado para a área de transferência!");
+                            }}
+                            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition text-xs font-semibold flex items-center gap-2 border border-gray-200"
+                        >
+                            Copiar Link Direto
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             {error && (
                 <div className="p-4 bg-red-50 text-red-600 rounded-xl border border-red-200 text-sm font-medium">
                     Oops: {error}
