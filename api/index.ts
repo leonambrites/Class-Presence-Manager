@@ -42,6 +42,24 @@ initDb().catch(console.error);
 const app = express();
 app.use(express.json({ limit: '10mb' }) as any); // Increased limit for full data sync
 
+// Public endpoints (Bypass Clerk auth)
+app.post('/api/public/students', async (req, res) => {
+    const student = req.body;
+    try {
+        if (!student.name || !student.class || !student.phone) {
+            return res.status(400).json({ error: "Campos obrigatórios ausentes: Nome, Turma e Telefone são necessários." });
+        }
+        if (!student.id) student.id = Date.now().toString();
+        student.type = student.type || 'Visitante';
+        
+        await dbService.addStudent(student);
+        res.status(201).json({ message: 'Cadastro realizado com sucesso!', studentId: student.id });
+    } catch (error) {
+        console.error("Error in public student registration:", error);
+        res.status(500).json({ error: "Falha ao realizar o cadastro. Tente novamente." });
+    }
+});
+
 // Protect all /api endpoints
 app.use('/api', ClerkExpressRequireAuth() as any);
 
