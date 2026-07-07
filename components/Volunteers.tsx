@@ -3,6 +3,7 @@ import { Volunteer, UserRole } from '../types';
 import { CLASS_NAMES } from '../constants';
 import { EditIcon, TrashIcon, UserPlusIcon } from './icons';
 import Modal from './Modal';
+import { resizeImageToBase64 } from '../utils';
 
 interface VolunteersProps {
     volunteers: Volunteer[];
@@ -22,6 +23,20 @@ const Volunteers: React.FC<VolunteersProps> = ({ volunteers, onAddVolunteer, onE
     const [phone, setPhone] = useState('');
     const [type, setType] = useState('');
     const [team, setTeam] = useState('');
+    const [photo, setPhoto] = useState('');
+    const [error, setError] = useState('');
+
+    const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        try {
+            const base64 = await resizeImageToBase64(file, 200, 200);
+            setPhoto(base64);
+        } catch (err) {
+            console.error("Erro ao processar foto do voluntário:", err);
+            setError("Falha ao carregar e redimensionar a foto.");
+        }
+    };
 
     // Filter state
     const [filterClass, setFilterClass] = useState('Todas');
@@ -87,6 +102,8 @@ const Volunteers: React.FC<VolunteersProps> = ({ volunteers, onAddVolunteer, onE
         setPhone('');
         setType('');
         setTeam('');
+        setPhoto('');
+        setError('');
         setIsModalOpen(true);
     };
 
@@ -97,6 +114,8 @@ const Volunteers: React.FC<VolunteersProps> = ({ volunteers, onAddVolunteer, onE
         setPhone(volunteer.phone || '');
         setType(volunteer.type || '');
         setTeam(volunteer.team || '');
+        setPhoto(volunteer.photo || '');
+        setError('');
         setIsModalOpen(true);
     };
 
@@ -109,7 +128,8 @@ const Volunteers: React.FC<VolunteersProps> = ({ volunteers, onAddVolunteer, onE
             class: volunteerClass,
             phone,
             type,
-            team
+            team,
+            photo
         };
 
         if (editingVolunteer) {
@@ -192,7 +212,16 @@ const Volunteers: React.FC<VolunteersProps> = ({ volunteers, onAddVolunteer, onE
                                 {sortedVolunteers.map(v => (
                                     <tr key={v.id}>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="text-sm font-medium text-gray-900">{v.name}</div>
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-full overflow-hidden border border-gray-205 bg-gray-100 flex items-center justify-center flex-shrink-0">
+                                                    {v.photo ? (
+                                                        <img src={v.photo} alt={v.name} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <span className="text-gray-400 text-xs">👤</span>
+                                                    )}
+                                                </div>
+                                                <div className="text-sm font-medium text-gray-900">{v.name}</div>
+                                            </div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             {v.class || '-'}
@@ -229,21 +258,30 @@ const Volunteers: React.FC<VolunteersProps> = ({ volunteers, onAddVolunteer, onE
                 <div className="md:hidden space-y-4 p-4">
                     {sortedVolunteers.length > 0 ? (
                         sortedVolunteers.map(v => (
-                            <div key={v.id} className="bg-gray-50 p-4 rounded-lg shadow">
-                                <p className="text-lg font-bold text-gray-900">{v.name}</p>
-                                <div className="mt-4 border-t pt-3 space-y-1">
-                                    <p className="text-sm text-gray-600">Turma: <span className="font-medium text-gray-800">{v.class || '-'}</span></p>
-                                    <p className="text-sm text-gray-600">Tipo: <span className="font-medium text-gray-800">{v.type || '-'}</span></p>
-                                    <p className="text-sm text-gray-600">Equipe: <span className="font-medium text-gray-800">{v.team || '-'}</span></p>
-                                    <p className="text-sm text-gray-600">Tel: <span className="font-medium text-gray-800">{v.phone || '-'}</span></p>
-                                </div>
-                                <div className="flex justify-end items-center mt-3 border-t pt-3 space-x-4">
-                                    {userRole !== 'Ministra' && (
-                                        <>
-                                            <button onClick={() => openEditModal(v)} className="text-gray-500 hover:text-brand-blue flex items-center gap-1 text-sm"><EditIcon className="h-4 w-4" /> Editar</button>
-                                            <button onClick={() => { if (window.confirm('Tem certeza?')) onDeleteVolunteer(v.id) }} className="text-gray-500 hover:text-brand-red flex items-center gap-1 text-sm"><TrashIcon className="h-4 w-4" /> Excluir</button>
-                                        </>
+                            <div key={v.id} className="bg-gray-50 p-4 rounded-lg shadow flex items-center gap-3">
+                                <div className="w-12 h-12 rounded-full overflow-hidden border border-gray-200 bg-gray-100 flex items-center justify-center flex-shrink-0">
+                                    {v.photo ? (
+                                        <img src={v.photo} alt={v.name} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <span className="text-gray-400 text-xl">👤</span>
                                     )}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-lg font-bold text-gray-900 truncate">{v.name}</p>
+                                    <div className="mt-4 border-t pt-3 space-y-1">
+                                        <p className="text-sm text-gray-600">Turma: <span className="font-medium text-gray-800">{v.class || '-'}</span></p>
+                                        <p className="text-sm text-gray-600">Tipo: <span className="font-medium text-gray-800">{v.type || '-'}</span></p>
+                                        <p className="text-sm text-gray-600">Equipe: <span className="font-medium text-gray-800">{v.team || '-'}</span></p>
+                                        <p className="text-sm text-gray-600">Tel: <span className="font-medium text-gray-800">{v.phone || '-'}</span></p>
+                                    </div>
+                                    <div className="flex justify-end items-center mt-3 border-t pt-3 space-x-4">
+                                        {userRole !== 'Ministra' && (
+                                            <>
+                                                <button onClick={() => openEditModal(v)} className="text-gray-500 hover:text-brand-blue flex items-center gap-1 text-sm"><EditIcon className="h-4 w-4" /> Editar</button>
+                                                <button onClick={() => { if (window.confirm('Tem certeza?')) onDeleteVolunteer(v.id) }} className="text-gray-500 hover:text-brand-red flex items-center gap-1 text-sm"><TrashIcon className="h-4 w-4" /> Excluir</button>
+                                            </>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         ))
@@ -255,6 +293,27 @@ const Volunteers: React.FC<VolunteersProps> = ({ volunteers, onAddVolunteer, onE
 
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingVolunteer ? "Editar Voluntário" : "Adicionar Voluntário"}>
                 <form onSubmit={handleSubmit} className="space-y-4">
+                    {error && <p className="text-red-500 text-sm font-semibold">{error}</p>}
+                    
+                    {/* Photo Upload Section */}
+                    <div className="flex flex-col items-center gap-3 p-4 bg-gray-55 rounded-lg border border-gray-200">
+                        <label className="block text-sm font-semibold text-gray-700 w-full text-center">Foto do Voluntário</label>
+                        <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-brand-blue bg-gray-200 flex items-center justify-center group shadow-inner">
+                            {photo ? (
+                                <img src={photo} alt="Avatar do voluntário" className="w-full h-full object-cover" />
+                            ) : (
+                                <span className="text-gray-400 text-3xl select-none">👤</span>
+                            )}
+                            <label className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-[10px] font-black uppercase tracking-wider cursor-pointer transition duration-200 select-none">
+                                Alterar
+                                <input type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
+                            </label>
+                        </div>
+                        {photo && (
+                            <button type="button" onClick={() => setPhoto('')} className="text-xs text-red-500 hover:text-red-700 transition font-medium">Remover Foto</button>
+                        )}
+                    </div>
+
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Nome Completo</label>
                         <input type="text" value={name} onChange={(e) => setName(e.target.value)} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-blue focus:border-brand-blue sm:text-sm" placeholder="Ex: Maria Alice" />

@@ -192,10 +192,26 @@ const Attendance: React.FC<AttendanceProps> = ({
                       return (
                         <div key={student.id} className="bg-white rounded-xl p-3 border border-amber-200/80 shadow-md flex items-center justify-between gap-3">
                           <div className="flex items-center gap-3 min-w-0">
-                            {dailyCode && (
-                              <div className="flex-shrink-0 w-12 h-12 bg-brand-blue text-white rounded-lg flex flex-col items-center justify-center shadow-md">
-                                <span className="text-[9px] font-black uppercase opacity-75 leading-none mb-0.5">CÓD</span>
-                                <span className="text-base font-black leading-none">{dailyCode}</span>
+                            {dailyCode ? (
+                              <div className="relative w-12 h-12 flex-shrink-0">
+                                <div className="w-full h-full rounded-full overflow-hidden border border-gray-200 bg-gray-100 flex items-center justify-center">
+                                  {student.photo ? (
+                                    <img src={student.photo} alt={student.name} className="w-full h-full object-cover" />
+                                  ) : (
+                                    <span className="text-gray-400 text-xl select-none">👤</span>
+                                  )}
+                                </div>
+                                <div className="absolute -bottom-1 -right-1 bg-brand-blue text-white rounded-full px-1.5 py-0.5 text-[8px] font-black border border-white leading-none shadow-sm scale-90">
+                                  #{dailyCode}
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="w-12 h-12 flex-shrink-0 rounded-full overflow-hidden border border-gray-150 bg-gray-50 flex items-center justify-center">
+                                {student.photo ? (
+                                  <img src={student.photo} alt={student.name} className="w-full h-full object-cover" />
+                                ) : (
+                                  <span className="text-gray-400 text-xl select-none">👤</span>
+                                )}
                               </div>
                             )}
                             <div className="min-w-0">
@@ -266,12 +282,26 @@ const Attendance: React.FC<AttendanceProps> = ({
                                     <li key={student.id} className="py-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 overflow-hidden">
                                         <div className="flex items-center gap-3 min-w-0">
                                             {isPresent && attRecord?.dailyCode ? (
-                                                <div className="w-10 h-10 flex-shrink-0 bg-brand-blue text-white rounded-lg flex flex-col items-center justify-center shadow-sm">
-                                                    <span className="text-[8px] font-black leading-none opacity-80">CÓD</span>
-                                                    <span className="text-sm font-black leading-none">{attRecord.dailyCode}</span>
+                                                <div className="relative w-10 h-10 flex-shrink-0">
+                                                    <div className="w-full h-full rounded-full overflow-hidden border border-gray-200 bg-gray-100 flex items-center justify-center">
+                                                        {student.photo ? (
+                                                            <img src={student.photo} alt={student.name} className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            <span className="text-gray-400 text-lg select-none">👤</span>
+                                                        )}
+                                                    </div>
+                                                    <div className="absolute -bottom-1 -right-1 bg-brand-blue text-white rounded-full px-1 py-0.5 text-[8px] font-black border border-white leading-none shadow-sm scale-90">
+                                                        #{attRecord.dailyCode}
+                                                    </div>
                                                 </div>
                                             ) : (
-                                                <div className="w-10 h-10 flex-shrink-0 bg-gray-100 rounded-lg" />
+                                                <div className="w-10 h-10 flex-shrink-0 rounded-full overflow-hidden border border-gray-150 bg-gray-50 flex items-center justify-center">
+                                                    {student.photo ? (
+                                                        <img src={student.photo} alt={student.name} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <span className="text-gray-400 text-lg select-none">👤</span>
+                                                    )}
+                                                </div>
                                             )}
                                             <div className="min-w-0">
                                                 <p className="font-bold text-gray-800 truncate">{student.name}</p>
@@ -390,12 +420,26 @@ const Attendance: React.FC<AttendanceProps> = ({
                                             <li key={visitor.id} className="py-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 overflow-hidden">
                                                 <div className="flex items-center gap-3 min-w-0">
                                                     {isPresent && attRecord?.dailyCode ? (
-                                                        <div className="w-10 h-10 flex-shrink-0 bg-brand-blue text-white rounded-lg flex flex-col items-center justify-center shadow-sm">
-                                                            <span className="text-[8px] font-black leading-none opacity-80">CÓD</span>
-                                                            <span className="text-sm font-black leading-none">{attRecord.dailyCode}</span>
+                                                        <div className="relative w-10 h-10 flex-shrink-0">
+                                                            <div className="w-full h-full rounded-full overflow-hidden border border-gray-200 bg-gray-100 flex items-center justify-center">
+                                                                {visitor.photo ? (
+                                                                    <img src={visitor.photo} alt={visitor.name} className="w-full h-full object-cover" />
+                                                                ) : (
+                                                                    <span className="text-gray-400 text-lg select-none">👤</span>
+                                                                )}
+                                                            </div>
+                                                            <div className="absolute -bottom-1 -right-1 bg-brand-blue text-white rounded-full px-1 py-0.5 text-[8px] font-black border border-white leading-none shadow-sm scale-90">
+                                                                #{attRecord.dailyCode}
+                                                            </div>
                                                         </div>
                                                     ) : (
-                                                        <div className="w-10 h-10 flex-shrink-0 bg-gray-100 rounded-lg" />
+                                                        <div className="w-10 h-10 flex-shrink-0 rounded-full overflow-hidden border border-gray-150 bg-gray-50 flex items-center justify-center">
+                                                            {visitor.photo ? (
+                                                                <img src={visitor.photo} alt={visitor.name} className="w-full h-full object-cover" />
+                                                            ) : (
+                                                                <span className="text-gray-400 text-lg select-none">👤</span>
+                                                            )}
+                                                        </div>
                                                     )}
                                                     <div className="min-w-0">
                                                         <p className="font-bold text-gray-800 truncate">{visitor.name}</p>

@@ -185,12 +185,21 @@ const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStude
                 return (
                 <tr key={student.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <button onClick={() => handleOpenProfile(student)} className="text-left hover:text-brand-blue transition-colors">
-                      <div className="text-sm font-medium text-gray-900">{student.name}</div>
-                      <div className="text-sm text-gray-500 flex items-center gap-2">
-                        {calculateAge(student.birthday, student.age)} anos
-                        {student.birthday && <span className="text-xs text-gray-400">({new Date(student.birthday).toLocaleDateString('pt-BR')})</span>}
-                        <InactivityBadge days={daysSince} />
+                    <button onClick={() => handleOpenProfile(student)} className="text-left hover:text-brand-blue transition-colors flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-205 bg-gray-100 flex items-center justify-center flex-shrink-0">
+                        {student.photo ? (
+                          <img src={student.photo} alt={student.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-gray-400 text-lg">👤</span>
+                        )}
+                      </div>
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">{student.name}</div>
+                        <div className="text-sm text-gray-500 flex items-center gap-2">
+                          {calculateAge(student.birthday, student.age)} anos
+                          {student.birthday && <span className="text-xs text-gray-400">({new Date(student.birthday).toLocaleDateString('pt-BR')})</span>}
+                          <InactivityBadge days={daysSince} />
+                        </div>
                       </div>
                     </button>
                   </td>
@@ -236,44 +245,53 @@ const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStude
           {filteredStudents.map(student => {
             const daysSince = getDaysSinceLastAttendance(student);
             return (
-            <div key={student.id} className="bg-gray-50 p-4 rounded-lg shadow">
-              <div className="flex justify-between items-start">
-                <button onClick={() => handleOpenProfile(student)} className="text-left">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <p className="text-lg font-bold text-gray-900 hover:text-brand-blue transition-colors">{student.name}</p>
-                    {student.hasAllergy && (
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-700 tracking-wider">ALERGIA</span>
-                    )}
-                    <InactivityBadge days={daysSince} />
-                  </div>
-                  <p className="text-sm text-gray-500">
-                    {calculateAge(student.birthday, student.age)} anos
-                    {student.birthday && <span className="ml-1 text-xs">({new Date(student.birthday).toLocaleDateString('pt-BR')})</span>}
-                  </p>
-                </button>
-                {student.attendance.some(a => a.date === today && a.present) ?
-                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Presente</span> :
-                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Ausente</span>
-                }
-              </div>
-              <div className="mt-4 border-t pt-3 space-y-1">
-                <p className="text-sm text-gray-600">Turma: <span className="font-medium text-gray-800">{student.class}</span></p>
-                <p className="text-sm text-gray-600">Responsável: <span className="font-medium text-gray-800">{student.guardianName}</span></p>
-                <p className="text-sm text-gray-600">Tel: <span className="font-medium text-gray-800">{student.phone}</span></p>
-                {student.hasAllergy && (
-                  <p className="text-sm text-gray-600">Alergia: <span className="font-medium text-red-600">{student.allergyDescription}</span></p>
+            <div key={student.id} className="bg-gray-50 p-4 rounded-lg shadow flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full overflow-hidden border border-gray-200 bg-gray-100 flex items-center justify-center flex-shrink-0">
+                {student.photo ? (
+                  <img src={student.photo} alt={student.name} className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-gray-400 text-xl">👤</span>
                 )}
               </div>
-              <div className="flex justify-end items-center mt-3 border-t pt-3 space-x-4">
-                {userRole !== 'Ministra' && activeTab === StudentType.Visitante && (
-                  <button onClick={() => onMakeMember(student.id)} className="text-gray-500 hover:text-brand-green flex items-center gap-1 text-sm"><UserPlusIcon className="h-4 w-4" /> Tornar Membro</button>
-                )}
-                {userRole !== 'Ministra' && (
-                  <button onClick={() => handleOpenEditModal(student)} className="text-gray-500 hover:text-brand-blue flex items-center gap-1 text-sm"><EditIcon className="h-4 w-4" /> Editar</button>
-                )}
-                {userRole === 'Pastor' && (
-                  <button onClick={() => handleDelete(student)} className="text-gray-500 hover:text-brand-red flex items-center gap-1 text-sm"><TrashIcon className="h-4 w-4" /> Excluir</button>
-                )}
+              <div className="flex-1 min-w-0">
+                <div className="flex justify-between items-start">
+                  <button onClick={() => handleOpenProfile(student)} className="text-left block min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="text-lg font-bold text-gray-900 hover:text-brand-blue transition-colors truncate">{student.name}</p>
+                      {student.hasAllergy && (
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-700 tracking-wider">ALERGIA</span>
+                      )}
+                      <InactivityBadge days={daysSince} />
+                    </div>
+                    <p className="text-sm text-gray-500">
+                      {calculateAge(student.birthday, student.age)} anos
+                      {student.birthday && <span className="ml-1 text-xs">({new Date(student.birthday).toLocaleDateString('pt-BR')})</span>}
+                    </p>
+                  </button>
+                  {student.attendance.some(a => a.date === today && a.present) ?
+                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Presente</span> :
+                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Ausente</span>
+                  }
+                </div>
+                <div className="mt-4 border-t pt-3 space-y-1">
+                  <p className="text-sm text-gray-600">Turma: <span className="font-medium text-gray-800">{student.class}</span></p>
+                  <p className="text-sm text-gray-600">Responsável: <span className="font-medium text-gray-800">{student.guardianName}</span></p>
+                  <p className="text-sm text-gray-600">Tel: <span className="font-medium text-gray-800">{student.phone}</span></p>
+                  {student.hasAllergy && (
+                    <p className="text-sm text-gray-600">Alergia: <span className="font-medium text-red-600">{student.allergyDescription}</span></p>
+                  )}
+                </div>
+                <div className="flex justify-end items-center mt-3 border-t pt-3 space-x-4">
+                  {userRole !== 'Ministra' && activeTab === StudentType.Visitante && (
+                    <button onClick={() => onMakeMember(student.id)} className="text-gray-500 hover:text-brand-green flex items-center gap-1 text-sm"><UserPlusIcon className="h-4 w-4" /> Tornar Membro</button>
+                  )}
+                  {userRole !== 'Ministra' && (
+                    <button onClick={() => handleOpenEditModal(student)} className="text-gray-500 hover:text-brand-blue flex items-center gap-1 text-sm"><EditIcon className="h-4 w-4" /> Editar</button>
+                  )}
+                  {userRole === 'Pastor' && (
+                    <button onClick={() => handleDelete(student)} className="text-gray-500 hover:text-brand-red flex items-center gap-1 text-sm"><TrashIcon className="h-4 w-4" /> Excluir</button>
+                  )}
+                </div>
               </div>
             </div>
           );
