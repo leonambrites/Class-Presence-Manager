@@ -73,7 +73,8 @@ export const dbService = {
             phone: v.phone || '',
             type: v.type || '',
             team: v.team || '',
-            photo: v.photo || ''
+            photo: v.photo || '',
+            email: v.email || ''
         }));
 
         const formattedSchedule = scheduleData.map((s: any) => ({
@@ -228,15 +229,15 @@ export const dbService = {
     async addVolunteer(volunteer: any) {
         const sql = getSql();
         await sql`
-            INSERT INTO volunteers (id, name, class, phone, type, team, photo, created_at)
-            VALUES (${String(Date.now())}, ${volunteer.name}, ${volunteer.class || ''}, ${volunteer.phone || ''}, ${volunteer.type || ''}, ${volunteer.team || ''}, ${volunteer.photo || ''}, ${getTimestamp()})
+            INSERT INTO volunteers (id, name, class, phone, type, team, photo, email, created_at)
+            VALUES (${String(Date.now())}, ${volunteer.name}, ${volunteer.class || ''}, ${volunteer.phone || ''}, ${volunteer.type || ''}, ${volunteer.team || ''}, ${volunteer.photo || ''}, ${volunteer.email || ''}, ${getTimestamp()})
         `;
     },
 
     async updateVolunteer(id: string, volunteer: any) {
         const sql = getSql();
         const result = await sql`
-            UPDATE volunteers SET name = ${volunteer.name}, class = ${volunteer.class || ''}, phone = ${volunteer.phone || ''}, type = ${volunteer.type || ''}, team = ${volunteer.team || ''}, photo = ${volunteer.photo || ''} WHERE id = ${String(id)}
+            UPDATE volunteers SET name = ${volunteer.name}, class = ${volunteer.class || ''}, phone = ${volunteer.phone || ''}, type = ${volunteer.type || ''}, team = ${volunteer.team || ''}, photo = ${volunteer.photo || ''}, email = ${volunteer.email || ''} WHERE id = ${String(id)}
             RETURNING id
         `;
         if (result.length === 0) throw new Error("Volunteer not found");

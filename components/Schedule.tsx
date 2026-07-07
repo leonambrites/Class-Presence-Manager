@@ -12,6 +12,7 @@ interface ScheduleProps {
     onEditSchedule: (entry: ScheduleEntry) => void;
     onDeleteSchedule: (id: string) => void;
     userRole: UserRole;
+    loggedInVolunteer?: Volunteer | null;
 }
 
 const WEEKDAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
@@ -124,12 +125,27 @@ const Schedule: React.FC<ScheduleProps> = ({
     onAddSchedule, 
     onEditSchedule, 
     onDeleteSchedule, 
-    userRole 
+    userRole,
+    loggedInVolunteer
 }) => {
     // Current visualized Month and Year
     const today = new Date();
     const [currentYear, setCurrentYear] = useState<number>(today.getFullYear());
     const [currentMonth, setCurrentMonth] = useState<number>(today.getMonth()); // 0-indexed
+    const [showOnlyMySchedules, setShowOnlyMySchedules] = useState(userRole === 'Ministra');
+
+    const isVolunteerAssignedToEntry = (volunteer: Volunteer, entry: ScheduleEntry) => {
+        if (entry.team && volunteer.team === entry.team) {
+            return true;
+        }
+        if (entry.ministerIds?.includes(volunteer.id)) {
+            return true;
+        }
+        if (entry.supervisorId === volunteer.id || entry.deskId === volunteer.id || entry.coordinatorId === volunteer.id) {
+            return true;
+        }
+        return false;
+    };
 
     // Add schedule modal and edit schedule modal state
     const [isAdding, setIsAdding] = useState(false);
@@ -294,18 +310,34 @@ const Schedule: React.FC<ScheduleProps> = ({
                     </button>
                 </div>
 
-                {/* Filter Dropdown */}
-                <div className="w-full md:w-64">
-                    <label htmlFor="class-select-schedule" className="sr-only">Filtrar por Turma</label>
-                    <select
-                        id="class-select-schedule"
-                        value={selectedClass}
-                        onChange={(e) => onClassChange(e.target.value)}
-                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand-blue focus:border-brand-blue block w-full p-2.5"
-                    >
-                        <option value="All">Todas as Turmas</option>
-                        {CLASS_NAMES.map(name => <option key={name} value={name}>{name}</option>)}
-                    </select>
+                {/* Filters */}
+                <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+                    {loggedInVolunteer && (
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="checkbox"
+                                id="only-my-schedules"
+                                checked={showOnlyMySchedules}
+                                onChange={(e) => setShowOnlyMySchedules(e.target.checked)}
+                                className="w-4 h-4 text-brand-blue border-gray-300 rounded focus:ring-brand-blue cursor-pointer"
+                            />
+                            <label htmlFor="only-my-schedules" className="text-sm font-semibold text-gray-700 cursor-pointer select-none">
+                                Apenas minhas escalas (⭐)
+                            </label>
+                        </div>
+                    )}
+                    <div className="w-full sm:w-64">
+                        <label htmlFor="class-select-schedule" className="sr-only">Filtrar por Turma</label>
+                        <select
+                            id="class-select-schedule"
+                            value={selectedClass}
+                            onChange={(e) => onClassChange(e.target.value)}
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand-blue focus:border-brand-blue block w-full p-2.5"
+                        >
+                            <option value="All">Todas as Turmas</option>
+                            {CLASS_NAMES.map(name => <option key={name} value={name}>{name}</option>)}
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -326,6 +358,9 @@ const Schedule: React.FC<ScheduleProps> = ({
                             const entryDate = s.date.split('T')[0];
                             const matchesDate = entryDate === cell.dateString;
                             const matchesClass = selectedClass === 'All' || s.className === selectedClass;
+                            if (showOnlyMySchedules && loggedInVolunteer) {
+                                return matchesDate && matchesClass && isVolunteerAssignedToEntry(loggedInVolunteer, s);
+                            }
                             return matchesDate && matchesClass;
                         }).sort((a, b) => {
                             const indexA = CLASS_NAMES.indexOf(a.className);
@@ -347,13 +382,18 @@ const Schedule: React.FC<ScheduleProps> = ({
                             >
                                 {/* Date Number and Add Indicator */}
                                 <div className="flex justify-between items-center mb-1">
-                                    <span className={`text-xs md:text-sm font-bold ${
-                                        isToday 
-                                            ? 'text-brand-blue font-extrabold bg-blue-100 w-5 h-5 rounded-full flex items-center justify-center' 
-                                            : cell.isCurrentMonth ? 'text-gray-700' : 'text-gray-400'
-                                    }`}>
-                                        {cell.dayNum}
-                                    </span>
+                                    <div className="flex items-center gap-1">
+                                        <span className={`text-xs md:text-sm font-bold ${
+                                            isToday 
+                                                ? 'text-brand-blue font-extrabold bg-blue-100 w-5 h-5 rounded-full flex items-center justify-center' 
+                                                : cell.isCurrentMonth ? 'text-gray-700' : 'text-gray-400'
+                                        }`}>
+                                            {cell.dayNum}
+                                        </span>
+                                        {loggedInVolunteer && schedule.some(s => s.date?.split('T')[0] === cell.dateString && isVolunteerAssignedToEntry(loggedInVolunteer, s)) && (
+                                            <span className="text-amber-500 text-xs" title="Você está escalada neste dia">⭐</span>
+                                        )}
+                                    </div>
                                     
                                     {cell.isCurrentMonth && (userRole === 'Pastor' || userRole === 'Coordenadora') && (
                                         <span className="text-[10px] text-brand-blue opacity-0 group-hover:opacity-100 transition-opacity font-semibold">
@@ -375,6 +415,7 @@ const Schedule: React.FC<ScheduleProps> = ({
                                             className={`text-[9px] font-bold px-1.5 py-0.5 rounded border truncate transition duration-150 ${getClassBadgeStyle(entry.className)}`}
                                             title={`${entry.className} - ${entry.team || 'Sem Equipe'}`}
                                         >
+                                            {loggedInVolunteer && isVolunteerAssignedToEntry(loggedInVolunteer, entry) && '⭐ '}
                                             {entry.className} {entry.team ? `(${entry.team})` : ''}
                                         </div>
                                     ))}
@@ -554,6 +595,12 @@ const Schedule: React.FC<ScheduleProps> = ({
                             {schedule
                                 .filter(s => s.date && s.date.split('T')[0] === selectedDayString)
                                 .filter(s => selectedClass === 'All' || s.className === selectedClass)
+                                .filter(s => {
+                                    if (showOnlyMySchedules && loggedInVolunteer) {
+                                        return isVolunteerAssignedToEntry(loggedInVolunteer, s);
+                                    }
+                                    return true;
+                                })
                                 .sort((a, b) => {
                                     const indexA = CLASS_NAMES.indexOf(a.className);
                                     const indexB = CLASS_NAMES.indexOf(b.className);
@@ -569,9 +616,12 @@ const Schedule: React.FC<ScheduleProps> = ({
                                         }}
                                         className={`p-3 rounded-lg border shadow-sm cursor-pointer transition hover:shadow flex justify-between items-center ${getClassBadgeStyle(entry.className)}`}
                                     >
-                                        <div>
-                                            <h4 className="font-bold text-sm">{entry.className}</h4>
-                                            {entry.team && <p className="text-[10px] mt-0.5 opacity-90">Equipe {entry.team}</p>}
+                                        <div className="flex items-center gap-2">
+                                            {loggedInVolunteer && isVolunteerAssignedToEntry(loggedInVolunteer, entry) && <span className="text-amber-500">⭐</span>}
+                                            <div>
+                                                <h4 className="font-bold text-sm">{entry.className}</h4>
+                                                {entry.team && <p className="text-[10px] mt-0.5 opacity-90">Equipe {entry.team}</p>}
+                                            </div>
                                         </div>
                                         <span className="text-[10px] font-bold px-2 py-1 rounded bg-white border border-inherit">Ver Detalhes &rarr;</span>
                                     </div>

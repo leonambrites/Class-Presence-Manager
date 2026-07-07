@@ -41,6 +41,7 @@ export interface Volunteer {
   type?: string;
   team?: string;
   photo?: string;
+  email?: string;
 }
 
 export interface ScheduleEntry {

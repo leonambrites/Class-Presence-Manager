@@ -55,6 +55,16 @@ const App: React.FC = () => {
     // Map the local userRole based on the publicMetadata from Clerk Cloud Session
     const userRole = (user?.publicMetadata?.role as UserRole) || 'Ministra'; // Default fallback
 
+    const loggedInVolunteer = React.useMemo(() => {
+        if (!user) return null;
+        const email = user.primaryEmailAddress?.emailAddress?.toLowerCase();
+        const name = user.fullName?.toLowerCase();
+        return volunteers.find(v => 
+            (email && v.email?.toLowerCase() === email) || 
+            (name && v.name.toLowerCase() === name)
+        ) || null;
+    }, [user, volunteers]);
+
     const fetchWithAuth = async (url: RequestInfo | URL, options: RequestInit = {}) => {
         try {
             const token = await getToken();
@@ -1081,7 +1091,7 @@ const App: React.FC = () => {
             case View.Students:
                 return <Students students={students} onAddStudent={handleAddMember} onEditStudent={handleEditStudent} onDeleteStudent={handleDeleteStudent} onMakeMember={handleMakeMember} selectedClass={selectedClass} onClassChange={setSelectedClass} userRole={userRole!} />;
             case View.Schedule:
-                return <Schedule schedule={schedule} volunteers={volunteers} selectedClass={selectedClass} onClassChange={setSelectedClass} onAddSchedule={handleAddSchedule} onEditSchedule={handleEditSchedule} onDeleteSchedule={handleDeleteSchedule} userRole={userRole!} />;
+                return <Schedule schedule={schedule} volunteers={volunteers} selectedClass={selectedClass} onClassChange={setSelectedClass} onAddSchedule={handleAddSchedule} onEditSchedule={handleEditSchedule} onDeleteSchedule={handleDeleteSchedule} userRole={userRole!} loggedInVolunteer={loggedInVolunteer} />;
             case View.Volunteers:
                 return <Volunteers volunteers={volunteers} onAddVolunteer={handleAddVolunteer} onEditVolunteer={handleEditVolunteer} onDeleteVolunteer={handleDeleteVolunteer} userRole={userRole!} />;
             case View.Topics:
