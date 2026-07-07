@@ -1102,6 +1102,14 @@ const App: React.FC = () => {
                     />
                 );
             case View.Students:
+                if (userRole === 'Ministra') {
+                    return <Dashboard
+                        students={students}
+                        selectedClass={selectedClass}
+                        onClassChange={setSelectedClass}
+                        userRole={userRole!}
+                    />;
+                }
                 return <Students students={students} onAddStudent={handleAddMember} onEditStudent={handleEditStudent} onDeleteStudent={handleDeleteStudent} onMakeMember={handleMakeMember} selectedClass={selectedClass} onClassChange={setSelectedClass} userRole={userRole!} />;
             case View.Schedule:
                 return <Schedule schedule={schedule} volunteers={volunteers} selectedClass={selectedClass} onClassChange={setSelectedClass} onAddSchedule={handleAddSchedule} onEditSchedule={handleEditSchedule} onDeleteSchedule={handleDeleteSchedule} userRole={userRole!} loggedInVolunteer={loggedInVolunteer} />;
