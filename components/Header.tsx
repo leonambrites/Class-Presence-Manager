@@ -55,7 +55,7 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, userRole, isSu
         { view: View.Attendance, icon: <CheckCircleIcon />, label: "Presença" },
         { view: View.Schedule, icon: <CalendarIcon />, label: "Escala" },
         { view: View.Topics, icon: <BookOpenIcon />, label: "Aulas" },
-        { view: View.Students, icon: <UsersIcon />, label: "Alunos" },
+        ...(userRole !== 'Ministra' ? [{ view: View.Students, icon: <UsersIcon />, label: "Alunos" }] : []),
         { view: View.Volunteers, icon: <UserPlusIcon />, label: "Professores" },
         { view: View.Reports, icon: <FileTextIcon />, label: "Relatórios" },
     ];
@@ -72,7 +72,7 @@ const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, userRole, isSu
     ];
 
     const extraMobileItems = [
-        { view: View.Students, icon: <UsersIcon />, label: "Alunos" },
+        ...(userRole !== 'Ministra' ? [{ view: View.Students, icon: <UsersIcon />, label: "Alunos" }] : []),
         { view: View.Volunteers, icon: <UserPlusIcon />, label: "Professores" },
         { view: View.Reports, icon: <FileTextIcon />, label: "Relatórios" },
     ];
