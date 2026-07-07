@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { CLASS_NAMES } from '../constants';
 import { Student } from '../types';
 import { calculateAge, resizeImageToBase64 } from '../utils';
@@ -25,6 +25,9 @@ interface StudentFormProps {
 }
 
 const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialData }) => {
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
   const [name, setName] = useState('');
   const [studentClass, setStudentClass] = useState(CLASS_NAMES[0]);
   const [phone, setPhone] = useState('');
@@ -166,17 +169,36 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
       {/* Photo Upload Section */}
       <div className="flex flex-col items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
         <label className="block text-sm font-semibold text-gray-700 w-full text-center">Foto da Criança</label>
-        <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-brand-blue bg-gray-200 flex items-center justify-center group shadow-inner">
+        <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-brand-blue bg-gray-200 flex items-center justify-center shadow-inner">
           {photo ? (
             <img src={photo} alt="Avatar da criança" className="w-full h-full object-cover" />
           ) : (
             <span className="text-gray-400 text-3xl select-none">👤</span>
           )}
-          <label className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-[10px] font-black uppercase tracking-wider cursor-pointer transition duration-200 select-none">
-            Alterar
-            <input type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
-          </label>
         </div>
+        
+        {/* Hidden inputs */}
+        <input type="file" accept="image/*" capture="environment" onChange={handlePhotoChange} ref={cameraInputRef} className="hidden" />
+        <input type="file" accept="image/*" onChange={handlePhotoChange} ref={fileInputRef} className="hidden" />
+        
+        {/* Mobile Camera and Gallery controls */}
+        <div className="flex gap-2">
+          <button 
+            type="button" 
+            onClick={() => cameraInputRef.current?.click()} 
+            className="px-3 py-1.5 text-xs bg-brand-blue text-white rounded-lg hover:bg-blue-600 transition flex items-center gap-1 font-semibold shadow-sm"
+          >
+            📷 Tirar Foto
+          </button>
+          <button 
+            type="button" 
+            onClick={() => fileInputRef.current?.click()} 
+            className="px-3 py-1.5 text-xs bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition flex items-center gap-1 font-semibold shadow-sm"
+          >
+            📁 Galeria
+          </button>
+        </div>
+
         {photo && (
           <button type="button" onClick={() => setPhoto('')} className="text-xs text-red-500 hover:text-red-700 transition font-medium">Remover Foto</button>
         )}
