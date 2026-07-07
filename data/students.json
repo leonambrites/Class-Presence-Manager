@@ -8,19 +8,58 @@
     "phone": "99920-1989",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -32,17 +71,50 @@
     "phone": "97231-1983",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-04", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      }
     ]
   },
   {
@@ -54,18 +126,54 @@
     "phone": "97975-4152",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-04", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      }
     ]
   },
   {
@@ -77,24 +185,78 @@
     "phone": "98211-2061",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-18", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -106,21 +268,66 @@
     "phone": "96468-3795",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -132,9 +339,18 @@
     "phone": "969844360",
     "type": "Visitante",
     "attendance": [
-        { "date": "2025-03-09", "present": true },
-        { "date": "2025-03-30", "present": true },
-        { "date": "2025-04-06", "present": true }
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      }
     ]
   },
   {
@@ -146,25 +362,82 @@
     "phone": "98287-1725",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-18", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
-  { "id": "8", "name": "Luiza", "class": "Maternal", "age": 1, "motherName": "NaN", "phone": "97354-4508", "type": "Membro", "attendance": [] },
+  {
+    "id": "8",
+    "name": "Luiza",
+    "class": "Maternal",
+    "age": 1,
+    "motherName": "NaN",
+    "phone": "97354-4508",
+    "type": "Membro",
+    "attendance": []
+  },
   {
     "id": "9",
     "name": "Luna Sousa B",
@@ -174,9 +447,18 @@
     "phone": "NaN",
     "type": "Membro",
     "attendance": [
-        { "date": "2025-05-04", "present": true },
-        { "date": "2025-05-11", "present": true },
-        { "date": "2025-05-18", "present": true }
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      }
     ]
   },
   {
@@ -188,11 +470,26 @@
     "phone": "995585214",
     "type": "Membro",
     "attendance": [
-        { "date": "2025-04-13", "present": true },
-        { "date": "2025-04-27", "present": true },
-        { "date": "2025-05-11", "present": true },
-        { "date": "2025-05-18", "present": true },
-        { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -204,8 +501,14 @@
     "phone": "975116320",
     "type": "Membro",
     "attendance": [
-        { "date": "2025-03-09", "present": true },
-        { "date": "2025-03-30", "present": true }
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      }
     ]
   },
   {
@@ -217,9 +520,18 @@
     "phone": "97310-9380",
     "type": "Membro",
     "attendance": [
-        { "date": "2025-03-30", "present": true },
-        { "date": "2025-04-13", "present": true },
-        { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -231,7 +543,10 @@
     "phone": "99916-1162",
     "type": "Membro",
     "attendance": [
-        { "date": "2025-01-26", "present": true }
+      {
+        "date": "2025-01-26",
+        "present": true
+      }
     ]
   },
   {
@@ -243,13 +558,34 @@
     "phone": "990982323",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-11", "present": true }
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      }
     ]
   },
   {
@@ -261,19 +597,58 @@
     "phone": "97029-8205",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-18", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
-  { "id": "16", "name": "Cecília Gomes de Almeida", "class": "2 a 3 anos", "age": 2, "motherName": "Thabata", "phone": "99712-2979", "type": "Membro", "attendance": [] },
+  {
+    "id": "16",
+    "name": "Cecília Gomes de Almeida",
+    "class": "2 a 3 anos",
+    "age": 2,
+    "motherName": "Thabata",
+    "phone": "99712-2979",
+    "type": "Membro",
+    "attendance": []
+  },
   {
     "id": "17",
     "name": "Chloe Rosa Brites",
@@ -283,23 +658,74 @@
     "phone": "98211-2061",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-18", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -311,21 +737,66 @@
     "phone": "964585195",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-18", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
-  { "id": "19", "name": "Dimitry Lisboa da Silva", "class": "2 a 3 anos", "age": 3, "motherName": "NaN", "phone": "9834440-05", "type": "Membro", "attendance": [] },
+  {
+    "id": "19",
+    "name": "Dimitry Lisboa da Silva",
+    "class": "2 a 3 anos",
+    "age": 3,
+    "motherName": "NaN",
+    "phone": "9834440-05",
+    "type": "Membro",
+    "attendance": []
+  },
   {
     "id": "20",
     "name": "Don Moraes Fros",
@@ -335,21 +806,66 @@
     "phone": "97587-1839",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-18", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -361,11 +877,26 @@
     "phone": "96548-2160",
     "type": "Membro",
     "attendance": [
-        { "date": "2025-05-04", "present": true },
-        { "date": "2025-05-11", "present": true }
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      }
     ]
   },
-  { "id": "22", "name": "Esther Vargas", "class": "2 a 3 anos", "age": 3, "motherName": "Nathaly", "phone": "99618-9309", "type": "Membro", "attendance": [] },
+  {
+    "id": "22",
+    "name": "Esther Vargas",
+    "class": "2 a 3 anos",
+    "age": 3,
+    "motherName": "Nathaly",
+    "phone": "99618-9309",
+    "type": "Membro",
+    "attendance": []
+  },
   {
     "id": "23",
     "name": "Ethan Bissi",
@@ -375,18 +906,54 @@
     "phone": "99824-0796",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-18", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -398,27 +965,90 @@
     "phone": "98095-9338",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-18", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -430,15 +1060,42 @@
     "phone": "988401563",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-04", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      }
     ]
   },
   {
@@ -450,26 +1107,86 @@
     "phone": "997981499",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-18", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -481,14 +1198,44 @@
     "phone": "98272-1676",
     "type": "Membro",
     "attendance": [
-        { "date": "2025-02-02", "present": true },
-        { "date": "2025-03-23", "present": true },
-        { "date": "2025-04-20", "present": true },
-        { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
-  { "id": "28", "name": "Luca Ferreira", "class": "2 a 3 anos", "age": 2, "motherName": "Ellen", "phone": "98247-9605", "type": "Membro", "attendance": [] },
-  { "id": "29", "name": "Luiz Roberto", "class": "2 a 3 anos", "age": 3, "motherName": "Andreia", "phone": "98185-2931", "type": "Membro", "attendance": [] },
+  {
+    "id": "28",
+    "name": "Luca Ferreira",
+    "class": "2 a 3 anos",
+    "age": 2,
+    "motherName": "Ellen",
+    "phone": "98247-9605",
+    "type": "Membro",
+    "attendance": []
+  },
+  {
+    "id": "29",
+    "name": "Luiz Roberto",
+    "class": "2 a 3 anos",
+    "age": 3,
+    "motherName": "Andreia",
+    "phone": "98185-2931",
+    "type": "Membro",
+    "attendance": []
+  },
   {
     "id": "30",
     "name": "Maria Alice",
@@ -498,9 +1245,18 @@
     "phone": "97022-6177",
     "type": "Visitante",
     "attendance": [
-        { "date": "2025-05-04", "present": true },
-        { "date": "2025-05-18", "present": true },
-        { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -512,11 +1268,26 @@
     "phone": "94056-8596",
     "type": "Visitante",
     "attendance": [
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-05-18", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -528,21 +1299,66 @@
     "phone": "99306-1252",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-18", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      }
     ]
   },
   {
@@ -554,17 +1370,56 @@
     "phone": "992927374",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-05-18", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      }
     ]
   },
-  { "id": "34", "name": "Mirela Teixeira", "class": "2 a 3 anos", "age": 3, "motherName": "Cleide", "phone": "96539-5544", "type": "Visitante", "attendance": [] },
-  { "id": "35", "name": "Noah", "class": "2 a 3 anos", "age": 3, "motherName": "NaN", "phone": "NaN", "type": "Visitante", "attendance": [] },
+  {
+    "id": "34",
+    "name": "Mirela Teixeira",
+    "class": "2 a 3 anos",
+    "age": 3,
+    "motherName": "Cleide",
+    "phone": "96539-5544",
+    "type": "Visitante",
+    "attendance": []
+  },
+  {
+    "id": "35",
+    "name": "Noah",
+    "class": "2 a 3 anos",
+    "age": 3,
+    "motherName": "NaN",
+    "phone": "NaN",
+    "type": "Visitante",
+    "attendance": []
+  },
   {
     "id": "36",
     "name": "Nyhon Appelt Fávero",
@@ -574,8 +1429,14 @@
     "phone": "97106-5363",
     "type": "Membro",
     "attendance": [
-        { "date": "2025-01-12", "present": true },
-        { "date": "2025-01-19", "present": true }
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      }
     ]
   },
   {
@@ -587,8 +1448,14 @@
     "phone": "98398-2634",
     "type": "Visitante",
     "attendance": [
-        { "date": "2025-01-26", "present": true },
-        { "date": "2025-02-09", "present": true }
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      }
     ]
   },
   {
@@ -600,8 +1467,14 @@
     "phone": "975083096",
     "type": "Membro",
     "attendance": [
-        { "date": "2025-03-30", "present": true },
-        { "date": "2025-04-27", "present": true }
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      }
     ]
   },
   {
@@ -613,18 +1486,54 @@
     "phone": "99023-3283",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-18", "present": true }
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      }
     ]
   },
   {
@@ -636,18 +1545,54 @@
     "phone": "965686515",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-18", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -659,21 +1604,66 @@
     "phone": "99387-9574",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
-  { "id": "42", "name": "Arthur Lima", "class": "4 a 5 anos", "age": 5, "motherName": "Mariana", "phone": "NaN", "type": "Visitante", "attendance": [] },
+  {
+    "id": "42",
+    "name": "Arthur Lima",
+    "class": "4 a 5 anos",
+    "age": 5,
+    "motherName": "Mariana",
+    "phone": "NaN",
+    "type": "Visitante",
+    "attendance": []
+  },
   {
     "id": "43",
     "name": "Aurora Moraes",
@@ -683,22 +1673,76 @@
     "phone": "99797-5452",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-04", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      }
     ]
   },
-  { "id": "44", "name": "Benicio Araujo", "class": "4 a 5 anos", "age": 4, "motherName": "NaN", "phone": "NaN", "type": "Visitante", "attendance": [] },
-  { "id": "45", "name": "Benicio Medeiros", "class": "4 a 5 anos", "age": 5, "motherName": "Cristiana", "phone": "988585027", "type": "Membro", "attendance": [] },
+  {
+    "id": "44",
+    "name": "Benicio Araujo",
+    "class": "4 a 5 anos",
+    "age": 4,
+    "motherName": "NaN",
+    "phone": "NaN",
+    "type": "Visitante",
+    "attendance": []
+  },
+  {
+    "id": "45",
+    "name": "Benicio Medeiros",
+    "class": "4 a 5 anos",
+    "age": 5,
+    "motherName": "Cristiana",
+    "phone": "988585027",
+    "type": "Membro",
+    "attendance": []
+  },
   {
     "id": "46",
     "name": "Bernardo Almeida",
@@ -708,7 +1752,10 @@
     "phone": "97589-8384",
     "type": "Visitante",
     "attendance": [
-        { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -720,12 +1767,30 @@
     "phone": "98796-9326",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-18", "present": true }
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      }
     ]
   },
   {
@@ -737,8 +1802,14 @@
     "phone": "96447-4605",
     "type": "Membro",
     "attendance": [
-        { "date": "2025-04-06", "present": true },
-        { "date": "2025-04-27", "present": true }
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      }
     ]
   },
   {
@@ -750,10 +1821,22 @@
     "phone": "99282-6951",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-02-16", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      }
     ]
   },
   {
@@ -765,16 +1848,46 @@
     "phone": "99920-1989",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-18", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      }
     ]
   },
   {
@@ -786,21 +1899,66 @@
     "phone": "967502549",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-18", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -812,11 +1970,26 @@
     "phone": "97026-6515",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-04-27", "present": true }
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      }
     ]
   },
   {
@@ -828,15 +2001,42 @@
     "phone": "99907-2537",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-27", "present": true }
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      }
     ]
   },
   {
@@ -848,9 +2048,18 @@
     "phone": "97921-4182",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -862,24 +2071,78 @@
     "phone": "980645457",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
-  { "id": "56", "name": "Marina Xavier", "class": "4 a 5 anos", "age": 4, "motherName": "NaN", "phone": "NaN", "type": "Visitante", "attendance": [] },
+  {
+    "id": "56",
+    "name": "Marina Xavier",
+    "class": "4 a 5 anos",
+    "age": 4,
+    "motherName": "NaN",
+    "phone": "NaN",
+    "type": "Visitante",
+    "attendance": []
+  },
   {
     "id": "57",
     "name": "Mila de Freitas Santos",
@@ -889,20 +2152,62 @@
     "phone": "99394-0840",
     "type": "Visitante",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-18", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
-  { "id": "58", "name": "Moana Gabriele", "class": "4 a 5 anos", "age": 4, "motherName": "NaN", "phone": "NaN", "type": "Visitante", "attendance": [] },
+  {
+    "id": "58",
+    "name": "Moana Gabriele",
+    "class": "4 a 5 anos",
+    "age": 4,
+    "motherName": "NaN",
+    "phone": "NaN",
+    "type": "Visitante",
+    "attendance": []
+  },
   {
     "id": "59",
     "name": "Pietro Henrique",
@@ -912,28 +2217,94 @@
     "phone": "99102-8352",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-18", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
-  { "id": "60", "name": "Valentin Fonte", "class": "4 a 5 anos", "age": 4, "motherName": "NaN", "phone": "NaN", "type": "Visitante", "attendance": [] },
+  {
+    "id": "60",
+    "name": "Valentin Fonte",
+    "class": "4 a 5 anos",
+    "age": 4,
+    "motherName": "NaN",
+    "phone": "NaN",
+    "type": "Visitante",
+    "attendance": []
+  },
   {
     "id": "61",
     "name": "Vicente Zuniga",
@@ -943,17 +2314,50 @@
     "phone": "97310-9381",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-18", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
-  { "id": "62", "name": "Zoe da Silva Aguiar", "class": "4 a 5 anos", "age": 5, "motherName": "Neuza", "phone": "966065590", "type": "Membro", "attendance": [] },
+  {
+    "id": "62",
+    "name": "Zoe da Silva Aguiar",
+    "class": "4 a 5 anos",
+    "age": 5,
+    "motherName": "Neuza",
+    "phone": "966065590",
+    "type": "Membro",
+    "attendance": []
+  },
   {
     "id": "63",
     "name": "Arthur Covinha",
@@ -963,19 +2367,58 @@
     "phone": "96436-7629",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
-  { "id": "64", "name": "Arthur Guimarães Nogueira", "class": "6 a 7 anos", "age": 7, "motherName": "Paula", "phone": "96480-1538", "type": "Visitante", "attendance": [] },
+  {
+    "id": "64",
+    "name": "Arthur Guimarães Nogueira",
+    "class": "6 a 7 anos",
+    "age": 7,
+    "motherName": "Paula",
+    "phone": "96480-1538",
+    "type": "Visitante",
+    "attendance": []
+  },
   {
     "id": "65",
     "name": "Arthur Misan Macedo",
@@ -985,26 +2428,86 @@
     "phone": "97373-7412",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-18", "present": true }
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      }
     ]
   },
-  { "id": "66", "name": "Ayla Manoela Ramos Freitas", "class": "6 a 7 anos", "age": 6, "motherName": "NaN", "phone": "99958-7485", "type": "Membro", "attendance": [] },
+  {
+    "id": "66",
+    "name": "Ayla Manoela Ramos Freitas",
+    "class": "6 a 7 anos",
+    "age": 6,
+    "motherName": "NaN",
+    "phone": "99958-7485",
+    "type": "Membro",
+    "attendance": []
+  },
   {
     "id": "67",
     "name": "Beatriz Militao",
@@ -1014,9 +2517,18 @@
     "phone": "9923277280",
     "type": "Visitante",
     "attendance": [
-        { "date": "2025-04-06", "present": true },
-        { "date": "2025-04-20", "present": true },
-        { "date": "2025-04-27", "present": true }
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      }
     ]
   },
   {
@@ -1028,15 +2540,42 @@
     "phone": "96436-7629",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
-  { "id": "69", "name": "Bryan da Silva Aguiar", "class": "6 a 7 anos", "age": 7, "motherName": "Neuza", "phone": "966065590", "type": "Membro", "attendance": [] },
+  {
+    "id": "69",
+    "name": "Bryan da Silva Aguiar",
+    "class": "6 a 7 anos",
+    "age": 7,
+    "motherName": "Neuza",
+    "phone": "966065590",
+    "type": "Membro",
+    "attendance": []
+  },
   {
     "id": "70",
     "name": "Davi Guimarães",
@@ -1046,8 +2585,14 @@
     "phone": "96493-6475",
     "type": "Membro",
     "attendance": [
-        { "date": "2025-04-27", "present": true },
-        { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -1059,20 +2604,62 @@
     "phone": "982415754",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-11", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      }
     ]
   },
   {
@@ -1084,15 +2671,42 @@
     "phone": "97429-4693",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -1104,24 +2718,78 @@
     "phone": "96427-4801",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-11", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      }
     ]
   },
   {
@@ -1133,28 +2801,94 @@
     "phone": "98233-1366",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-18", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
-  { "id": "75", "name": "Enzo Gabriel", "class": "6 a 7 anos", "age": 7, "motherName": "NaN", "phone": "NaN", "type": "Visitante", "attendance": [] },
+  {
+    "id": "75",
+    "name": "Enzo Gabriel",
+    "class": "6 a 7 anos",
+    "age": 7,
+    "motherName": "NaN",
+    "phone": "NaN",
+    "type": "Visitante",
+    "attendance": []
+  },
   {
     "id": "76",
     "name": "Heitor Bruno de Carvalho",
@@ -1164,20 +2898,62 @@
     "phone": "964258723",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-18", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      }
     ]
   },
   {
@@ -1189,23 +2965,74 @@
     "phone": "97560-2334",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-18", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
-  { "id": "78", "name": "Jonas Santos", "class": "6 a 7 anos", "age": 7, "motherName": "NaN", "phone": "NaN", "type": "Visitante", "attendance": [] },
+  {
+    "id": "78",
+    "name": "Jonas Santos",
+    "class": "6 a 7 anos",
+    "age": 7,
+    "motherName": "NaN",
+    "phone": "NaN",
+    "type": "Visitante",
+    "attendance": []
+  },
   {
     "id": "79",
     "name": "Jonas Zózimo",
@@ -1215,26 +3042,86 @@
     "phone": "97752-2556",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-18", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
-  { "id": "80", "name": "Lívia Felix Araújo", "class": "6 a 7 anos", "age": 7, "motherName": "Vania", "phone": "96660-0792", "type": "Membro", "attendance": [] },
+  {
+    "id": "80",
+    "name": "Lívia Felix Araújo",
+    "class": "6 a 7 anos",
+    "age": 7,
+    "motherName": "Vania",
+    "phone": "96660-0792",
+    "type": "Membro",
+    "attendance": []
+  },
   {
     "id": "81",
     "name": "Lívia Oliveira",
@@ -1244,16 +3131,46 @@
     "phone": "99772-0108",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -1265,10 +3182,22 @@
     "phone": "988831442",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-02-23", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      }
     ]
   },
   {
@@ -1280,10 +3209,22 @@
     "phone": "99631-8882",
     "type": "Membro",
     "attendance": [
-        { "date": "2025-01-05", "present": true },
-        { "date": "2025-02-09", "present": true },
-        { "date": "2025-04-20", "present": true },
-        { "date": "2025-05-11", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      }
     ]
   },
   {
@@ -1295,14 +3236,38 @@
     "phone": "99190-7041",
     "type": "Visitante",
     "attendance": [
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-18", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -1314,27 +3279,90 @@
     "phone": "97720-8173",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-18", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -1346,24 +3374,78 @@
     "phone": "99546-7793",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-18", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -1375,11 +3457,26 @@
     "phone": "97047-5015",
     "type": "Membro",
     "attendance": [
-        { "date": "2025-01-12", "present": true },
-        { "date": "2025-03-09", "present": true },
-        { "date": "2025-04-06", "present": true },
-        { "date": "2025-04-20", "present": true },
-        { "date": "2025-04-27", "present": true }
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      }
     ]
   },
   {
@@ -1391,22 +3488,70 @@
     "phone": "976021354",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-18", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -1418,24 +3563,78 @@
     "phone": "970138465",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-18", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -1447,8 +3646,14 @@
     "phone": "98809-5053",
     "type": "Membro",
     "attendance": [
-        { "date": "2025-01-05", "present": true },
-        { "date": "2025-02-02", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-02-02",
+        "present": true
+      }
     ]
   },
   {
@@ -1460,35 +3665,22 @@
     "phone": "98704-2517",
     "type": "Membro",
     "attendance": [
-        { "date": "2025-01-12", "present": true },
-        { "date": "2025-03-30", "present": true },
-        { "date": "2025-05-18", "present": true },
-        { "date": "2025-05-25", "present": true }
-    ]
-  },
-  {
-    "id": "92",
-    "name": "Alice Vitória",
-    "class": "Seeds",
-    "age": 11,
-    "motherName": "Alessandra",
-    "phone": "97242-3787",
-    "type": "Membro",
-    "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-18", "present": true }
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -1500,14 +3692,38 @@
     "phone": "97423-4598",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -1519,15 +3735,42 @@
     "phone": "99713-6150",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-18", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -1539,22 +3782,70 @@
     "phone": "98336-8742",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-18", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
-  { "id": "96", "name": "Breno Henrique dos Santos Borba", "class": "8 a 10 anos", "age": 10, "motherName": "Viviane", "phone": "97987-5388", "type": "Membro", "attendance": [] },
+  {
+    "id": "96",
+    "name": "Breno Henrique dos Santos Borba",
+    "class": "8 a 10 anos",
+    "age": 10,
+    "motherName": "Viviane",
+    "phone": "97987-5388",
+    "type": "Membro",
+    "attendance": []
+  },
   {
     "id": "97",
     "name": "Clara Nascimento de Oliveira",
@@ -1564,12 +3855,30 @@
     "phone": "999327046",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-04-20", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      }
     ]
   },
   {
@@ -1581,11 +3890,26 @@
     "phone": "99932-7046",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-04-20", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      }
     ]
   },
   {
@@ -1597,23 +3921,74 @@
     "phone": "980065101",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-18", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -1625,22 +4000,70 @@
     "phone": "99010-7929",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-18", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -1652,23 +4075,74 @@
     "phone": "99696-7712",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-18", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -1680,24 +4154,78 @@
     "phone": "96930-2774",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-18", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -1709,15 +4237,42 @@
     "phone": "979572359",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
-  { "id": "104", "name": "Júlia Gomes Bonfim", "class": "8 a 10 anos", "age": 8, "motherName": "Rayane", "phone": "99147-8908", "type": "Membro", "attendance": [] },
+  {
+    "id": "104",
+    "name": "Júlia Gomes Bonfim",
+    "class": "8 a 10 anos",
+    "age": 8,
+    "motherName": "Rayane",
+    "phone": "99147-8908",
+    "type": "Membro",
+    "attendance": []
+  },
   {
     "id": "105",
     "name": "Kaleb Oliveira da Silva",
@@ -1727,46 +4282,94 @@
     "phone": "98496-5716",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-18", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      }
     ]
   },
   {
-    "id": "106",
-    "name": "Luíza Helena Zózimo",
-    "class": "Seeds",
-    "age": 11,
-    "motherName": "Steffani",
-    "phone": "97752-2976",
-    "type": "Membro",
-    "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-18", "present": true }
-    ]
+    "id": "107",
+    "name": "Luiza Sampaio Ramos",
+    "class": "8 a 10 anos",
+    "age": 9,
+    "motherName": "Nathalia",
+    "phone": "99425-1797",
+    "type": "Visitante",
+    "attendance": []
   },
-  { "id": "107", "name": "Luiza Sampaio Ramos", "class": "8 a 10 anos", "age": 9, "motherName": "Nathalia", "phone": "99425-1797", "type": "Visitante", "attendance": [] },
   {
     "id": "108",
     "name": "Maitê Almeida",
@@ -1776,11 +4379,26 @@
     "phone": "-24",
     "type": "Membro",
     "attendance": [
-        { "date": "2025-03-02", "present": true },
-        { "date": "2025-03-16", "present": true },
-        { "date": "2025-03-30", "present": true },
-        { "date": "2025-04-27", "present": true },
-        { "date": "2025-05-11", "present": true }
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      }
     ]
   },
   {
@@ -1792,18 +4410,54 @@
     "phone": "96422-3910",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-03-30", "present": true },
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-18", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-30",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -1815,12 +4469,30 @@
     "phone": "964545629",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-19", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      }
     ]
   },
-  { "id": "111", "name": "Maria Esther Freitas", "class": "8 a 10 anos", "age": 9, "motherName": "Michele", "phone": "98979-0440", "type": "Membro", "attendance": [] },
+  {
+    "id": "111",
+    "name": "Maria Esther Freitas",
+    "class": "8 a 10 anos",
+    "age": 9,
+    "motherName": "Michele",
+    "phone": "98979-0440",
+    "type": "Membro",
+    "attendance": []
+  },
   {
     "id": "112",
     "name": "Maria Helena Lima e Silva Tavares",
@@ -1830,15 +4502,42 @@
     "phone": "97291-1770",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-05-04", "present": true }
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      }
     ]
   },
   {
@@ -1850,14 +4549,38 @@
     "phone": "99134-3813",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-11", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      }
     ]
   },
   {
@@ -1869,18 +4592,54 @@
     "phone": "99907-2537",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-04-27", "present": true }
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      }
     ]
   },
-  { "id": "115", "name": "Miguel Eugênio Batista da Silva", "class": "8 a 10 anos", "age": 9, "motherName": "Lilian", "phone": "970305734", "type": "Membro", "attendance": [] },
+  {
+    "id": "115",
+    "name": "Miguel Eugênio Batista da Silva",
+    "class": "8 a 10 anos",
+    "age": 9,
+    "motherName": "Lilian",
+    "phone": "970305734",
+    "type": "Membro",
+    "attendance": []
+  },
   {
     "id": "116",
     "name": "Nicolas Cantuária",
@@ -1890,18 +4649,54 @@
     "phone": "96757-5556",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-18", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -1913,17 +4708,50 @@
     "phone": "99134-5358",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-03-23",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -1935,10 +4763,22 @@
     "phone": "97106-5363",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
   {
@@ -1950,35 +4790,58 @@
     "phone": "96691-4284",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-05", "present": true },
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-18", "present": true }
-    ]
-  },
-  {
-    "id": "120",
-    "name": "Rafaela Dusi",
-    "class": "Seeds",
-    "age": 11,
-    "motherName": "Cristina",
-    "phone": "61",
-    "type": "Membro",
-    "attendance": [
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-05",
+        "present": true
+      },
+      {
+        "date": "2025-01-19",
+        "present": true
+      },
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-02-02",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-16",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-09",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-18",
+        "present": true
+      }
     ]
   },
   {
@@ -1990,144 +4853,80 @@
     "phone": "99504-6276",
     "type": "Membro",
     "attendance": [
-      { "date": "2025-01-12", "present": true },
-      { "date": "2025-01-26", "present": true },
-      { "date": "2025-02-09", "present": true },
-      { "date": "2025-02-23", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-04-06", "present": true },
-      { "date": "2025-04-13", "present": true },
-      { "date": "2025-04-20", "present": true },
-      { "date": "2025-04-27", "present": true },
-      { "date": "2025-05-04", "present": true },
-      { "date": "2025-05-11", "present": true },
-      { "date": "2025-05-25", "present": true }
+      {
+        "date": "2025-01-12",
+        "present": true
+      },
+      {
+        "date": "2025-01-26",
+        "present": true
+      },
+      {
+        "date": "2025-02-09",
+        "present": true
+      },
+      {
+        "date": "2025-02-23",
+        "present": true
+      },
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-03-16",
+        "present": true
+      },
+      {
+        "date": "2025-04-06",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-20",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      },
+      {
+        "date": "2025-05-04",
+        "present": true
+      },
+      {
+        "date": "2025-05-11",
+        "present": true
+      },
+      {
+        "date": "2025-05-25",
+        "present": true
+      }
     ]
   },
-  { "id": "122", "name": "Solphia Gomes", "class": "8 a 10 anos", "age": 8, "motherName": "Jaciara", "phone": "969249155", "type": "Visitante", "attendance": [] },
-  { "id": "123", "name": "Ana Beatriz Becker Schmalz de Oliveira", "class": "Seeds", "age": 13, "motherName": "Patrícia", "phone": "97951-3282", "type": "Membro", "attendance": [] },
-  { "id": "124", "name": "Ana Julia Rodrigues Pereira", "class": "Seeds", "age": 13, "motherName": "Fernanda Rodrigues", "phone": "969861030", "type": "Visitante", "attendance": [] },
-  { "id": "125", "name": "Arthur Campos de Oliveira", "class": "Seeds", "age": 13, "motherName": "Vanessa", "phone": "987132540", "type": "Visitante", "attendance": [] },
-  { "id": "126", "name": "Arthur Gonçalves Rodrigues", "class": "Seeds", "age": 11, "motherName": "Maura", "phone": "999839108", "type": "Visitante", "attendance": [] },
-  { "id": "127", "name": "Bernardo do Nascimento e Silva", "class": "Seeds", "age": 13, "motherName": "Viviane", "phone": "97929-1853", "type": "Membro", "attendance": [] },
-  { "id": "128", "name": "Bernardo Henrique Pereira Pessoa", "class": "Seeds", "age": 12, "motherName": "Evelyn de Moura Pessoa", "phone": "NaN", "type": "Membro", "attendance": [] },
   {
-    "id": "129",
-    "name": "Bernardo Martins",
-    "class": "Seeds",
-    "age": 11,
-    "motherName": "Carina",
-    "phone": "988401563",
-    "type": "Membro",
+    "id": "122",
+    "name": "Solphia Gomes",
+    "class": "8 a 10 anos",
+    "age": 8,
+    "motherName": "Jaciara",
+    "phone": "969249155",
+    "type": "Visitante",
     "attendance": []
   },
-  { "id": "130", "name": "Cauã Appelt Menezes Nicolau", "class": "Seeds", "age": 12, "motherName": "Eveline", "phone": "99851-7351", "type": "Membro", "attendance": [] },
-  { "id": "131", "name": "Cayo Appelt Menezes Nicolau", "class": "Seeds", "age": 14, "motherName": "Eveline", "phone": "99851-7351", "type": "Membro", "attendance": [] },
-  { "id": "132", "name": "Davi Mascarenhas", "class": "Seeds", "age": 14, "motherName": "Ana Carolina", "phone": "964223910", "type": "Membro", "attendance": [] },
-  { "id": "133", "name": "Davy Thiago Nascimento dos Santos", "class": "Seeds", "age": 11, "motherName": "Juliana Cristina", "phone": "969972438", "type": "Membro", "attendance": [] },
-  { "id": "134", "name": "Fabiany Victória de Oliveira Santos", "class": "Seeds", "age": 14, "motherName": "Maria", "phone": "96761-6856", "type": "Membro", "attendance": [] },
-  { "id": "135", "name": "Giovanna BottinoNetto Jeronymo", "class": "Seeds", "age": 11, "motherName": "Ludmila", "phone": "99634-7278", "type": "Membro", "attendance": [] },
-  { "id": "136", "name": "Guilherme Freitas de Azevedo", "class": "Seeds", "age": 12, "motherName": "Marcia Vieira Freitas", "phone": "97041-4054", "type": "Membro", "attendance": [] },
-  { "id": "137", "name": "Henry Freitas Nunes Machado", "class": "Seeds", "age": 14, "motherName": "Luciane Freitas", "phone": "964339643", "type": "Membro", "attendance": [] },
-  { "id": "138", "name": "Isaac da Silva Pereira", "class": "Seeds", "age": 11, "motherName": "Vaniele", "phone": "92527-0857", "type": "Membro", "attendance": [] },
-  { "id": "139", "name": "João Gabriel Pires", "class": "Seeds", "age": 11, "motherName": "Camila", "phone": "98398-2634", "type": "Membro", "attendance": [] },
-  { "id": "140", "name": "João Victor da R Souza", "class": "Seeds", "age": 13, "motherName": "Cintia", "phone": "992338649", "type": "Visitante", "attendance": [] },
-  { "id": "141", "name": "Julia dos Santos", "class": "Seeds", "age": 13, "motherName": "Ely", "phone": "988557511", "type": "Visitante", "attendance": [] },
-  { "id": "142", "name": "Julie Miel", "class": "Seeds", "age": 13, "motherName": "NaN", "phone": "980155210", "type": "Visitante", "attendance": [] },
-  { "id": "143", "name": "Kaleb Augusto", "class": "Seeds", "age": 13, "motherName": "NaN", "phone": "985783108", "type": "Visitante", "attendance": [] },
-  { "id": "144", "name": "Kezia Cerqueira", "class": "Seeds", "age": 13, "motherName": "NaN", "phone": "980155210", "type": "Visitante", "attendance": [] },
-  { "id": "145", "name": "Levi Sena Povoleri da Silva", "class": "Seeds", "age": 12, "motherName": "Pra Fabiana", "phone": "97124-4206", "type": "Membro", "attendance": [] },
-  { "id": "146", "name": "Luiz Miguel", "class": "Seeds", "age": 13, "motherName": "Maria Rita", "phone": "966419503", "type": "Membro", "attendance": [] },
   {
-    "id": "147",
-    "name": "Luíza D'Avila Eller",
-    "class": "Seeds",
-    "age": 13,
-    "motherName": "Márcia",
-    "phone": "99414-3227",
-    "type": "Membro",
-    "attendance": [
-        { "date": "2025-01-05", "present": true }
-    ]
-  },
-  { "id": "148", "name": "Marcele Cristina dos Santos Souza", "class": "Seeds", "age": 13, "motherName": "Kelly", "phone": "987844450", "type": "Membro", "attendance": [] },
-  {
-    "id": "149",
-    "name": "Marcos Pietro",
-    "class": "Seeds",
-    "age": 11,
-    "motherName": "Joyce",
-    "phone": "996318889",
-    "type": "Visitante",
-    "attendance": [
-        { "date": "2025-01-05", "present": true }
-    ]
-  },
-  { "id": "150", "name": "Maria Fernanda Rabelo de Araújo", "class": "Seeds", "age": 13, "motherName": "Andrea", "phone": "98102-6284", "type": "Membro", "attendance": [ { "date": "2025-01-05", "present": true } ] },
-  { "id": "151", "name": "Maria Valentina Cavalcante Mayer", "class": "Seeds", "age": 13, "motherName": "Nathalia", "phone": "96462-1353", "type": "Membro", "attendance": [ { "date": "2025-01-05", "present": true } ] },
-  {
-    "id": "152",
-    "name": "Pietra da S Pereira",
-    "class": "Seeds",
-    "age": 12,
-    "motherName": "Angelica",
+    "id": "163",
+    "name": "Thiago Camargo",
+    "class": "NaN",
+    "age": 0,
+    "motherName": "NaN",
     "phone": "NaN",
     "type": "Visitante",
-    "attendance": [
-      { "date": "2025-01-19", "present": true },
-      { "date": "2025-02-02", "present": true },
-      { "date": "2025-02-16", "present": true },
-      { "date": "2025-03-02", "present": true },
-      { "date": "2025-03-09", "present": true },
-      { "date": "2025-03-16", "present": true },
-      { "date": "2025-03-23", "present": true },
-      { "date": "2025-03-30", "present": true }
-    ]
+    "attendance": []
   },
-  { "id": "153", "name": "Pietra Silva Pereira", "class": "Seeds", "age": 12, "motherName": "Angélica Souza Silva", "phone": "NaN", "type": "Membro", "attendance": [ { "date": "2025-01-05", "present": true } ] },
-  { "id": "154", "name": "Rayssa Costa Silva", "class": "Seeds", "age": 12, "motherName": "Camila", "phone": "99504-6276", "type": "Membro", "attendance": [] },
-  { "id": "155", "name": "Samuel Lucas Souza Silva", "class": "Seeds", "age": 12, "motherName": "Elenise", "phone": "99546-7793", "type": "Membro", "attendance": [ { "date": "2025-01-05", "present": true } ] },
-  { "id": "156", "name": "Sophia Almeida Barbosa", "class": "Seeds", "age": 12, "motherName": "Maria", "phone": "98704-2517", "type": "Membro", "attendance": [ { "date": "2025-01-05", "present": true } ] },
-  { "id": "157", "name": "Sophia Martins", "class": "Seeds", "age": 11, "motherName": "Carina", "phone": "988401563", "type": "Membro", "attendance": [ { "date": "2025-01-05", "present": true } ] },
-  { "id": "158", "name": "Sophia Pereira Pessoa", "class": "Seeds", "age": 12, "motherName": "Evelyn de Moura Pessoa", "phone": "982415754", "type": "Membro", "attendance": [ { "date": "2025-01-05", "present": true } ] },
-  { "id": "159", "name": "Vitória Moraes Gouveia", "class": "Seeds", "age": 12, "motherName": "Michele", "phone": "974999995", "type": "Membro", "attendance": [] },
-  {
-    "id": "160",
-    "name": "Yara Souza de Almeida",
-    "class": "Seeds",
-    "age": 13,
-    "motherName": "Gabriela",
-    "phone": "97921-4182",
-    "type": "Membro",
-    "attendance": [
-        { "date": "2025-01-19", "present": true },
-        { "date": "2025-04-13", "present": true },
-        { "date": "2025-04-27", "present": true },
-        { "date": "2025-05-04", "present": true },
-        { "date": "2025-05-25", "present": true }
-    ]
-  },
-  { "id": "161", "name": "Yasmin Oliveira da Silva", "class": "Seeds", "age": 11, "motherName": "Priscilla Oliveira Peixoto", "phone": "997981499", "type": "Membro", "attendance": [] },
-  {
-    "id": "162",
-    "name": "Sofia Martins",
-    "class": "Seeds",
-    "age": 11,
-    "motherName": "Carina",
-    "phone": "988401563",
-    "type": "Membro",
-    "attendance": [
-        { "date": "2025-01-19", "present": true },
-        { "date": "2025-02-09", "present": true },
-        { "date": "2025-02-16", "present": true },
-        { "date": "2025-02-23", "present": true },
-        { "date": "2025-03-30", "present": true },
-        { "date": "2025-04-27", "present": true },
-        { "date": "2025-05-25", "present": true }
-    ]
-  },
-  { "id": "163", "name": "Thiago Camargo", "class": "NaN", "age": 0, "motherName": "NaN", "phone": "NaN", "type": "Visitante", "attendance": [] },
   {
     "id": "164",
     "name": "Davi Miguel",
@@ -2137,10 +4936,28 @@
     "phone": "969069847",
     "type": "Visitante",
     "attendance": [
-        { "date": "2025-03-02", "present": true },
-        { "date": "2025-04-13", "present": true },
-        { "date": "2025-04-27", "present": true }
+      {
+        "date": "2025-03-02",
+        "present": true
+      },
+      {
+        "date": "2025-04-13",
+        "present": true
+      },
+      {
+        "date": "2025-04-27",
+        "present": true
+      }
     ]
   },
-  { "id": "165", "name": "Giovanna Vital", "class": "NaN", "age": 0, "motherName": "NaN", "phone": "NaN", "type": "Visitante", "attendance": [] }
+  {
+    "id": "165",
+    "name": "Giovanna Vital",
+    "class": "NaN",
+    "age": 0,
+    "motherName": "NaN",
+    "phone": "NaN",
+    "type": "Visitante",
+    "attendance": []
+  }
 ]
