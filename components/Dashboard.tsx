@@ -18,12 +18,75 @@ const StatCard: React.FC<{ title: string; value: number | string; color: string 
     </div>
 );
 
-const ClassStatCard: React.FC<{ title: string; value: number; color: string }> = ({ title, value, color }) => (
-    <div className={`p-4 rounded-lg shadow-md flex flex-col items-center justify-center ${color}`}>
-        <span className="text-3xl font-bold text-white">{value}</span>
-        <h3 className="text-md font-semibold text-white mt-1 text-center">{title}</h3>
-    </div>
-);
+const CLASS_DETAILS: Record<string, { gradient: string; shadow: string; icon: string; tag: string }> = {
+    'Maternal': {
+        gradient: 'from-rose-400 to-pink-500',
+        shadow: 'shadow-rose-100 hover:shadow-rose-200 hover:shadow-lg',
+        icon: '🧸',
+        tag: '0 a 1 ano'
+    },
+    '2 a 3 anos': {
+        gradient: 'from-amber-400 to-orange-500',
+        shadow: 'shadow-orange-100 hover:shadow-orange-200 hover:shadow-lg',
+        icon: '🎨',
+        tag: 'Maternal II'
+    },
+    '4 a 5 anos': {
+        gradient: 'from-emerald-400 to-teal-500',
+        shadow: 'shadow-emerald-100 hover:shadow-emerald-200 hover:shadow-lg',
+        icon: '🚀',
+        tag: 'Jardim'
+    },
+    '6 a 7 anos': {
+        gradient: 'from-sky-400 to-indigo-500',
+        shadow: 'shadow-sky-100 hover:shadow-sky-200 hover:shadow-lg',
+        icon: '📚',
+        tag: 'Primários'
+    },
+    '8 a 10 anos': {
+        gradient: 'from-violet-400 to-purple-600',
+        shadow: 'shadow-purple-100 hover:shadow-purple-200 hover:shadow-lg',
+        icon: '⚡',
+        tag: 'Juniores'
+    }
+};
+
+const ClassStatCard: React.FC<{ title: string; value: number }> = ({ title, value }) => {
+    const details = CLASS_DETAILS[title] || {
+        gradient: 'from-gray-400 to-gray-500',
+        shadow: 'shadow-gray-100',
+        icon: '👶',
+        tag: ''
+    };
+
+    return (
+        <div className={`relative overflow-hidden p-5 rounded-2xl bg-gradient-to-br ${details.gradient} text-white shadow-md ${details.shadow} transform hover:-translate-y-1 hover:scale-[1.03] transition-all duration-300 ease-out border border-white/10 group`}>
+            {/* Background Decorative Element */}
+            <div className="absolute -right-4 -bottom-4 text-7xl opacity-15 transform group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300 pointer-events-none select-none">
+                {details.icon}
+            </div>
+
+            {/* Header: Icon & Tag */}
+            <div className="flex justify-between items-start mb-3">
+                <span className="text-2xl" role="img" aria-label={title}>{details.icon}</span>
+                {details.tag && (
+                    <span className="text-[10px] font-bold uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-full backdrop-blur-sm">
+                        {details.tag}
+                    </span>
+                )}
+            </div>
+
+            {/* Content: Value & Title */}
+            <div className="mt-2">
+                <div className="flex items-baseline gap-1">
+                    <span className="text-4xl font-black tracking-tight">{value}</span>
+                    <span className="text-[11px] font-medium text-white/80">presente{value !== 1 ? 's' : ''}</span>
+                </div>
+                <h3 className="text-sm font-bold text-white/95 mt-1 truncate group-hover:text-white transition-colors">{title}</h3>
+            </div>
+        </div>
+    );
+};
 
 const getDayFromDate = (dateString: string): 'Sunday' | 'Wednesday' | null => {
     const d = new Date(dateString + 'T00:00:00');
@@ -282,13 +345,12 @@ const DailyView: React.FC<DailyViewProps> = ({ students, selectedClass, onClassC
             {selectedClass === 'All' && (
                 <div className="mt-12">
                     <h3 className="text-2xl font-bold text-brand-dark mb-4">Presença por Turma</h3>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                        {CLASS_NAMES.map((className, index) => (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
+                        {CLASS_NAMES.map((className) => (
                             <ClassStatCard
                                 key={className}
                                 title={className}
                                 value={getClassPresence(className)}
-                                color={classColors[index % classColors.length]}
                             />
                         ))}
                     </div>
