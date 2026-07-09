@@ -11,6 +11,7 @@ interface StudentProfileProps {
 
 const StudentProfile: React.FC<StudentProfileProps> = ({ student, students, onLinkSiblings, onClose }) => {
     const [siblingSearch, setSiblingSearch] = useState('');
+    const [showLinker, setShowLinker] = useState(false);
 
     const currentSiblings = useMemo(() => {
         if (!students || !student.familyId) return [];
@@ -203,73 +204,78 @@ const StudentProfile: React.FC<StudentProfileProps> = ({ student, students, onLi
                             <p className="text-xs text-gray-400 font-semibold">Nenhum irmão vinculado a este cadastro.</p>
                         )}
 
-                        {/* Sibling Linkage Autocomplete (Option B) */}
-                        <div className="mt-4 border-t pt-3.5 relative">
-                            <label className="text-xs font-bold text-gray-700 block mb-1">
-                                Buscar outro irmão para vincular:
-                            </label>
-                            <div className="relative">
-                                <input
-                                    type="text"
-                                    value={siblingSearch}
-                                    onChange={(e) => setSiblingSearch(e.target.value)}
-                                    placeholder="Digite o nome do irmão para buscar..."
-                                    className="w-full bg-gray-50 border border-gray-200 text-gray-900 text-xs rounded-lg p-2 font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                                />
-                                {siblingSuggestions.length > 0 && (
-                                    <ul className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 divide-y divide-gray-100 max-h-40 overflow-y-auto">
-                                        {siblingSuggestions.map(sib => (
-                                            <li key={sib.id}>
+                        {/* Sibling Linkage area (Option A & B) - Toggled via the footer button */}
+                        {showLinker && (
+                            <div className="mt-4 border-t pt-3.5 space-y-4">
+                                {/* Sibling Linkage Autocomplete (Option B) */}
+                                <div className="relative">
+                                    <label className="text-xs font-bold text-gray-700 block mb-1">
+                                        Buscar outro irmão para vincular:
+                                    </label>
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            value={siblingSearch}
+                                            onChange={(e) => setSiblingSearch(e.target.value)}
+                                            placeholder="Digite o nome do irmão para buscar..."
+                                            className="w-full bg-gray-50 border border-gray-200 text-gray-900 text-xs rounded-lg p-2 font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                        />
+                                        {siblingSuggestions.length > 0 && (
+                                            <ul className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 divide-y divide-gray-100 max-h-40 overflow-y-auto">
+                                                {siblingSuggestions.map(sib => (
+                                                    <li key={sib.id}>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                if (window.confirm(`Deseja vincular ${student.name} e ${sib.name} como irmãos? Isso unificará os dados familiares.`)) {
+                                                                    onLinkSiblings?.(student.id, sib.id);
+                                                                    setSiblingSearch('');
+                                                                }
+                                                            }}
+                                                            className="w-full text-left p-2.5 hover:bg-blue-50/50 transition flex flex-col gap-0.5"
+                                                        >
+                                                            <span className="text-xs font-bold text-gray-950">{sib.name}</span>
+                                                            <span className="text-[10px] text-gray-500 font-semibold">
+                                                                Sala: {sib.class} • Responsável: {sib.guardianName}
+                                                            </span>
+                                                        </button>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                        {siblingSearch.trim().length >= 2 && siblingSuggestions.length === 0 && (
+                                            <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg p-2.5 text-center text-xs text-gray-500 z-50">
+                                                Nenhum aluno encontrado com "{siblingSearch}".
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Option A: Smart suggestions */}
+                                {potentialSiblings.length > 0 && (
+                                    <div className="space-y-2">
+                                        <span className="text-xs font-bold text-yellow-800 block">💡 Sugestão de Vínculo:</span>
+                                        {potentialSiblings.map(sib => (
+                                            <div key={sib.id} className="flex items-center justify-between bg-yellow-50/70 border border-yellow-200 rounded-xl p-3 text-xs text-yellow-900 shadow-sm">
+                                                <div className="min-w-0 flex-1 pr-2">
+                                                    <p className="font-bold">Possível irmão: {sib.name}</p>
+                                                    <p className="text-[10px] text-yellow-800 mt-0.5">
+                                                        Sala: {sib.class} • Responsável: {sib.guardianName}
+                                                    </p>
+                                                </div>
                                                 <button
                                                     type="button"
                                                     onClick={() => {
-                                                        if (window.confirm(`Deseja vincular ${student.name} e ${sib.name} como irmãos? Isso unificará os dados familiares.`)) {
-                                                            onLinkSiblings?.(student.id, sib.id);
-                                                            setSiblingSearch('');
-                                                        }
+                                                        onLinkSiblings?.(student.id, sib.id);
                                                     }}
-                                                    className="w-full text-left p-2.5 hover:bg-blue-50/50 transition flex flex-col gap-0.5"
+                                                    className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold px-3 py-1 rounded-lg border border-yellow-400 shadow-sm transition"
                                                 >
-                                                    <span className="text-xs font-bold text-gray-950">{sib.name}</span>
-                                                    <span className="text-[10px] text-gray-500 font-semibold">
-                                                        Sala: {sib.class} • Responsável: {sib.guardianName}
-                                                    </span>
+                                                    Vincular
                                                 </button>
-                                            </li>
+                                            </div>
                                         ))}
-                                    </ul>
-                                )}
-                                {siblingSearch.trim().length >= 2 && siblingSuggestions.length === 0 && (
-                                    <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg p-2.5 text-center text-xs text-gray-500 z-50">
-                                        Nenhum aluno encontrado com "{siblingSearch}".
                                     </div>
                                 )}
-                            </div>
-                        </div>
-
-                        {/* Option A: Smart suggestions */}
-                        {potentialSiblings.length > 0 && (
-                            <div className="mt-4 space-y-2">
-                                <span className="text-xs font-bold text-yellow-800 block">💡 Sugestão de Vínculo:</span>
-                                {potentialSiblings.map(sib => (
-                                    <div key={sib.id} className="flex items-center justify-between bg-yellow-50/70 border border-yellow-200 rounded-xl p-3 text-xs text-yellow-900 shadow-sm">
-                                        <div className="min-w-0 flex-1 pr-2">
-                                            <p className="font-bold">Possível irmão: {sib.name}</p>
-                                            <p className="text-[10px] text-yellow-800 mt-0.5">
-                                                Sala: {sib.class} • Responsável: {sib.guardianName}
-                                            </p>
-                                        </div>
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                onLinkSiblings?.(student.id, sib.id);
-                                            }}
-                                            className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold px-3 py-1 rounded-lg border border-yellow-400 shadow-sm transition"
-                                        >
-                                            Vincular
-                                        </button>
-                                    </div>
-                                ))}
                             </div>
                         )}
                     </div>
@@ -360,6 +366,29 @@ const StudentProfile: React.FC<StudentProfileProps> = ({ student, students, onLi
                     ) : (
                         <p className="text-center text-gray-400 py-6">Nenhum registro de presença.</p>
                     )}
+                </div>
+
+                {/* Modal Footer Actions */}
+                <div className="px-6 py-4 bg-gray-50 rounded-b-2xl border-t border-gray-150 flex items-center justify-between gap-3 sticky bottom-0 z-10 shadow-inner">
+                    <button
+                        type="button"
+                        onClick={() => setShowLinker(!showLinker)}
+                        className={`text-xs font-bold px-4 py-2 rounded-xl transition flex items-center gap-1.5 border ${
+                            showLinker
+                                ? 'bg-gray-200 text-gray-700 hover:bg-gray-300 border-gray-300'
+                                : 'bg-blue-50 text-blue-700 hover:bg-blue-100/80 border-blue-200'
+                        }`}
+                    >
+                        <span>🔗</span> {showLinker ? 'Ocultar Vinculador de Irmãos' : 'Vincular Irmão'}
+                    </button>
+                    
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="text-xs font-bold px-4 py-2 bg-gray-850 hover:bg-gray-900 text-white rounded-xl transition shadow-sm"
+                    >
+                        Fechar
+                    </button>
                 </div>
             </div>
         </div>
