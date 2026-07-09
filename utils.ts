@@ -55,3 +55,28 @@ export const resizeImageToBase64 = (file: File, maxWidth = 180, maxHeight = 180)
         reader.onerror = (err) => reject(err);
     });
 };
+
+export const isBirthdayThisWeek = (birthdayStr?: string): boolean => {
+    if (!birthdayStr) return false;
+    const bDate = new Date(birthdayStr + 'T00:00:00');
+    if (isNaN(bDate.getTime())) return false;
+
+    const today = new Date();
+    const currentDay = today.getDay();
+    
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - currentDay);
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setHours(23, 59, 59, 999);
+
+    const bThisYear = new Date(today.getFullYear(), bDate.getMonth(), bDate.getDate());
+    const bPrevYear = new Date(today.getFullYear() - 1, bDate.getMonth(), bDate.getDate());
+    const bNextYear = new Date(today.getFullYear() + 1, bDate.getMonth(), bDate.getDate());
+
+    return (bThisYear >= startOfWeek && bThisYear <= endOfWeek) ||
+           (bPrevYear >= startOfWeek && bPrevYear <= endOfWeek) ||
+           (bNextYear >= startOfWeek && bNextYear <= endOfWeek);
+};

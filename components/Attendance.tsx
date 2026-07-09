@@ -17,6 +17,9 @@ interface AttendanceProps {
     selectedClass: string;
     onClassChange: (className: string) => void;
     userRole: UserRole;
+    autoPrintEnabled: boolean;
+    onToggleAutoPrint: (enabled: boolean) => void;
+    onPrintLabel: (studentId: string) => void;
 }
 
 const getDayFromDate = (dateString: string): 'Sunday' | 'Wednesday' | null => {
@@ -37,7 +40,10 @@ const Attendance: React.FC<AttendanceProps> = ({
     onToggleReadyToLeave,
     selectedClass, 
     onClassChange, 
-    userRole 
+    userRole,
+    autoPrintEnabled,
+    onToggleAutoPrint,
+    onPrintLabel
 }) => {
     const [activeTab, setActiveTab] = useState<'Membro' | 'Visitante'>('Membro');
     const [searchTerm, setSearchTerm] = useState('');
@@ -180,6 +186,23 @@ const Attendance: React.FC<AttendanceProps> = ({
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
                 <h2 className="text-3xl font-bold text-brand-dark mb-4 sm:mb-0">Marcar Presença</h2>
                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                    {/* Auto Print Toggle Switch */}
+                    <div className="bg-white border border-gray-200 px-4 py-2 rounded-lg shadow-sm flex items-center gap-3 shrink-0">
+                        <label htmlFor="toggle-auto-print" className="text-sm font-bold text-gray-500 whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
+                            🖨️ Impressão Automática
+                        </label>
+                        <button
+                            id="toggle-auto-print"
+                            type="button"
+                            onClick={() => onToggleAutoPrint(!autoPrintEnabled)}
+                            className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${autoPrintEnabled ? 'bg-brand-blue' : 'bg-gray-200'}`}
+                        >
+                            <span
+                                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${autoPrintEnabled ? 'translate-x-5' : 'translate-x-0'}`}
+                            />
+                        </button>
+                    </div>
+
                     <div className="bg-white border border-gray-200 px-4 py-2 rounded-lg shadow-sm flex items-center gap-2 shrink-0">
                         <label htmlFor="attendance-date-picker" className="text-sm font-bold text-gray-550 whitespace-nowrap">Data da Aula:</label>
                         <input
@@ -417,13 +440,24 @@ const Attendance: React.FC<AttendanceProps> = ({
                                             {/* Presence toggle button */}
                                             {!isDismissed && (
                                                 isPresent ? (
-                                                    <button
-                                                        onClick={() => onUnmarkPresence(student.id, date)}
-                                                        disabled={!selectedDay.name}
-                                                        className="px-3.5 py-1 bg-brand-yellow text-white rounded-lg hover:bg-yellow-600 transition text-xs font-semibold w-24 text-center disabled:opacity-50 disabled:cursor-not-allowed"
-                                                    >
-                                                        Desmarcar
-                                                    </button>
+                                                    <div className="flex items-center gap-2">
+                                                        <button
+                                                            onClick={() => onPrintLabel(student.id)}
+                                                            className="p-1 text-gray-500 hover:text-brand-blue hover:bg-gray-100 rounded transition"
+                                                            title="Reimprimir Etiqueta"
+                                                        >
+                                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                                            </svg>
+                                                        </button>
+                                                        <button
+                                                            onClick={() => onUnmarkPresence(student.id, date)}
+                                                            disabled={!selectedDay.name}
+                                                            className="px-3.5 py-1 bg-brand-yellow text-white rounded-lg hover:bg-yellow-600 transition text-xs font-semibold w-24 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                                                        >
+                                                            Desmarcar
+                                                        </button>
+                                                    </div>
                                                 ) : (
                                                     <button
                                                         onClick={() => onMarkPresence(student.id, date)}
@@ -558,13 +592,24 @@ const Attendance: React.FC<AttendanceProps> = ({
                                                     {/* Presence toggle button */}
                                                     {!isDismissed && (
                                                         isPresent ? (
-                                                            <button
-                                                                onClick={() => onUnmarkPresence(visitor.id, date)}
-                                                                disabled={!selectedDay.name}
-                                                                className="px-3.5 py-1 bg-brand-yellow text-white rounded-lg hover:bg-yellow-600 transition text-xs font-semibold w-24 text-center disabled:opacity-50 disabled:cursor-not-allowed"
-                                                            >
-                                                                Desmarcar
-                                                            </button>
+                                                            <div className="flex items-center gap-2">
+                                                                <button
+                                                                    onClick={() => onPrintLabel(visitor.id)}
+                                                                    className="p-1 text-gray-500 hover:text-brand-blue hover:bg-gray-100 rounded transition"
+                                                                    title="Reimprimir Etiqueta"
+                                                                >
+                                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                                                    </svg>
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => onUnmarkPresence(visitor.id, date)}
+                                                                    disabled={!selectedDay.name}
+                                                                    className="px-3.5 py-1 bg-brand-yellow text-white rounded-lg hover:bg-yellow-600 transition text-xs font-semibold w-24 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                                                                >
+                                                                    Desmarcar
+                                                                </button>
+                                                            </div>
                                                         ) : (
                                                             <button
                                                                 onClick={() => onMarkPresence(visitor.id, date)}
