@@ -46,28 +46,27 @@ export function printTwoWayLabel(student: Student, dailyCode: number | undefined
         <meta charset="UTF-8">
         <style>
             @page {
-                size: 60mm 30mm;
+                size: 62mm 100mm;
                 margin: 0;
             }
             html, body {
                 margin: 0;
                 padding: 0;
-                width: 60mm;
-                height: 30mm;
+                width: 62mm;
+                height: 100mm;
                 background-color: #fff;
                 font-family: system-ui, -apple-system, sans-serif;
             }
             .etiqueta-wrapper {
-                width: 60mm;
-                height: 30mm;
+                width: 62mm;
+                height: 100mm;
                 box-sizing: border-box;
-                /* Increased padding margins to prevent physical printer cutting/clipping */
-                padding: 2.8mm 4.2mm;
+                padding: 4mm 4.5mm;
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;
-                border: 1px solid #000;
-                border-radius: 4px;
+                border: 2px solid #000;
+                border-radius: 6px;
                 page-break-after: always;
                 break-after: page;
                 overflow: hidden;
@@ -75,66 +74,90 @@ export function printTwoWayLabel(student: Student, dailyCode: number | undefined
             .etiqueta-header {
                 display: flex;
                 align-items: center;
-                gap: 1.2mm;
-                height: 4mm;
+                justify-content: space-between;
+                height: 6mm;
+            }
+            .etiqueta-logo-box {
+                display: flex;
+                align-items: center;
+                gap: 1.5mm;
             }
             .etiqueta-logo {
-                width: 3.8mm;
-                height: 3.8mm;
+                width: 5mm;
+                height: 5mm;
                 object-fit: contain;
             }
             .etiqueta-brand {
-                font-size: 8pt;
+                font-size: 9.5pt;
                 font-weight: 900;
                 color: #000;
                 text-transform: uppercase;
                 letter-spacing: -0.2px;
                 line-height: 1;
             }
+            .etiqueta-time {
+                font-size: 7pt;
+                font-weight: 700;
+                color: #000;
+                text-align: right;
+            }
             
-            /* Name Container & Child Name with Auto-Fit properties */
+            .divider {
+                height: 0.5mm;
+                background-color: #000;
+                width: 100%;
+                margin-top: 1mm;
+                margin-bottom: 1mm;
+            }
+            
             .name-container {
-                height: 6.8mm;
+                height: 16mm;
                 width: 100%;
                 display: flex;
                 align-items: center;
+                justify-content: center;
+                text-align: center;
                 overflow: hidden;
-                margin-top: 0.5mm;
+                margin-top: 1mm;
             }
             .child-name {
-                font-size: 13pt; /* Base font size, will shrink if needed */
+                font-size: 16pt; /* Base font size, will shrink if needed */
                 font-weight: 850;
                 color: #000;
                 text-transform: uppercase;
-                letter-spacing: -0.4px;
+                letter-spacing: -0.3px;
                 margin: 0;
-                line-height: 1.05;
+                line-height: 1.1;
                 word-break: break-word;
                 width: 100%;
             }
 
-            .code-status-row {
+            .code-container {
                 display: flex;
                 align-items: center;
-                justify-content: space-between;
-                height: 10.5mm;
-                margin-top: 0.5mm;
+                justify-content: center;
+                height: 24mm;
+                margin-top: 1mm;
             }
             .security-code {
-                font-size: 32pt;
-                font-weight: 900;
+                font-size: 52pt;
+                font-weight: 950;
                 color: #000;
                 line-height: 1;
                 letter-spacing: -1px;
             }
+            
             .status-indicators {
                 display: flex;
                 align-items: center;
-                gap: 1.5mm;
+                justify-content: center;
+                gap: 3mm;
+                height: 8mm;
+                margin-top: 1mm;
             }
             .status-icon {
-                width: 4.8mm;
-                height: 4.8mm;
+                width: 7.5mm;
+                height: 7.5mm;
                 color: #000;
                 display: flex;
                 align-items: center;
@@ -144,43 +167,63 @@ export function printTwoWayLabel(student: Student, dailyCode: number | undefined
                 width: 100%;
                 height: 100%;
             }
-            .divider {
-                height: 0.3mm;
-                background-color: #000;
-                width: 100%;
-                margin-top: 0.5mm;
-                margin-bottom: 0.5mm;
+            
+            .footer-info {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+                height: 20mm;
+                margin-top: 1mm;
             }
             
-            .footer-row {
-                display: flex;
-                justify-content: space-between;
-                font-size: 6.5pt;
-                font-weight: 700;
-                color: #000;
+            .info-class {
+                font-size: 11pt;
+                font-weight: 800;
                 text-transform: uppercase;
-                letter-spacing: 0.2px;
-                line-height: 1;
-                align-items: center;
-                height: 3.5mm;
+                color: #000;
+                line-height: 1.15;
+            }
+            .info-allergy-desc {
+                font-size: 7.5pt;
+                font-weight: 750;
+                text-transform: uppercase;
+                color: #000;
+                margin-top: 1mm;
+                line-height: 1.2;
+                border: 1.5px solid #000;
+                padding: 1mm 2mm;
+                border-radius: 4px;
+                width: 100%;
+                box-sizing: border-box;
+                word-break: break-word;
+                overflow: hidden;
+                max-height: 10.5mm;
             }
 
-            /* Containers for footer columns for auto-fitting single line text */
-            .footer-class-container {
-                max-width: 28mm;
-                overflow: hidden;
-                white-space: nowrap;
+            /* Via 2 Specific Styles */
+            .via2-banner {
+                font-size: 11pt;
+                font-weight: 900;
+                text-align: center;
+                background-color: #000;
+                color: #fff;
+                width: 100%;
+                padding: 1.5mm 0;
+                border-radius: 4px;
+                letter-spacing: 0.5px;
+                text-transform: uppercase;
+                margin-top: 1mm;
             }
-            .footer-name-container {
-                max-width: 26mm;
-                overflow: hidden;
-                white-space: nowrap;
-            }
-            .footer-class-container span,
-            .footer-name-container span {
-                font-size: 6.5pt;
-                font-weight: 700;
-                display: inline-block;
+            .via2-instructions {
+                font-size: 9.5pt;
+                font-weight: 850;
+                text-align: center;
+                line-height: 1.25;
+                text-transform: uppercase;
+                margin-top: 1.5mm;
+                width: 100%;
             }
         </style>
     </head>
@@ -189,103 +232,116 @@ export function printTwoWayLabel(student: Student, dailyCode: number | undefined
         <!-- VIA 1: CRIAÇÃO / CONTROLE CRIANÇA -->
         <div class="etiqueta-wrapper">
             <div class="etiqueta-header">
-                <img class="etiqueta-logo" src="${logoSrc}" alt="Logo">
-                <div class="etiqueta-brand">Mundo Kids</div>
-            </div>
-
-            <div class="name-container">
-                <h2 class="child-name" id="name-via-1">${student.name}</h2>
-            </div>
-            
-            <div class="code-status-row">
-                <span class="security-code">${codeStr}</span>
-                <div class="status-indicators">
-                    <!-- Restrição Alimentar -->
-                    ${showAllergy ? `
-                    <div class="status-icon" title="Restrição Alimentar">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
-                            <line x1="12" y1="9" x2="12" y2="13"/>
-                            <line x1="12" y1="17" x2="12.01" y2="17"/>
-                        </svg>
-                    </div>` : ''}
-
-                    <!-- Sem Autorização de Imagem -->
-                    ${showNoImage ? `
-                    <div class="status-icon" title="Sem Autorização de Imagem">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="2" y1="2" x2="22" y2="22"/>
-                            <path d="M7 21h10a2 2 0 0 0 2-2V9.4a2 2 0 0 0-.58-1.42l-2.42-2.4A2 2 0 0 0 14.58 5H13m-3.42.58L8.4 6.8H7a2 2 0 0 0-2 2v10.2A2 2 0 0 0 7 21Z"/>
-                            <circle cx="12" cy="13" r="3"/>
-                        </svg>
-                    </div>` : ''}
-
-                    <!-- Aniversariante -->
-                    ${showBirthday ? `
-                    <div class="status-icon" title="Aniversariante da Semana">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"/>
-                            <path d="M4 16h16"/>
-                            <path d="M12 9V5"/>
-                            <path d="M11 3a1 1 0 0 1 2 0v2h-2V3Z"/>
-                        </svg>
-                    </div>` : ''}
-
-                    <!-- Necessidade Especial -->
-                    ${showSpecial ? `
-                    <div class="status-icon" title="Necessidade Especial / PCD">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="6" r="3"/>
-                            <path d="M6 12h6a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9a3 3 0 0 1-3-3v-6"/>
-                            <path d="m19 12-4-4"/>
-                        </svg>
-                    </div>` : ''}
-
-                    <!-- Visitante -->
-                    ${showVisitor ? `
-                    <div class="status-icon" title="Visitante">
-                        <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                        </svg>
-                    </div>` : ''}
+                <div class="etiqueta-logo-box">
+                    <img class="etiqueta-logo" src="${logoSrc}" alt="Logo">
+                    <div class="etiqueta-brand">Mundo Kids</div>
                 </div>
+                <div class="etiqueta-time">${dateStr} ${timeStr}</div>
             </div>
 
             <div class="divider"></div>
 
-            <div class="footer-row">
-                <div class="footer-class-container" id="class-container-1">
-                    <span id="class-via-1">${student.class}</span>
+            <div class="name-container">
+                <h2 class="child-name" id="name-via-1">${student.name}</h2>
+            </div>
+
+            <div class="code-container">
+                <span class="security-code">${codeStr}</span>
+            </div>
+
+            <div class="status-indicators">
+                <!-- Restrição Alimentar -->
+                ${showAllergy ? `
+                <div class="status-icon" title="Restrição Alimentar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                        <line x1="12" y1="9" x2="12" y2="13"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                </div>` : ''}
+
+                <!-- Sem Autorização de Imagem -->
+                ${showNoImage ? `
+                <div class="status-icon" title="Sem Autorização de Imagem">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="2" y1="2" x2="22" y2="22"/>
+                        <path d="M7 21h10a2 2 0 0 0 2-2V9.4a2 2 0 0 0-.58-1.42l-2.42-2.4A2 2 0 0 0 14.58 5H13m-3.42.58L8.4 6.8H7a2 2 0 0 0-2 2v10.2A2 2 0 0 0 7 21Z"/>
+                        <circle cx="12" cy="13" r="3"/>
+                    </svg>
+                </div>` : ''}
+
+                <!-- Aniversariante -->
+                ${showBirthday ? `
+                <div class="status-icon" title="Aniversariante da Semana">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"/>
+                        <path d="M4 16h16"/>
+                        <path d="M12 9V5"/>
+                        <path d="M11 3a1 1 0 0 1 2 0v2h-2V3Z"/>
+                    </svg>
+                </div>` : ''}
+
+                <!-- Necessidade Especial -->
+                ${showSpecial ? `
+                <div class="status-icon" title="Necessidade Especial / PCD">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="6" r="3"/>
+                        <path d="M6 12h6a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9a3 3 0 0 1-3-3v-6"/>
+                        <path d="m19 12-4-4"/>
+                    </svg>
+                </div>` : ''}
+
+                <!-- Visitante -->
+                ${showVisitor ? `
+                <div class="status-icon" title="Visitante">
+                    <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                </div>` : ''}
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="footer-info">
+                <div class="info-class" id="class-container-1">
+                    <span id="class-via-1">TURMA: ${student.class}</span>
                 </div>
-                <span>${dateStr} ${timeStr}</span>
+                ${student.hasAllergy && student.allergyDescription ? `
+                <div class="info-allergy-desc" id="allergy-container-1">
+                    <span id="allergy-via-1">${student.allergyDescription}</span>
+                </div>
+                ` : ''}
             </div>
         </div>
 
         <!-- VIA 2: VIA DO RESPONSÁVEL / RETIRADA -->
         <div class="etiqueta-wrapper" style="page-break-after: avoid; break-after: avoid;">
             <div class="etiqueta-header">
-                <img class="etiqueta-logo" src="${logoSrc}" alt="Logo">
-                <div class="etiqueta-brand">Mundo Kids</div>
-            </div>
-
-            <div class="name-container">
-                <h2 class="child-name" id="title-via-2" style="font-size: 10pt; font-weight: 850;">VIA DO RESPONSÁVEL</h2>
-            </div>
-            
-            <div class="code-status-row">
-                <span class="security-code">${codeStr}</span>
-                <span id="instruction-via-2" style="font-size: 7.5pt; font-weight: 800; text-align: right; max-width: 32mm; line-height: 1.15; display: inline-block;">
-                    APRESENTE ESTA VIA PARA A RETIRADA
-                </span>
+                <div class="etiqueta-logo-box">
+                    <img class="etiqueta-logo" src="${logoSrc}" alt="Logo">
+                    <div class="etiqueta-brand">Mundo Kids</div>
+                </div>
+                <div class="etiqueta-time">${dateStr} ${timeStr}</div>
             </div>
 
             <div class="divider"></div>
 
-            <div class="footer-row">
-                <div class="footer-name-container" id="name-container-2">
-                    <span id="name-via-2">${student.name}</span>
+            <div class="via2-banner">VIA DO RESPONSÁVEL</div>
+
+            <div class="code-container">
+                <span class="security-code">${codeStr}</span>
+            </div>
+
+            <div class="name-container" style="height: 12mm;">
+                <h2 class="child-name" id="name-via-2" style="font-size: 13pt;">Criança: ${student.name}</h2>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="footer-info" style="height: 15mm;">
+                <div class="via2-instructions" id="instruction-container-2">
+                    <span id="instruction-via-2">APRESENTE ESTA VIA PARA A RETIRADA DO ALUNO</span>
                 </div>
-                <span>${dateStr} ${timeStr}</span>
             </div>
         </div>
 
@@ -311,26 +367,25 @@ export function printTwoWayLabel(student: Student, dailyCode: number | undefined
             }
 
             window.onload = function() {
-                // 1. Auto fit child name in Via 1 (multi-line wrapping up to 2 lines)
+                // 1. Auto fit child name in Via 1
                 const name1 = document.getElementById('name-via-1');
-                const nameContainer1 = name1 ? name1.parentElement : null;
-                autoFit(name1, nameContainer1, false);
+                if (name1) autoFit(name1, name1.parentElement, false);
 
-                // 2. Auto fit child name in Via 2 footer (single line fit)
+                // 2. Auto fit child name in Via 2
                 const name2 = document.getElementById('name-via-2');
-                const nameContainer2 = name2 ? name2.parentElement : null;
-                autoFit(name2, nameContainer2, true);
+                if (name2) autoFit(name2, name2.parentElement, false);
 
-                // 3. Auto fit instruction text in Via 2 middle (single/multi-line boundary check)
-                const instr2 = document.getElementById('instruction-via-2');
-                if (instr2) {
-                    autoFit(instr2, instr2.parentElement, false);
-                }
-
-                // 4. Auto fit class name in Via 1 footer (single line check)
+                // 3. Auto fit class name in Via 1
                 const class1 = document.getElementById('class-via-1');
-                const classContainer1 = class1 ? class1.parentElement : null;
-                autoFit(class1, classContainer1, true);
+                if (class1) autoFit(class1, class1.parentElement, true);
+
+                // 4. Auto fit allergy details in Via 1
+                const allergy1 = document.getElementById('allergy-via-1');
+                if (allergy1) autoFit(allergy1, allergy1.parentElement, false);
+
+                // 5. Auto fit instruction text in Via 2
+                const instr2 = document.getElementById('instruction-via-2');
+                if (instr2) autoFit(instr2, instr2.parentElement, false);
 
                 // Disparar impressão
                 window.focus();
@@ -342,7 +397,6 @@ export function printTwoWayLabel(student: Student, dailyCode: number | undefined
             };
         </script>
     </body>
-    </html>
     `;
 
     doc.open();
