@@ -190,6 +190,24 @@ export const initDb = async () => {
             )
         `;
 
+        // Print Queue Table
+        await sql`
+            CREATE TABLE IF NOT EXISTS print_queue (
+                id VARCHAR(255) PRIMARY KEY,
+                student_id VARCHAR(255) NOT NULL,
+                student_name TEXT NOT NULL,
+                class_name TEXT NOT NULL,
+                security_code VARCHAR(50) NOT NULL,
+                has_allergy BOOLEAN NOT NULL DEFAULT FALSE,
+                allergy_description TEXT NOT NULL DEFAULT '',
+                is_birthday BOOLEAN NOT NULL DEFAULT FALSE,
+                image_use_allowed BOOLEAN NOT NULL DEFAULT TRUE,
+                student_type TEXT NOT NULL,
+                status VARCHAR(50) NOT NULL DEFAULT 'pending',
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+            )
+        `;
+
         try {
             await sql`ALTER TABLE push_subscriptions ADD COLUMN user_email TEXT`;
         } catch (e) {
