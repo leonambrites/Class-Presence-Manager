@@ -318,6 +318,7 @@ const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStude
           onSubmit={handleFormSubmit}
           onCancel={() => setIsModalOpen(false)}
           initialData={editingStudent}
+          students={students}
         />
       </Modal>
 

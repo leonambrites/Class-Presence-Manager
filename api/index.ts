@@ -51,9 +51,12 @@ app.post('/api/public/students', async (req, res) => {
         }
         if (!student.id) student.id = Date.now().toString();
         student.type = student.type || 'Visitante';
+        if (!student.familyId) {
+            student.familyId = `fam_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        }
         
         await dbService.addStudent(student);
-        res.status(201).json({ message: 'Cadastro realizado com sucesso!', studentId: student.id });
+        res.status(201).json({ message: 'Cadastro realizado com sucesso!', studentId: student.id, familyId: student.familyId });
     } catch (error) {
         console.error("Error in public student registration:", error);
         res.status(500).json({ error: "Falha ao realizar o cadastro. Tente novamente." });
@@ -489,6 +492,9 @@ app.post('/api/students', checkRole(['Pastor', 'Coordenadora', 'Supervisora']) a
     try {
         // Ensure ID exists if not passed
         if (!newStudent.id) newStudent.id = Date.now().toString();
+        if (!newStudent.familyId) {
+            newStudent.familyId = `fam_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        }
 
         await dbService.addStudent(newStudent);
         res.status(201).json({ message: 'Student created' });
