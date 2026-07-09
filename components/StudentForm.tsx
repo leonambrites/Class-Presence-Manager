@@ -57,6 +57,7 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
   const [siblingSearch, setSiblingSearch] = useState('');
   const [selectedSibling, setSelectedSibling] = useState<Student | null>(null);
   const [familyId, setFamilyId] = useState('');
+  const [showSiblingLinker, setShowSiblingLinker] = useState(false);
 
   // Filter students based on typed name
   const siblingSuggestions = React.useMemo(() => {
@@ -138,6 +139,7 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
       setImageUseDocument(initialData.imageUseDocument || '');
       setImageUseDocumentName(initialData.imageUseDocument ? 'documento_assinado.pdf' : '');
       setFamilyId(initialData.familyId || '');
+      setShowSiblingLinker(!!initialData.familyId);
       if (initialData.familyId && students) {
         const sib = students.find(s => s.id !== initialData.id && s.familyId === initialData.familyId);
         if (sib) {
@@ -168,6 +170,7 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
       setFamilyId('');
       setSelectedSibling(null);
       setSiblingSearch('');
+      setShowSiblingLinker(false);
     }
   }, [initialData]);
 
@@ -241,7 +244,7 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
       {error && <p className="text-red-500 text-sm font-semibold">{error}</p>}
       
       {/* Sibling Linkage via Search Input (when students list is provided) */}
-      {students && (
+      {students && showSiblingLinker && (
         <div className="flex flex-col gap-2 p-3.5 bg-blue-50/50 border border-blue-200 rounded-xl relative">
           <label className="text-xs font-bold text-blue-900 flex items-center gap-1">
             <span>🔗</span> Vincular a um irmão já cadastrado:
@@ -588,9 +591,26 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
         )}
       </div>
 
-      <div className="flex justify-end space-x-3 pt-4">
-        <button type="button" onClick={onCancel} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition">Cancelar</button>
-        <button type="submit" className="px-4 py-2 bg-brand-blue text-white rounded-md hover:bg-blue-600 transition">Salvar</button>
+      <div className="flex justify-between items-center pt-4 border-t border-gray-250">
+        <div>
+          {students && (
+            <button
+              type="button"
+              onClick={() => setShowSiblingLinker(!showSiblingLinker)}
+              className={`px-3 py-2 text-xs font-bold rounded-lg transition flex items-center gap-1.5 border shadow-sm ${
+                showSiblingLinker
+                  ? 'bg-gray-100 text-gray-700 hover:bg-gray-200 border-gray-200'
+                  : 'bg-blue-50 text-blue-700 hover:bg-blue-100/80 border-blue-200'
+              }`}
+            >
+              <span>🔗</span> {showSiblingLinker ? 'Ocultar Campo de Irmão' : 'Vincular Irmão'}
+            </button>
+          )}
+        </div>
+        <div className="flex space-x-3">
+          <button type="button" onClick={onCancel} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition text-sm font-semibold">Cancelar</button>
+          <button type="submit" className="px-4 py-2 bg-brand-blue text-white rounded-md hover:bg-blue-600 transition text-sm font-semibold">Salvar</button>
+        </div>
       </div>
     </form>
   );
