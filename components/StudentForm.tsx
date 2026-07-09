@@ -63,9 +63,9 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
     if (!students || siblingSearch.trim().length < 2) return [];
     const query = siblingSearch.toLowerCase();
     return students
-      .filter(s => s.name.toLowerCase().includes(query))
+      .filter(s => s.name.toLowerCase().includes(query) && s.id !== initialData?.id)
       .slice(0, 5);
-  }, [students, siblingSearch]);
+  }, [students, siblingSearch, initialData]);
   
   const pdfInputRef = React.useRef<HTMLInputElement>(null);
   
@@ -138,6 +138,16 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
       setImageUseDocument(initialData.imageUseDocument || '');
       setImageUseDocumentName(initialData.imageUseDocument ? 'documento_assinado.pdf' : '');
       setFamilyId(initialData.familyId || '');
+      if (initialData.familyId && students) {
+        const sib = students.find(s => s.id !== initialData.id && s.familyId === initialData.familyId);
+        if (sib) {
+          setSelectedSibling(sib);
+        } else {
+          setSelectedSibling(null);
+        }
+      } else {
+        setSelectedSibling(null);
+      }
     } else {
       setName('');
       setStudentClass(CLASS_NAMES[0]);
@@ -230,8 +240,8 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && <p className="text-red-500 text-sm font-semibold">{error}</p>}
       
-      {/* Sibling Linkage via Search Input (Only for creation when students list is provided) */}
-      {students && !initialData && (
+      {/* Sibling Linkage via Search Input (when students list is provided) */}
+      {students && (
         <div className="flex flex-col gap-2 p-3.5 bg-blue-50/50 border border-blue-200 rounded-xl relative">
           <label className="text-xs font-bold text-blue-900 flex items-center gap-1">
             <span>🔗</span> Vincular a um irmão já cadastrado:

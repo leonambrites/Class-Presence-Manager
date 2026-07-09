@@ -94,6 +94,42 @@ const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStude
     }
   };
 
+  const handleLinkSiblings = async (studentId1: string, studentId2: string) => {
+    const s1 = students.find(s => s.id === studentId1);
+    const s2 = students.find(s => s.id === studentId2);
+    if (!s1 || !s2) return;
+
+    const targetFamilyId = s2.familyId || `fam_${Date.now()}`;
+
+    // If s2 does not have familyId yet, update s2 as well
+    if (!s2.familyId) {
+      await onEditStudent({
+        ...s2,
+        familyId: targetFamilyId
+      });
+    }
+
+    // Update s1 to match s2's family and parent info
+    const updatedS1 = {
+      ...s1,
+      familyId: targetFamilyId,
+      guardianName: s2.guardianName,
+      phone: s2.phone,
+      motherName: s2.motherName,
+      fatherName: s2.fatherName,
+      hasOtherGuardian: s2.hasOtherGuardian,
+      otherGuardianName: s2.otherGuardianName,
+      otherGuardianRelationship: s2.otherGuardianRelationship,
+      imageUseAllowed: s2.imageUseAllowed,
+      imageUseDocument: s2.imageUseDocument
+    };
+
+    await onEditStudent(updatedS1);
+
+    // Update profile view state so the UI reflects the linkage immediately
+    setProfileStudent(updatedS1);
+  };
+
   const handleFormSubmit = (formData: { 
     name: string; 
     class: string; 
@@ -326,6 +362,8 @@ const Students: React.FC<StudentsProps> = ({ students, onAddStudent, onEditStude
       {profileStudent && (
         <StudentProfile
           student={profileStudent}
+          students={students}
+          onLinkSiblings={handleLinkSiblings}
           onClose={() => setProfileStudent(null)}
         />
       )}
