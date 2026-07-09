@@ -53,21 +53,19 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
   const [imageUseDocument, setImageUseDocument] = useState('');
   const [imageUseDocumentName, setImageUseDocumentName] = useState('');
   
-  // Family link states
-  const [selectedFamilyId, setSelectedFamilyId] = useState('');
+  // Sibling search states
+  const [siblingSearch, setSiblingSearch] = useState('');
+  const [selectedSibling, setSelectedSibling] = useState<Student | null>(null);
   const [familyId, setFamilyId] = useState('');
 
-  const uniqueFamilies = React.useMemo(() => {
-    if (!students || students.length === 0) return [];
-    const familiesMap = new Map<string, Student>();
-    students.forEach(s => {
-      const key = s.familyId || s.phone || s.id;
-      if (s.guardianName && s.phone && !familiesMap.has(key)) {
-        familiesMap.set(key, s);
-      }
-    });
-    return Array.from(familiesMap.values()).sort((a, b) => a.guardianName.localeCompare(b.guardianName));
-  }, [students]);
+  // Filter students based on typed name
+  const siblingSuggestions = React.useMemo(() => {
+    if (!students || siblingSearch.trim().length < 2) return [];
+    const query = siblingSearch.toLowerCase();
+    return students
+      .filter(s => s.name.toLowerCase().includes(query))
+      .slice(0, 5);
+  }, [students, siblingSearch]);
   
   const pdfInputRef = React.useRef<HTMLInputElement>(null);
   
@@ -158,7 +156,8 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
       setImageUseDocument('');
       setImageUseDocumentName('');
       setFamilyId('');
-      setSelectedFamilyId('');
+      setSelectedSibling(null);
+      setSiblingSearch('');
     }
   }, [initialData]);
 
@@ -231,75 +230,108 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && <p className="text-red-500 text-sm font-semibold">{error}</p>}
       
-      {/* Family copy dropdown (only for creation when students list is provided) */}
-      {students && !initialData && uniqueFamilies.length > 0 && (
-        <div className="flex flex-col gap-1.5 p-3.5 bg-blue-50/50 border border-blue-200 rounded-xl">
-          <label htmlFor="family-copy-select" className="text-xs font-bold text-blue-900 flex items-center gap-1">
-            <span>🔗</span> Vincular a uma família já cadastrada (Irmão/Irmã):
+      {/* Sibling Linkage via Search Input (Only for creation when students list is provided) */}
+      {students && !initialData && (
+        <div className="flex flex-col gap-2 p-3.5 bg-blue-50/50 border border-blue-200 rounded-xl relative">
+          <label className="text-xs font-bold text-blue-900 flex items-center gap-1">
+            <span>🔗</span> Vincular a um irmão já cadastrado:
           </label>
-          <select
-            id="family-copy-select"
-            value={selectedFamilyId}
-            onChange={(e) => {
-              const val = e.target.value;
-              setSelectedFamilyId(val);
-              if (val) {
-                const representative = uniqueFamilies.find(f => (f.familyId || f.phone || f.id) === val);
-                if (representative) {
-                  setPhone(representative.phone || '');
-                  setMotherName(representative.motherName || '');
-                  setFatherName(representative.fatherName || '');
-                  setHasOtherGuardian(representative.hasOtherGuardian || false);
-                  setOtherGuardianName(representative.otherGuardianName || '');
-                  
-                  const relationship = representative.otherGuardianRelationship || '';
-                  const isPredefined = ['Avô/Avó', 'Tio/Tia', 'Irmão/Irmã', 'Padrasto/Madrasta', 'Cuidador(a)/Babá', 'Vizinho(a)'].includes(relationship);
-                  if (relationship) {
-                    if (isPredefined) {
-                      setOtherGuardianRelationship(relationship);
-                      setCustomRelationship('');
-                    } else {
-                      setOtherGuardianRelationship('Outro');
-                      setCustomRelationship(relationship);
-                    }
-                  } else {
-                    setOtherGuardianRelationship('');
-                    setCustomRelationship('');
-                  }
-                  
-                  setImageUseAllowed(representative.imageUseAllowed || false);
-                  setImageUseDocument(representative.imageUseDocument || '');
-                  setImageUseDocumentName(representative.imageUseDocument ? 'documento_assinado.pdf' : '');
-                  setFamilyId(representative.familyId || `fam_${Date.now()}`);
-                }
-              } else {
-                setPhone('');
-                setMotherName('');
-                setFatherName('');
-                setHasOtherGuardian(false);
-                setOtherGuardianName('');
-                setOtherGuardianRelationship('');
-                setCustomRelationship('');
-                setImageUseAllowed(false);
-                setImageUseDocument('');
-                setImageUseDocumentName('');
-                setFamilyId('');
-              }
-            }}
-            className="w-full bg-white border border-blue-200 text-blue-950 text-xs rounded-lg p-2 font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none"
-          >
-            <option value="">-- Selecionar Responsável --</option>
-            {uniqueFamilies.map(fam => {
-              const key = fam.familyId || fam.phone || fam.id;
-              return (
-                <option key={key} value={key}>
-                  {fam.guardianName} (Tel: {fam.phone})
-                </option>
-              );
-            })}
-          </select>
-          <p className="text-[10px] text-blue-800 leading-normal font-medium">
-            Selecionar uma família irá preencher automaticamente os dados de contato, pais e autorizações de uso de imagem.
+          
+          {selectedSibling ? (
+            <div className="flex items-center justify-between bg-blue-100/70 border border-blue-300 rounded-lg p-2.5">
+              <div className="min-w-0">
+                <p className="text-xs font-bold text-blue-950">✓ Irmão Vinculado: {selectedSibling.name}</p>
+                <p className="text-[10px] text-blue-800 font-semibold mt-0.5">
+                  Sala: {selectedSibling.class} • Responsável: {selectedSibling.guardianName}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedSibling(null);
+                  setSiblingSearch('');
+                  // Clear form fields
+                  setPhone('');
+                  setMotherName('');
+                  setFatherName('');
+                  setHasOtherGuardian(false);
+                  setOtherGuardianName('');
+                  setOtherGuardianRelationship('');
+                  setCustomRelationship('');
+                  setImageUseAllowed(false);
+                  setImageUseDocument('');
+                  setImageUseDocumentName('');
+                  setFamilyId('');
+                }}
+                className="text-xs font-bold text-red-600 hover:text-red-700 bg-white border border-red-200 rounded px-2 py-1 shadow-sm transition"
+              >
+                Remover
+              </button>
+            </div>
+          ) : (
+            <div className="relative">
+              <input
+                type="text"
+                value={siblingSearch}
+                onChange={(e) => setSiblingSearch(e.target.value)}
+                placeholder="Digite o nome do irmão cadastrado para buscar..."
+                className="w-full bg-white border border-blue-200 text-blue-950 text-xs rounded-lg p-2.5 font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              />
+              {siblingSuggestions.length > 0 && (
+                <ul className="absolute left-0 right-0 mt-1.5 bg-white border border-gray-200 rounded-lg shadow-lg z-50 divide-y divide-gray-100 max-h-48 overflow-y-auto">
+                  {siblingSuggestions.map(sibling => (
+                    <li key={sibling.id}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedSibling(sibling);
+                          setPhone(sibling.phone || '');
+                          setMotherName(sibling.motherName || '');
+                          setFatherName(sibling.fatherName || '');
+                          setHasOtherGuardian(sibling.hasOtherGuardian || false);
+                          setOtherGuardianName(sibling.otherGuardianName || '');
+                          
+                          const relationship = sibling.otherGuardianRelationship || '';
+                          const isPredefined = ['Avô/Avó', 'Tio/Tia', 'Irmão/Irmã', 'Padrasto/Madrasta', 'Cuidador(a)/Babá', 'Vizinho(a)'].includes(relationship);
+                          if (relationship) {
+                            if (isPredefined) {
+                              setOtherGuardianRelationship(relationship);
+                              setCustomRelationship('');
+                            } else {
+                              setOtherGuardianRelationship('Outro');
+                              setCustomRelationship(relationship);
+                            }
+                          } else {
+                            setOtherGuardianRelationship('');
+                            setCustomRelationship('');
+                          }
+                          
+                          setImageUseAllowed(sibling.imageUseAllowed || false);
+                          setImageUseDocument(sibling.imageUseDocument || '');
+                          setImageUseDocumentName(sibling.imageUseDocument ? 'documento_assinado.pdf' : '');
+                          setFamilyId(sibling.familyId || `fam_${Date.now()}`);
+                        }}
+                        className="w-full text-left p-2.5 hover:bg-blue-50/50 transition flex flex-col gap-0.5"
+                      >
+                        <span className="text-xs font-bold text-gray-900">{sibling.name}</span>
+                        <span className="text-[10px] text-gray-500 font-semibold">
+                          Sala: {sibling.class} • Responsável: {sibling.guardianName}
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {siblingSearch.trim().length >= 2 && siblingSuggestions.length === 0 && (
+                <div className="absolute left-0 right-0 mt-1.5 bg-white border border-gray-200 rounded-lg p-3 text-center text-xs text-gray-500 z-50">
+                  Nenhum irmão encontrado com o nome "{siblingSearch}".
+                </div>
+              )}
+            </div>
+          )}
+          
+          <p className="text-[10px] text-blue-800 leading-normal font-medium mt-0.5">
+            Ao buscar e selecionar um irmão, os dados familiares e de imagem serão preenchidos automaticamente.
           </p>
         </div>
       )}
