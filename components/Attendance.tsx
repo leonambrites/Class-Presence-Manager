@@ -486,7 +486,7 @@ const Attendance: React.FC<AttendanceProps> = ({
                                         O cadastro de novos visitantes está desabilitado hoje pois não é um dia de aula (Domingo ou Quarta-feira).
                                     </div>
                                 ) : (
-                                    <StudentForm onSubmit={handleAddVisitorSubmit} onCancel={() => setActiveTab('Membro')} />
+                                    <StudentForm onSubmit={handleAddVisitorSubmit} onCancel={() => setActiveTab('Membro')} students={students} />
                                 )}
                             </>
                         )}

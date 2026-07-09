@@ -5,6 +5,7 @@ const PublicRegister: React.FC = () => {
     const [submitting, setSubmitting] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [parentInitialData, setParentInitialData] = useState<any>(null);
 
     const handleSubmit = async (formData: any) => {
         setSubmitting(true);
@@ -21,10 +22,25 @@ const PublicRegister: React.FC = () => {
                 }),
             });
 
+            const resData = await res.json();
+
             if (!res.ok) {
-                const errData = await res.json();
-                throw new Error(errData.error || 'Erro ao realizar o cadastro.');
+                throw new Error(resData.error || 'Erro ao realizar o cadastro.');
             }
+
+            // Save parent data and familyId for subsequent registrations
+            setParentInitialData({
+                guardianName: formData.guardianName || '',
+                phone: formData.phone || '',
+                motherName: formData.motherName || '',
+                fatherName: formData.fatherName || '',
+                hasOtherGuardian: formData.hasOtherGuardian || false,
+                otherGuardianName: formData.otherGuardianName || '',
+                otherGuardianRelationship: formData.otherGuardianRelationship || '',
+                imageUseAllowed: formData.imageUseAllowed || false,
+                imageUseDocument: formData.imageUseDocument || '',
+                familyId: resData.familyId || formData.familyId
+            });
 
             setSuccess(true);
         } catch (err: any) {
@@ -87,6 +103,7 @@ const PublicRegister: React.FC = () => {
                     )}
                     <StudentForm
                         onSubmit={handleSubmit}
+                        initialData={parentInitialData}
                         onCancel={() => {
                             if (window.confirm("Deseja mesmo limpar as informações do formulário?")) {
                                 window.location.reload();

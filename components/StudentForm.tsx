@@ -19,12 +19,16 @@ interface StudentFormProps {
     otherGuardianName?: string;
     otherGuardianRelationship?: string;
     photo?: string;
+    imageUseAllowed?: boolean;
+    imageUseDocument?: string;
+    familyId?: string;
   }) => void;
   onCancel: () => void;
   initialData?: Partial<Student> | null;
+  students?: Student[];
 }
 
-const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialData }) => {
+const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialData, students }) => {
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
@@ -48,6 +52,22 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
   const [imageUseAllowed, setImageUseAllowed] = useState(false);
   const [imageUseDocument, setImageUseDocument] = useState('');
   const [imageUseDocumentName, setImageUseDocumentName] = useState('');
+  
+  // Family link states
+  const [selectedFamilyId, setSelectedFamilyId] = useState('');
+  const [familyId, setFamilyId] = useState('');
+
+  const uniqueFamilies = React.useMemo(() => {
+    if (!students || students.length === 0) return [];
+    const familiesMap = new Map<string, Student>();
+    students.forEach(s => {
+      const key = s.familyId || s.phone || s.id;
+      if (s.guardianName && s.phone && !familiesMap.has(key)) {
+        familiesMap.set(key, s);
+      }
+    });
+    return Array.from(familiesMap.values()).sort((a, b) => a.guardianName.localeCompare(b.guardianName));
+  }, [students]);
   
   const pdfInputRef = React.useRef<HTMLInputElement>(null);
   
@@ -119,6 +139,7 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
       setImageUseAllowed(initialData.imageUseAllowed || false);
       setImageUseDocument(initialData.imageUseDocument || '');
       setImageUseDocumentName(initialData.imageUseDocument ? 'documento_assinado.pdf' : '');
+      setFamilyId(initialData.familyId || '');
     } else {
       setName('');
       setStudentClass(CLASS_NAMES[0]);
@@ -136,6 +157,8 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
       setImageUseAllowed(false);
       setImageUseDocument('');
       setImageUseDocumentName('');
+      setFamilyId('');
+      setSelectedFamilyId('');
     }
   }, [initialData]);
 
@@ -199,7 +222,8 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
       otherGuardianRelationship: hasOtherGuardian ? finalRelationship : '',
       photo,
       imageUseAllowed,
-      imageUseDocument: imageUseAllowed ? imageUseDocument : ''
+      imageUseDocument: imageUseAllowed ? imageUseDocument : '',
+      familyId: familyId || undefined
     });
   };
 
@@ -207,6 +231,79 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && <p className="text-red-500 text-sm font-semibold">{error}</p>}
       
+      {/* Family copy dropdown (only for creation when students list is provided) */}
+      {students && !initialData && uniqueFamilies.length > 0 && (
+        <div className="flex flex-col gap-1.5 p-3.5 bg-blue-50/50 border border-blue-200 rounded-xl">
+          <label htmlFor="family-copy-select" className="text-xs font-bold text-blue-900 flex items-center gap-1">
+            <span>🔗</span> Vincular a uma família já cadastrada (Irmão/Irmã):
+          </label>
+          <select
+            id="family-copy-select"
+            value={selectedFamilyId}
+            onChange={(e) => {
+              const val = e.target.value;
+              setSelectedFamilyId(val);
+              if (val) {
+                const representative = uniqueFamilies.find(f => (f.familyId || f.phone || f.id) === val);
+                if (representative) {
+                  setPhone(representative.phone || '');
+                  setMotherName(representative.motherName || '');
+                  setFatherName(representative.fatherName || '');
+                  setHasOtherGuardian(representative.hasOtherGuardian || false);
+                  setOtherGuardianName(representative.otherGuardianName || '');
+                  
+                  const relationship = representative.otherGuardianRelationship || '';
+                  const isPredefined = ['Avô/Avó', 'Tio/Tia', 'Irmão/Irmã', 'Padrasto/Madrasta', 'Cuidador(a)/Babá', 'Vizinho(a)'].includes(relationship);
+                  if (relationship) {
+                    if (isPredefined) {
+                      setOtherGuardianRelationship(relationship);
+                      setCustomRelationship('');
+                    } else {
+                      setOtherGuardianRelationship('Outro');
+                      setCustomRelationship(relationship);
+                    }
+                  } else {
+                    setOtherGuardianRelationship('');
+                    setCustomRelationship('');
+                  }
+                  
+                  setImageUseAllowed(representative.imageUseAllowed || false);
+                  setImageUseDocument(representative.imageUseDocument || '');
+                  setImageUseDocumentName(representative.imageUseDocument ? 'documento_assinado.pdf' : '');
+                  setFamilyId(representative.familyId || `fam_${Date.now()}`);
+                }
+              } else {
+                setPhone('');
+                setMotherName('');
+                setFatherName('');
+                setHasOtherGuardian(false);
+                setOtherGuardianName('');
+                setOtherGuardianRelationship('');
+                setCustomRelationship('');
+                setImageUseAllowed(false);
+                setImageUseDocument('');
+                setImageUseDocumentName('');
+                setFamilyId('');
+              }
+            }}
+            className="w-full bg-white border border-blue-200 text-blue-950 text-xs rounded-lg p-2 font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          >
+            <option value="">-- Selecionar Responsável --</option>
+            {uniqueFamilies.map(fam => {
+              const key = fam.familyId || fam.phone || fam.id;
+              return (
+                <option key={key} value={key}>
+                  {fam.guardianName} (Tel: {fam.phone})
+                </option>
+              );
+            })}
+          </select>
+          <p className="text-[10px] text-blue-800 leading-normal font-medium">
+            Selecionar uma família irá preencher automaticamente os dados de contato, pais e autorizações de uso de imagem.
+          </p>
+        </div>
+      )}
+
       {/* Photo Upload Section */}
       <div className="flex flex-col items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
         <label className="block text-sm font-semibold text-gray-700 w-full text-center">Foto da Criança</label>

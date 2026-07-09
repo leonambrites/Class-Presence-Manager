@@ -34,6 +34,7 @@ export const initDb = async () => {
                 photo TEXT,
                 image_use_allowed BOOLEAN DEFAULT FALSE,
                 image_use_document TEXT,
+                family_id TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
@@ -49,8 +50,9 @@ export const initDb = async () => {
             await sql`ALTER TABLE students ADD COLUMN IF NOT EXISTS photo TEXT`;
             await sql`ALTER TABLE students ADD COLUMN IF NOT EXISTS image_use_allowed BOOLEAN DEFAULT FALSE`;
             await sql`ALTER TABLE students ADD COLUMN IF NOT EXISTS image_use_document TEXT`;
+            await sql`ALTER TABLE students ADD COLUMN IF NOT EXISTS family_id TEXT`;
         } catch (err) {
-            console.error("Migration error adding guardian and image use columns to students table:", err);
+            console.error("Migration error adding family_id and other columns to students table:", err);
         }
 
         // Attendance Table
@@ -204,6 +206,47 @@ export const initDb = async () => {
             await sql`ALTER TABLE push_subscriptions ADD COLUMN user_role TEXT`;
         } catch (e) {
             // Column likely already exists
+        }
+
+        // Automatic data migration for family_id grouping
+        try {
+            const allStudents = await sql`SELECT id, phone, family_id FROM students`;
+            const studentsWithoutFamily = allStudents.filter(s => !s.family_id);
+            if (studentsWithoutFamily.length > 0) {
+                console.log(`Running automatic family_id migration for ${studentsWithoutFamily.length} students...`);
+                const groupsByPhone: { [phone: string]: any[] } = {};
+                
+                studentsWithoutFamily.forEach(s => {
+                    const cleanPhone = (s.phone || '').trim().replace(/\D/g, '');
+                    const key = cleanPhone || `no_phone_${s.id}`;
+                    if (!groupsByPhone[key]) {
+                        groupsByPhone[key] = [];
+                    }
+                    groupsByPhone[key].push(s);
+                });
+
+                for (const phoneKey of Object.keys(groupsByPhone)) {
+                    const group = groupsByPhone[phoneKey];
+                    let existingFamilyId: string | null = null;
+                    const cleanPhone = phoneKey.startsWith('no_phone_') ? '' : phoneKey;
+                    
+                    if (cleanPhone) {
+                        const match = allStudents.find(s => s.family_id && (s.phone || '').trim().replace(/\D/g, '') === cleanPhone);
+                        if (match) {
+                            existingFamilyId = match.family_id;
+                        }
+                    }
+                    
+                    const familyId = existingFamilyId || `fam_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                    
+                    for (const student of group) {
+                        await sql`UPDATE students SET family_id = ${familyId} WHERE id = ${student.id}`;
+                    }
+                }
+                console.log("Automatic family_id migration completed successfully.");
+            }
+        } catch (migrationErr) {
+            console.error("Failed executing family_id data migration:", migrationErr);
         }
 
         console.log("Vercel Postgres Database initialized successfully.");

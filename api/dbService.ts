@@ -55,6 +55,7 @@ export const dbService = {
                 photo: s.photo || '',
                 imageUseAllowed: s.image_use_allowed || false,
                 imageUseDocument: s.image_use_document || '',
+                familyId: s.family_id || '',
                 attendance: attendanceData
                     .filter((a: any) => String(a.student_id) === String(s.id))
                     .map((a: any) => ({
@@ -103,7 +104,7 @@ export const dbService = {
     async addStudent(student: any) {
         const sql = getSql();
         await sql`
-            INSERT INTO students (id, name, class, age, guardianName, phone, type, birthday, has_allergy, allergy_description, mother_name, father_name, has_other_guardian, other_guardian_name, other_guardian_relationship, photo, image_use_allowed, image_use_document, created_at, updated_at)
+            INSERT INTO students (id, name, class, age, guardianName, phone, type, birthday, has_allergy, allergy_description, mother_name, father_name, has_other_guardian, other_guardian_name, other_guardian_relationship, photo, image_use_allowed, image_use_document, family_id, created_at, updated_at)
             VALUES (
                 ${String(student.id)}, ${student.name}, ${student.class}, ${student.age}, 
                 ${student.guardianName || ''}, ${student.phone}, ${student.type}, ${student.birthday}, 
@@ -113,6 +114,7 @@ export const dbService = {
                 ${student.otherGuardianRelationship || ''},
                 ${student.photo || ''},
                 ${student.imageUseAllowed || false}, ${student.imageUseDocument || ''},
+                ${student.familyId || ''},
                 ${getTimestamp()}, ${getTimestamp()}
             )
         `;
@@ -131,6 +133,7 @@ export const dbService = {
                 photo = ${data.photo || ''},
                 image_use_allowed = ${data.imageUseAllowed || false},
                 image_use_document = ${data.imageUseDocument || ''},
+                family_id = ${data.familyId || ''},
                 updated_at = ${getTimestamp()}
             WHERE id = ${String(id)}
             RETURNING id

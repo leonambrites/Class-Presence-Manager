@@ -33,6 +33,7 @@ export interface Student {
   photo?: string;
   imageUseAllowed?: boolean;
   imageUseDocument?: string;
+  familyId?: string;
 }
 
 export interface Volunteer {
