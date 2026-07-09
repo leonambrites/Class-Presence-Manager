@@ -61,7 +61,8 @@ export function printTwoWayLabel(student: Student, dailyCode: number | undefined
                 width: 60mm;
                 height: 30mm;
                 box-sizing: border-box;
-                padding: 2.2mm 3.2mm;
+                /* Increased padding margins to prevent physical printer cutting/clipping */
+                padding: 2.8mm 4.2mm;
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;
@@ -69,6 +70,7 @@ export function printTwoWayLabel(student: Student, dailyCode: number | undefined
                 border-radius: 4px;
                 page-break-after: always;
                 break-after: page;
+                overflow: hidden;
             }
             .etiqueta-header {
                 display: flex;
@@ -77,45 +79,53 @@ export function printTwoWayLabel(student: Student, dailyCode: number | undefined
                 height: 4mm;
             }
             .etiqueta-logo {
-                width: 4.2mm;
-                height: 4.2mm;
+                width: 3.8mm;
+                height: 3.8mm;
                 object-fit: contain;
             }
             .etiqueta-brand {
-                font-size: 8.5pt;
+                font-size: 8pt;
                 font-weight: 900;
                 color: #000;
                 text-transform: uppercase;
                 letter-spacing: -0.2px;
                 line-height: 1;
             }
+            
+            /* Name Container & Child Name with Auto-Fit properties */
+            .name-container {
+                height: 6.8mm;
+                width: 100%;
+                display: flex;
+                align-items: center;
+                overflow: hidden;
+                margin-top: 0.5mm;
+            }
             .child-name {
-                font-size: 13.5pt;
+                font-size: 13pt; /* Base font size, will shrink if needed */
                 font-weight: 850;
                 color: #000;
                 text-transform: uppercase;
                 letter-spacing: -0.4px;
-                margin: 0.8mm 0 0 0;
-                line-height: 1.1;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
+                margin: 0;
+                line-height: 1.05;
+                word-break: break-word;
                 width: 100%;
             }
+
             .code-status-row {
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                height: 12mm;
+                height: 10.5mm;
                 margin-top: 0.5mm;
             }
             .security-code {
-                font-size: 34pt;
+                font-size: 32pt;
                 font-weight: 900;
                 color: #000;
                 line-height: 1;
                 letter-spacing: -1px;
-                margin: 0;
             }
             .status-indicators {
                 display: flex;
@@ -138,19 +148,39 @@ export function printTwoWayLabel(student: Student, dailyCode: number | undefined
                 height: 0.3mm;
                 background-color: #000;
                 width: 100%;
-                margin-top: 0.8mm;
-                margin-bottom: 0.8mm;
+                margin-top: 0.5mm;
+                margin-bottom: 0.5mm;
             }
+            
             .footer-row {
                 display: flex;
                 justify-content: space-between;
-                font-size: 6.8pt;
+                font-size: 6.5pt;
                 font-weight: 700;
                 color: #000;
                 text-transform: uppercase;
                 letter-spacing: 0.2px;
                 line-height: 1;
                 align-items: center;
+                height: 3.5mm;
+            }
+
+            /* Containers for footer columns for auto-fitting single line text */
+            .footer-class-container {
+                max-width: 28mm;
+                overflow: hidden;
+                white-space: nowrap;
+            }
+            .footer-name-container {
+                max-width: 26mm;
+                overflow: hidden;
+                white-space: nowrap;
+            }
+            .footer-class-container span,
+            .footer-name-container span {
+                font-size: 6.5pt;
+                font-weight: 700;
+                display: inline-block;
             }
         </style>
     </head>
@@ -163,7 +193,9 @@ export function printTwoWayLabel(student: Student, dailyCode: number | undefined
                 <div class="etiqueta-brand">Mundo Kids</div>
             </div>
 
-            <h2 class="child-name">${student.name}</h2>
+            <div class="name-container">
+                <h2 class="child-name" id="name-via-1">${student.name}</h2>
+            </div>
             
             <div class="code-status-row">
                 <span class="security-code">${codeStr}</span>
@@ -222,7 +254,9 @@ export function printTwoWayLabel(student: Student, dailyCode: number | undefined
             <div class="divider"></div>
 
             <div class="footer-row">
-                <span>${student.class}</span>
+                <div class="footer-class-container" id="class-container-1">
+                    <span id="class-via-1">${student.class}</span>
+                </div>
                 <span>${dateStr} ${timeStr}</span>
             </div>
         </div>
@@ -234,11 +268,13 @@ export function printTwoWayLabel(student: Student, dailyCode: number | undefined
                 <div class="etiqueta-brand">Mundo Kids</div>
             </div>
 
-            <h2 class="child-name" style="font-size: 11pt; font-weight: 700;">VIA DO RESPONSÁVEL</h2>
+            <div class="name-container">
+                <h2 class="child-name" id="title-via-2" style="font-size: 10pt; font-weight: 850;">VIA DO RESPONSÁVEL</h2>
+            </div>
             
             <div class="code-status-row">
                 <span class="security-code">${codeStr}</span>
-                <span style="font-size: 7.5pt; font-weight: 800; text-align: right; max-width: 32mm; line-height: 1.2;">
+                <span id="instruction-via-2" style="font-size: 7.5pt; font-weight: 800; text-align: right; max-width: 32mm; line-height: 1.15; display: inline-block;">
                     APRESENTE ESTA VIA PARA A RETIRADA
                 </span>
             </div>
@@ -246,18 +282,63 @@ export function printTwoWayLabel(student: Student, dailyCode: number | undefined
             <div class="divider"></div>
 
             <div class="footer-row">
-                <span style="max-width: 30mm; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${student.name}</span>
+                <div class="footer-name-container" id="name-container-2">
+                    <span id="name-via-2">${student.name}</span>
+                </div>
                 <span>${dateStr} ${timeStr}</span>
             </div>
         </div>
 
         <script>
+            // JS Auto-Fitting Engine for Dynamic Thermal Labels
+            function autoFit(element, parent, isSingleLine = false) {
+                if (!element || !parent) return;
+                
+                let fontSize = parseFloat(window.getComputedStyle(element).fontSize);
+                
+                const hasOverflow = () => {
+                    if (isSingleLine) {
+                        return element.scrollWidth > parent.clientWidth;
+                    }
+                    return element.scrollHeight > parent.clientHeight || element.scrollWidth > parent.clientWidth;
+                };
+
+                // Gradually decrease font size until the text fits the container safely
+                while (hasOverflow() && fontSize > 6) {
+                    fontSize -= 0.4;
+                    element.style.fontSize = fontSize + 'px';
+                }
+            }
+
             window.onload = function() {
+                // 1. Auto fit child name in Via 1 (multi-line wrapping up to 2 lines)
+                const name1 = document.getElementById('name-via-1');
+                const nameContainer1 = name1 ? name1.parentElement : null;
+                autoFit(name1, nameContainer1, false);
+
+                // 2. Auto fit child name in Via 2 footer (single line fit)
+                const name2 = document.getElementById('name-via-2');
+                const nameContainer2 = name2 ? name2.parentElement : null;
+                autoFit(name2, nameContainer2, true);
+
+                // 3. Auto fit instruction text in Via 2 middle (single/multi-line boundary check)
+                const instr2 = document.getElementById('instruction-via-2');
+                if (instr2) {
+                    autoFit(instr2, instr2.parentElement, false);
+                }
+
+                // 4. Auto fit class name in Via 1 footer (single line check)
+                const class1 = document.getElementById('class-via-1');
+                const classContainer1 = class1 ? class1.parentElement : null;
+                autoFit(class1, classContainer1, true);
+
+                // Disparar impressão
                 window.focus();
                 window.print();
+                
                 setTimeout(function() {
                     window.parent.document.body.removeChild(window.frameElement);
-                }, 1200);
+                }, 1500);
             };
         </script>
     </body>
