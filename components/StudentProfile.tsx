@@ -1,13 +1,46 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Student, StudentType } from '../types';
 import { calculateAge } from '../utils';
 
 interface StudentProfileProps {
     student: Student;
+    students?: Student[];
+    onLinkSiblings?: (studentId1: string, studentId2: string) => void;
     onClose: () => void;
 }
 
-const StudentProfile: React.FC<StudentProfileProps> = ({ student, onClose }) => {
+const StudentProfile: React.FC<StudentProfileProps> = ({ student, students, onLinkSiblings, onClose }) => {
+    const [siblingSearch, setSiblingSearch] = useState('');
+
+    const currentSiblings = useMemo(() => {
+        if (!students || !student.familyId) return [];
+        return students.filter(s => s.id !== student.id && s.familyId === student.familyId);
+    }, [student, students]);
+
+    const potentialSiblings = useMemo(() => {
+        if (!students || students.length === 0) return [];
+        return students.filter(s => {
+            if (s.id === student.id) return false;
+            if (student.familyId && s.familyId === student.familyId) return false;
+            
+            const matchesPhone = s.phone && student.phone && s.phone.replace(/\D/g, '') === student.phone.replace(/\D/g, '');
+            const matchesMother = s.motherName && student.motherName && s.motherName.trim().toLowerCase() === student.motherName.trim().toLowerCase();
+            const matchesFather = s.fatherName && student.fatherName && s.fatherName.trim().toLowerCase() === student.fatherName.trim().toLowerCase();
+            
+            return matchesPhone || matchesMother || matchesFather;
+        });
+    }, [student, students]);
+
+    const siblingSuggestions = useMemo(() => {
+        if (!students || siblingSearch.trim().length < 2) return [];
+        const query = siblingSearch.toLowerCase();
+        return students.filter(s => {
+            if (s.id === student.id) return false;
+            if (student.familyId && s.familyId === student.familyId) return false;
+            return s.name.toLowerCase().includes(query);
+        }).slice(0, 5);
+    }, [students, siblingSearch, student]);
+
     const stats = useMemo(() => {
         const totalPresences = student.attendance.filter(a => a.present).length;
         const totalRecords = student.attendance.length;
@@ -149,6 +182,98 @@ const StudentProfile: React.FC<StudentProfileProps> = ({ student, onClose }) => 
                         </div>
                     </div>
                 </div>
+
+                {/* Família e Irmãos (Options A & B) */}
+                {students && (
+                    <div className="px-6 py-4 border-b border-gray-100 bg-white">
+                        <h3 className="text-sm font-semibold text-gray-600 mb-2">Família e Irmãos</h3>
+                        
+                        {currentSiblings.length > 0 ? (
+                            <div className="flex flex-col gap-2">
+                                <span className="text-xs text-gray-500 font-medium">Irmãos Vinculados:</span>
+                                <div className="flex flex-wrap gap-2">
+                                    {currentSiblings.map(sib => (
+                                        <span key={sib.id} className="inline-flex items-center gap-1.5 bg-blue-50 text-blue-700 text-xs px-3 py-1.5 rounded-full border border-blue-200 font-semibold shadow-sm">
+                                            👤 {sib.name} ({sib.class})
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        ) : (
+                            <p className="text-xs text-gray-400 font-semibold">Nenhum irmão vinculado a este cadastro.</p>
+                        )}
+
+                        {/* Sibling Linkage Autocomplete (Option B) */}
+                        <div className="mt-4 border-t pt-3.5 relative">
+                            <label className="text-xs font-bold text-gray-700 block mb-1">
+                                Buscar outro irmão para vincular:
+                            </label>
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    value={siblingSearch}
+                                    onChange={(e) => setSiblingSearch(e.target.value)}
+                                    placeholder="Digite o nome do irmão para buscar..."
+                                    className="w-full bg-gray-50 border border-gray-200 text-gray-900 text-xs rounded-lg p-2 font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                />
+                                {siblingSuggestions.length > 0 && (
+                                    <ul className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 divide-y divide-gray-100 max-h-40 overflow-y-auto">
+                                        {siblingSuggestions.map(sib => (
+                                            <li key={sib.id}>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        if (window.confirm(`Deseja vincular ${student.name} e ${sib.name} como irmãos? Isso unificará os dados familiares.`)) {
+                                                            onLinkSiblings?.(student.id, sib.id);
+                                                            setSiblingSearch('');
+                                                        }
+                                                    }}
+                                                    className="w-full text-left p-2.5 hover:bg-blue-50/50 transition flex flex-col gap-0.5"
+                                                >
+                                                    <span className="text-xs font-bold text-gray-950">{sib.name}</span>
+                                                    <span className="text-[10px] text-gray-500 font-semibold">
+                                                        Sala: {sib.class} • Responsável: {sib.guardianName}
+                                                    </span>
+                                                </button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                                {siblingSearch.trim().length >= 2 && siblingSuggestions.length === 0 && (
+                                    <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg p-2.5 text-center text-xs text-gray-500 z-50">
+                                        Nenhum aluno encontrado com "{siblingSearch}".
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Option A: Smart suggestions */}
+                        {potentialSiblings.length > 0 && (
+                            <div className="mt-4 space-y-2">
+                                <span className="text-xs font-bold text-yellow-800 block">💡 Sugestão de Vínculo:</span>
+                                {potentialSiblings.map(sib => (
+                                    <div key={sib.id} className="flex items-center justify-between bg-yellow-50/70 border border-yellow-200 rounded-xl p-3 text-xs text-yellow-900 shadow-sm">
+                                        <div className="min-w-0 flex-1 pr-2">
+                                            <p className="font-bold">Possível irmão: {sib.name}</p>
+                                            <p className="text-[10px] text-yellow-800 mt-0.5">
+                                                Sala: {sib.class} • Responsável: {sib.guardianName}
+                                            </p>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                onLinkSiblings?.(student.id, sib.id);
+                                            }}
+                                            className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold px-3 py-1 rounded-lg border border-yellow-400 shadow-sm transition"
+                                        >
+                                            Vincular
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
 
                 {/* Stats */}
                 <div className="px-6 py-4 grid grid-cols-3 gap-4 border-b border-gray-100">
