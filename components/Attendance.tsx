@@ -19,6 +19,8 @@ interface AttendanceProps {
     userRole: UserRole;
     autoPrintEnabled: boolean;
     onToggleAutoPrint: (enabled: boolean) => void;
+    remotePrintEnabled: boolean;
+    onToggleRemotePrint: (enabled: boolean) => void;
     onPrintLabel: (studentId: string) => void;
 }
 
@@ -43,6 +45,8 @@ const Attendance: React.FC<AttendanceProps> = ({
     userRole,
     autoPrintEnabled,
     onToggleAutoPrint,
+    remotePrintEnabled,
+    onToggleRemotePrint,
     onPrintLabel
 }) => {
     const [activeTab, setActiveTab] = useState<'Membro' | 'Visitante'>('Membro');
@@ -199,6 +203,23 @@ const Attendance: React.FC<AttendanceProps> = ({
                         >
                             <span
                                 className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${autoPrintEnabled ? 'translate-x-5' : 'translate-x-0'}`}
+                            />
+                        </button>
+                    </div>
+
+                    {/* Remote Print Toggle Switch */}
+                    <div className="bg-white border border-gray-200 px-4 py-2 rounded-lg shadow-sm flex items-center gap-3 shrink-0">
+                        <label htmlFor="toggle-remote-print" className="text-sm font-bold text-gray-500 whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
+                            🌐 Fila Remota (Windows)
+                        </label>
+                        <button
+                            id="toggle-remote-print"
+                            type="button"
+                            onClick={() => onToggleRemotePrint(!remotePrintEnabled)}
+                            className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${remotePrintEnabled ? 'bg-brand-blue' : 'bg-gray-200'}`}
+                        >
+                            <span
+                                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${remotePrintEnabled ? 'translate-x-5' : 'translate-x-0'}`}
                             />
                         </button>
                     </div>

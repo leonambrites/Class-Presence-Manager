@@ -63,6 +63,41 @@ app.post('/api/public/students', async (req, res) => {
     }
 });
 
+// Local Print Agent Endpoints (Token Authenticated)
+app.get('/api/public/print/pending', async (req, res) => {
+    const token = req.headers['x-print-agent-token'];
+    const expectedToken = process.env.AGENT_TOKEN || 'sua_chave_secreta_aqui';
+    if (!token || token !== expectedToken) {
+        return res.status(401).json({ error: 'Não autorizado' });
+    }
+    try {
+        const jobs = await dbService.getPendingPrintJobs();
+        res.status(200).json(jobs);
+    } catch (error) {
+        console.error("Error fetching pending print jobs:", error);
+        res.status(500).json({ error: "Failed to fetch pending print jobs" });
+    }
+});
+
+app.post('/api/public/print/complete', async (req, res) => {
+    const token = req.headers['x-print-agent-token'];
+    const expectedToken = process.env.AGENT_TOKEN || 'sua_chave_secreta_aqui';
+    if (!token || token !== expectedToken) {
+        return res.status(401).json({ error: 'Não autorizado' });
+    }
+    const { jobId } = req.body;
+    if (!jobId) {
+        return res.status(400).json({ error: 'Job ID é obrigatório' });
+    }
+    try {
+        await dbService.completePrintJob(jobId);
+        res.status(200).json({ message: 'Print job completed' });
+    } catch (error) {
+        console.error("Error completing print job:", error);
+        res.status(500).json({ error: "Failed to complete print job" });
+    }
+});
+
 // Protect all /api endpoints
 app.use('/api', ClerkExpressRequireAuth() as any);
 
@@ -342,10 +377,107 @@ app.post('/api/attendance', checkRole(['Pastor', 'Coordenadora', 'Supervisora', 
     const { studentId, date, present, day, dailyCode } = req.body;
     try {
         await dbService.updateAttendance(studentId, date, present, day, dailyCode);
+
+        // If presence is marked, add print job to queue
+        if (present) {
+            try {
+                const student = await dbService.getStudentById(studentId);
+                if (student) {
+                    const isBirthdayThisWeek = (birthdayStr: string) => {
+                        if (!birthdayStr) return false;
+                        try {
+                            const [dayPart, monthPart] = birthdayStr.split('/');
+                            if (!dayPart || !monthPart) return false;
+                            const today = new Date();
+                            const bDate = new Date(today.getFullYear(), Number(monthPart) - 1, Number(dayPart));
+                            
+                            const currentSunday = new Date(today);
+                            currentSunday.setDate(today.getDate() - today.getDay());
+                            currentSunday.setHours(0, 0, 0, 0);
+                            
+                            const currentSaturday = new Date(currentSunday);
+                            currentSaturday.setDate(currentSunday.getDate() + 6);
+                            currentSaturday.setHours(23, 59, 59, 999);
+                            
+                            return bDate >= currentSunday && bDate <= currentSaturday;
+                        } catch (e) {
+                            return false;
+                        }
+                    };
+
+                    await dbService.addPrintJob({
+                        id: `print_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                        studentId: String(student.id),
+                        studentName: student.name,
+                        className: student.class,
+                        securityCode: dailyCode !== undefined ? String(dailyCode) : '0',
+                        hasAllergy: !!student.has_allergy,
+                        allergyDescription: student.allergy_description || '',
+                        isBirthday: isBirthdayThisWeek(student.birthday),
+                        imageUseAllowed: student.image_use_allowed !== false,
+                        studentType: student.type || 'Membro'
+                    });
+                }
+            } catch (printQueueErr) {
+                console.error("Failed to enqueue print job:", printQueueErr);
+            }
+        }
+
         res.status(200).json({ message: 'Attendance updated' });
     } catch (error) {
         console.error("Error updating attendance:", error);
         res.status(500).json({ error: "Failed to update attendance" });
+    }
+});
+
+// Manual Print Enqueue Endpoint
+app.post('/api/print/enqueue', checkRole(['Pastor', 'Coordenadora', 'Supervisora', 'Ministra']) as any, async (req, res) => {
+    const { studentId, dailyCode } = req.body;
+    if (!studentId) {
+        return res.status(400).json({ error: "ID do aluno é obrigatório" });
+    }
+    try {
+        const student = await dbService.getStudentById(studentId);
+        if (!student) {
+            return res.status(404).json({ error: "Aluno não encontrado" });
+        }
+        
+        const isBirthdayThisWeek = (birthdayStr: string) => {
+            if (!birthdayStr) return false;
+            try {
+                const [dayPart, monthPart] = birthdayStr.split('/');
+                if (!dayPart || !monthPart) return false;
+                const today = new Date();
+                const bDate = new Date(today.getFullYear(), Number(monthPart) - 1, Number(dayPart));
+                const currentSunday = new Date(today);
+                currentSunday.setDate(today.getDate() - today.getDay());
+                currentSunday.setHours(0, 0, 0, 0);
+                const currentSaturday = new Date(currentSunday);
+                currentSaturday.setDate(currentSunday.getDate() + 6);
+                currentSaturday.setHours(23, 59, 59, 999);
+                return bDate >= currentSunday && bDate <= currentSaturday;
+            } catch (e) {
+                return false;
+            }
+        };
+
+        await dbService.addPrintJob({
+            id: `print_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            studentId: String(student.id),
+            studentName: student.name,
+            className: student.class,
+            securityCode: dailyCode !== undefined ? String(dailyCode) : '0',
+            hasAllergy: !!student.has_allergy,
+            allergyDescription: student.allergy_description || '',
+            isBirthday: isBirthdayThisWeek(student.birthday),
+            imageUseAllowed: student.image_use_allowed !== false,
+            studentType: student.type || 'Membro'
+        });
+
+        res.status(200).json({ message: "Trabalho de impressão enviado para a fila remota com sucesso!" });
+    } catch (error) {
+        console.error("Error enqueuing print job:", error);
+        res.status(500).json({ error: "Failed to queue print job" });
     }
 });
 
@@ -497,6 +629,59 @@ app.post('/api/students', checkRole(['Pastor', 'Coordenadora', 'Supervisora']) a
         }
 
         await dbService.addStudent(newStudent);
+
+        // Also insert any initial attendance records if provided (e.g. for visitor register)
+        if (newStudent.attendance && newStudent.attendance.length > 0) {
+            for (const att of newStudent.attendance) {
+                await dbService.updateAttendance(
+                    newStudent.id, 
+                    att.date, 
+                    att.present, 
+                    att.day, 
+                    att.dailyCode
+                );
+                
+                // If present, also enqueue print job
+                if (att.present) {
+                    try {
+                        const isBirthdayThisWeek = (birthdayStr: string) => {
+                            if (!birthdayStr) return false;
+                            try {
+                                const [dayPart, monthPart] = birthdayStr.split('/');
+                                if (!dayPart || !monthPart) return false;
+                                const today = new Date();
+                                const bDate = new Date(today.getFullYear(), Number(monthPart) - 1, Number(dayPart));
+                                const currentSunday = new Date(today);
+                                currentSunday.setDate(today.getDate() - today.getDay());
+                                currentSunday.setHours(0, 0, 0, 0);
+                                const currentSaturday = new Date(currentSunday);
+                                currentSaturday.setDate(currentSunday.getDate() + 6);
+                                currentSaturday.setHours(23, 59, 59, 999);
+                                return bDate >= currentSunday && bDate <= currentSaturday;
+                            } catch (e) {
+                                return false;
+                            }
+                        };
+
+                        await dbService.addPrintJob({
+                            id: `print_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                            studentId: String(newStudent.id),
+                            studentName: newStudent.name,
+                            className: newStudent.class,
+                            securityCode: att.dailyCode !== undefined ? String(att.dailyCode) : '0',
+                            hasAllergy: !!newStudent.hasAllergy,
+                            allergyDescription: newStudent.allergyDescription || '',
+                            isBirthday: isBirthdayThisWeek(newStudent.birthday),
+                            imageUseAllowed: newStudent.imageUseAllowed !== false,
+                            studentType: newStudent.type || 'Visitante'
+                        });
+                    } catch (printQueueErr) {
+                        console.error("Failed to enqueue print job for new visitor:", printQueueErr);
+                    }
+                }
+            }
+        }
+
         res.status(201).json({ message: 'Student created' });
     } catch (error) {
         console.error("Error adding student:", error);

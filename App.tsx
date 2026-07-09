@@ -62,6 +62,15 @@ const App: React.FC = () => {
         setAutoPrintEnabled(enabled);
         localStorage.setItem('autoPrintEnabled', String(enabled));
     }, []);
+
+    const [remotePrintEnabled, setRemotePrintEnabled] = useState<boolean>(() => {
+        return localStorage.getItem('remotePrintEnabled') !== 'false';
+    });
+
+    const handleToggleRemotePrint = useCallback((enabled: boolean) => {
+        setRemotePrintEnabled(enabled);
+        localStorage.setItem('remotePrintEnabled', String(enabled));
+    }, []);
     const [isSubscribedToPush, setIsSubscribedToPush] = useState<boolean>(false);
     const [swRegistration, setSwRegistration] = useState<ServiceWorkerRegistration | null>(null);
 
@@ -492,7 +501,9 @@ const App: React.FC = () => {
 
         const targetStudent = updatedStudents.find(s => s.id === studentId);
         if (autoPrintEnabled && targetStudent) {
-            printTwoWayLabel(targetStudent, assignedCode);
+            if (!remotePrintEnabled) {
+                printTwoWayLabel(targetStudent, assignedCode);
+            }
         }
 
         if (connectionStatus === 'connected') {
@@ -510,16 +521,35 @@ const App: React.FC = () => {
         } else {
             showNotification("Presença salva (Modo Offline).");
         }
-    }, [students, connectionStatus, autoPrintEnabled]);
+    }, [students, connectionStatus, autoPrintEnabled, remotePrintEnabled, fetchWithAuth]);
 
-    const handleManualPrint = useCallback((studentId: string) => {
+    const handleManualPrint = useCallback(async (studentId: string) => {
         const student = students.find(s => s.id === studentId);
         if (!student) return;
         const todayStr = new Date().toISOString().split('T')[0];
         const att = student.attendance.find(a => a.date === todayStr);
         const code = att?.dailyCode || undefined;
-        printTwoWayLabel(student, code);
-    }, [students]);
+        
+        if (remotePrintEnabled) {
+            try {
+                const response = await fetchWithAuth('/api/print/enqueue', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ studentId, dailyCode: code })
+                });
+                if (response.ok) {
+                    showNotification("Enviado para a fila de impressão!");
+                } else {
+                    const errData = await response.json();
+                    showNotification(`Erro ao enfileirar: ${errData.error}`);
+                }
+            } catch (e) {
+                showNotification("Erro de conexão ao enfileirar impressão.");
+            }
+        } else {
+            printTwoWayLabel(student, code);
+        }
+    }, [students, remotePrintEnabled, fetchWithAuth]);
 
     const handleUnmarkPresence = useCallback(async (studentId: string, date: string) => {
         const dayOfWeek = getDayOfWeek(date);
@@ -629,7 +659,9 @@ const App: React.FC = () => {
         saveDataLocally('students', updatedStudents);
 
         if (autoPrintEnabled) {
-            printTwoWayLabel(newStudent, dailyCode);
+            if (!remotePrintEnabled) {
+                printTwoWayLabel(newStudent, dailyCode);
+            }
         }
 
         if (connectionStatus === 'connected') {
@@ -1136,6 +1168,8 @@ const App: React.FC = () => {
                         userRole={userRole!} 
                         autoPrintEnabled={autoPrintEnabled}
                         onToggleAutoPrint={handleToggleAutoPrint}
+                        remotePrintEnabled={remotePrintEnabled}
+                        onToggleRemotePrint={handleToggleRemotePrint}
                         onPrintLabel={handleManualPrint}
                     />
                 );

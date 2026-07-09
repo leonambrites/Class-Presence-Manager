@@ -422,5 +422,58 @@ export const dbService = {
             userName: r.user_name,
             userRole: r.user_role
         }));
+    },
+
+    async addPrintJob(job: {
+        id: string;
+        studentId: string;
+        studentName: string;
+        className: string;
+        securityCode: string;
+        hasAllergy: boolean;
+        allergyDescription: string;
+        isBirthday: boolean;
+        imageUseAllowed: boolean;
+        studentType: string;
+    }) {
+        const sql = getSql();
+        await sql`
+            INSERT INTO print_queue (
+                id, student_id, student_name, class_name, security_code, 
+                has_allergy, allergy_description, is_birthday, image_use_allowed, 
+                student_type, status, created_at
+            ) VALUES (
+                ${job.id}, ${job.studentId}, ${job.studentName}, ${job.className}, ${job.securityCode},
+                ${job.hasAllergy}, ${job.allergyDescription}, ${job.isBirthday}, ${job.imageUseAllowed},
+                ${job.studentType}, 'pending', ${getTimestamp()}
+            )
+        `;
+    },
+
+    async getPendingPrintJobs() {
+        const sql = getSql();
+        return await sql`
+            SELECT id, student_id AS "studentId", student_name AS "student_name", class_name AS "class_name", security_code AS "security_code",
+                   has_allergy AS "has_allergy", allergy_description AS "allergy_description", is_birthday AS "is_birthday", image_use_allowed AS "image_use_allowed",
+                   student_type AS "student_type", status, created_at AS "created_at"
+            FROM print_queue
+            WHERE status = 'pending'
+            ORDER BY created_at ASC
+        `;
+    },
+
+    async getStudentById(id: string) {
+        const sql = getSql();
+        const rows = await sql`SELECT * FROM students WHERE id = ${String(id)}`;
+        return rows[0] || null;
+    },
+
+    async completePrintJob(jobId: string) {
+        const sql = getSql();
+        await sql`
+            UPDATE print_queue
+            SET status = 'printed'
+            WHERE id = ${jobId}
+        `;
     }
 };
