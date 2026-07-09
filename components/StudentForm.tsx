@@ -139,7 +139,7 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
       setImageUseDocument(initialData.imageUseDocument || '');
       setImageUseDocumentName(initialData.imageUseDocument ? 'documento_assinado.pdf' : '');
       setFamilyId(initialData.familyId || '');
-      setShowSiblingLinker(!!initialData.familyId);
+      setShowSiblingLinker(false);
       if (initialData.familyId && students) {
         const sib = students.find(s => s.id !== initialData.id && s.familyId === initialData.familyId);
         if (sib) {
