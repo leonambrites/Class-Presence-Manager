@@ -10,6 +10,7 @@ import Topics from './components/Topics';
 import Reports from './components/Reports';
 import Admin from './components/Admin';
 import PublicRegister from './components/PublicRegister';
+import { printTwoWayLabel } from './utils/print';
 import { SignedIn, SignedOut, SignIn, useUser, useAuth } from '@clerk/clerk-react';
 import {
     INITIAL_STUDENTS,
@@ -52,6 +53,15 @@ const App: React.FC = () => {
     const [selectedClass, setSelectedClass] = useState<string>('All');
     const [loading, setLoading] = useState<boolean>(true);
     const [connectionStatus, setConnectionStatus] = useState<'connected' | 'disconnected' | 'syncing' | 'offline'>('syncing');
+    
+    const [autoPrintEnabled, setAutoPrintEnabled] = useState<boolean>(() => {
+        return localStorage.getItem('autoPrintEnabled') === 'true';
+    });
+
+    const handleToggleAutoPrint = useCallback((enabled: boolean) => {
+        setAutoPrintEnabled(enabled);
+        localStorage.setItem('autoPrintEnabled', String(enabled));
+    }, []);
     const [isSubscribedToPush, setIsSubscribedToPush] = useState<boolean>(false);
     const [swRegistration, setSwRegistration] = useState<ServiceWorkerRegistration | null>(null);
 
@@ -480,6 +490,11 @@ const App: React.FC = () => {
         setStudents(updatedStudents);
         saveDataLocally('students', updatedStudents);
 
+        const targetStudent = updatedStudents.find(s => s.id === studentId);
+        if (autoPrintEnabled && targetStudent) {
+            printTwoWayLabel(targetStudent, assignedCode);
+        }
+
         if (connectionStatus === 'connected') {
             try {
                 await fetchWithAuth('/api/attendance', {
@@ -495,7 +510,16 @@ const App: React.FC = () => {
         } else {
             showNotification("Presença salva (Modo Offline).");
         }
-    }, [students, connectionStatus]);
+    }, [students, connectionStatus, autoPrintEnabled]);
+
+    const handleManualPrint = useCallback((studentId: string) => {
+        const student = students.find(s => s.id === studentId);
+        if (!student) return;
+        const todayStr = new Date().toISOString().split('T')[0];
+        const att = student.attendance.find(a => a.date === todayStr);
+        const code = att?.dailyCode || undefined;
+        printTwoWayLabel(student, code);
+    }, [students]);
 
     const handleUnmarkPresence = useCallback(async (studentId: string, date: string) => {
         const dayOfWeek = getDayOfWeek(date);
@@ -603,6 +627,10 @@ const App: React.FC = () => {
         const updatedStudents = [...students, newStudent];
         setStudents(updatedStudents);
         saveDataLocally('students', updatedStudents);
+
+        if (autoPrintEnabled) {
+            printTwoWayLabel(newStudent, dailyCode);
+        }
 
         if (connectionStatus === 'connected') {
             try {
@@ -1106,6 +1134,9 @@ const App: React.FC = () => {
                         selectedClass={selectedClass} 
                         onClassChange={setSelectedClass} 
                         userRole={userRole!} 
+                        autoPrintEnabled={autoPrintEnabled}
+                        onToggleAutoPrint={handleToggleAutoPrint}
+                        onPrintLabel={handleManualPrint}
                     />
                 );
             case View.Students:
