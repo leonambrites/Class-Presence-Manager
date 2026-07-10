@@ -13,11 +13,11 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 30px;
+            gap: 20px;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 900px;
             width: 100%;
             display: flex;
             flex-direction: column;
@@ -28,6 +28,7 @@
         .header-info {
             text-align: center;
             color: #1f2937;
+            margin-bottom: 10px;
         }
 
         .header-info h1 {
@@ -42,93 +43,133 @@
             color: #6b7280;
         }
 
-        /* CONFIGURAÇÃO EXATA DE ETIQUETA BROTHER QL DE 60mm */
+        .labels-flex {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        /* CONFIGURAÇÃO EXATA DE ETIQUETA BROTHER QL DE 62mm x 100mm */
         .etiqueta-wrapper {
             background-color: #fff;
-            border: 1px solid #000;
+            border: 2px solid #000;
             border-radius: 6px;
-            width: 60mm;
-            height: 30mm;
+            width: 62mm;
+            height: 100mm;
             box-sizing: border-box;
-            padding: 2.2mm 3mm;
+            padding: 4mm 4.5mm;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             position: relative;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
-            /* Escala no navegador para visualização de alta qualidade */
-            transform: scale(2.2);
-            margin: 60px 0;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.08);
+            /* Escala leve para visualização adequada em telas */
+            transform: scale(1.15);
+            margin: 20px 10px;
         }
 
         /* Cabeçalho da etiqueta */
         .etiqueta-header {
             display: flex;
             align-items: center;
+            justify-content: space-between;
+            height: 6mm;
+        }
+
+        .etiqueta-logo-box {
+            display: flex;
+            align-items: center;
             gap: 1.5mm;
-            height: 4mm;
         }
 
         .etiqueta-logo {
-            width: 4.2mm;
-            height: 4.2mm;
+            width: 5mm;
+            height: 5mm;
             object-fit: contain;
         }
 
         .etiqueta-brand {
-            font-size: 8.5pt;
+            font-size: 9.5pt;
             font-weight: 900;
             color: #000;
-            letter-spacing: -0.2px;
             text-transform: uppercase;
+            letter-spacing: -0.2px;
             line-height: 1;
+        }
+
+        .etiqueta-time {
+            font-size: 7pt;
+            font-weight: 700;
+            color: #000;
+            text-align: right;
+        }
+
+        /* Divisor */
+        .divider {
+            height: 0.5mm;
+            background-color: #000;
+            width: 100%;
+            margin-top: 1mm;
+            margin-bottom: 1mm;
         }
 
         /* Nome da criança */
+        .name-container {
+            height: 16mm;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+            margin-top: 1mm;
+        }
+
         .child-name {
-            font-size: 13.5pt;
+            font-size: 16pt;
             font-weight: 850;
             color: #000;
             text-transform: uppercase;
-            letter-spacing: -0.4px;
-            margin: 0.8mm 0 0 0;
+            letter-spacing: -0.3px;
+            margin: 0;
             line-height: 1.1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            word-break: break-word;
             width: 100%;
         }
 
-        /* Seção do código e indicadores */
-        .code-status-row {
+        /* Código de segurança */
+        .code-container {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            height: 12mm;
-            margin-top: 0.5mm;
+            justify-content: center;
+            height: 24mm;
+            margin-top: 1mm;
         }
 
         .security-code {
-            font-size: 34pt;
-            font-weight: 900;
+            font-size: 52pt;
+            font-weight: 950;
             color: #000;
             line-height: 1;
             letter-spacing: -1px;
-            margin: 0;
-            display: flex;
-            align-items: center;
         }
 
+        /* Indicadores de status */
         .status-indicators {
             display: flex;
             align-items: center;
-            gap: 1.8mm;
+            justify-content: center;
+            gap: 3mm;
+            height: 8mm;
+            margin-top: 1mm;
         }
 
-        /* Ícones vetoriais pretos */
         .status-icon {
-            width: 4.8mm;
-            height: 4.8mm;
+            width: 7.5mm;
+            height: 7.5mm;
             color: #000;
             display: flex;
             align-items: center;
@@ -140,33 +181,72 @@
             height: 100%;
         }
 
-        /* Divisor */
-        .divider {
-            height: 0.3mm;
-            background-color: #000;
-            width: 100%;
-            margin-top: 0.8mm;
-            margin-bottom: 0.8mm;
+        /* Rodapé com info */
+        .footer-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            height: 20mm;
+            margin-top: 1mm;
         }
 
-        /* Rodapé */
-        .footer-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 6.8pt;
-            font-weight: 700;
-            color: #000;
+        .info-class {
+            font-size: 11pt;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.2px;
-            line-height: 1;
-            align-items: center;
+            color: #000;
+            line-height: 1.15;
+        }
+
+        .info-allergy-desc {
+            font-size: 7.5pt;
+            font-weight: 750;
+            text-transform: uppercase;
+            color: #000;
+            margin-top: 1mm;
+            line-height: 1.2;
+            border: 1.5px solid #000;
+            padding: 1.2mm 2mm;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+            word-break: break-word;
+            overflow: hidden;
+            max-height: 10.5mm;
+        }
+
+        /* Via 2 Specific Styles */
+        .via2-banner {
+            font-size: 11pt;
+            font-weight: 900;
+            text-align: center;
+            background-color: #000;
+            color: #fff;
+            width: 100%;
+            padding: 1.5mm 0;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-top: 1mm;
+        }
+
+        .via2-instructions {
+            font-size: 9.5pt;
+            font-weight: 850;
+            text-align: center;
+            line-height: 1.25;
+            text-transform: uppercase;
+            margin-top: 1.5mm;
+            width: 100%;
         }
 
         /* BOTOES DE CONTROLE */
         .controls {
             display: flex;
             gap: 15px;
-            margin-top: 60px;
+            margin-top: 40px;
         }
 
         .btn {
@@ -211,7 +291,7 @@
             }
             .etiqueta-wrapper {
                 box-shadow: none !important;
-                border: 1px solid #000 !important;
+                border: 2px solid #000 !important;
                 margin: 0 !important;
                 transform: none !important;
                 page-break-inside: avoid;
@@ -223,24 +303,31 @@
 
     <div class="container">
         <div class="header-info">
-            <h1>Etiqueta Térmica Brother QL (60mm x 30mm)</h1>
-            <p>Layout vetorial de alto contraste otimizado para fitas contínuas de 60mm</p>
+            <h1>Etiqueta Térmica Brother QL (62mm x 100mm)</h1>
+            <p>Layout vetorial vertical otimizado para fita contínua Brother de 62mm</p>
         </div>
 
-        <!-- ETIQUETA RENDERIZADA -->
-        <div class="etiqueta-wrapper">
-            <!-- CABEÇALHO COM LOGO REAL -->
-            <div class="etiqueta-header">
-                <img class="etiqueta-logo" src="./public/favicon-96x96.png" alt="Mundo Kids Logo">
-                <div class="etiqueta-brand">Mundo Kids</div>
-            </div>
+        <div class="labels-flex">
+            <!-- VIA 1: CRIAÇÃO / CONTROLE CRIANÇA -->
+            <div class="etiqueta-wrapper">
+                <div class="etiqueta-header">
+                    <div class="etiqueta-logo-box">
+                        <img class="etiqueta-logo" src="./public/favicon-96x96.png" alt="Mundo Kids Logo">
+                        <div class="etiqueta-brand">Mundo Kids</div>
+                    </div>
+                    <div class="etiqueta-time">10/07/2026 09:15</div>
+                </div>
 
-            <!-- NOME DA CRIANÇA -->
-            <h2 class="child-name">Gabriel Santos</h2>
-            
-            <!-- CÓDIGO E ÍCONES DE STATUS -->
-            <div class="code-status-row">
-                <span class="security-code">001</span>
+                <div class="divider"></div>
+
+                <div class="name-container">
+                    <h2 class="child-name" id="name-via-1">Gabriel Santos</h2>
+                </div>
+
+                <div class="code-container">
+                    <span class="security-code">001</span>
+                </div>
+
                 <div class="status-indicators">
                     <!-- Restrição Alimentar (⚠️) -->
                     <div class="status-icon icon-allergy" title="Restrição Alimentar">
@@ -250,8 +337,7 @@
                             <line x1="12" y1="17" x2="12.01" y2="17"/>
                         </svg>
                     </div>
-
-                    <!-- Sem Autorização de Imagem (Câmera barrada) -->
+                    <!-- Sem Autorização de Imagem -->
                     <div class="status-icon icon-image" title="Sem Autorização de Imagem">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="2" y1="2" x2="22" y2="22"/>
@@ -259,8 +345,7 @@
                             <circle cx="12" cy="13" r="3"/>
                         </svg>
                     </div>
-
-                    <!-- Aniversariante (Bolo com vela) -->
+                    <!-- Aniversariante -->
                     <div class="status-icon icon-birthday" title="Aniversariante da Semana">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"/>
@@ -269,32 +354,49 @@
                             <path d="M11 3a1 1 0 0 1 2 0v2h-2V3Z"/>
                         </svg>
                     </div>
+                </div>
 
-                    <!-- Necessidade Especial (Wheelchair/Acessibilidade) -->
-                    <div class="status-icon icon-special" title="Necessidade Especial / Acessibilidade">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="6" r="3"/>
-                            <path d="M6 12h6a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9a3 3 0 0 1-3-3v-6"/>
-                            <path d="m19 12-4-4"/>
-                        </svg>
+                <div class="divider"></div>
+
+                <div class="footer-info">
+                    <div class="info-class" id="class-container-1">
+                        <span id="class-via-1">TURMA: 8 a 10 anos</span>
                     </div>
-
-                    <!-- Visitante (Estrela) -->
-                    <div class="status-icon icon-visitor" title="Aluno Visitante">
-                        <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                        </svg>
+                    <div class="info-allergy-desc" id="allergy-container-1">
+                        <span id="allergy-via-1">Lactose, Glúten</span>
                     </div>
                 </div>
             </div>
 
-            <!-- DIVISOR HORIZONTAL -->
-            <div class="divider"></div>
+            <!-- VIA 2: VIA DO RESPONSÁVEL / RETIRADA -->
+            <div class="etiqueta-wrapper">
+                <div class="etiqueta-header">
+                    <div class="etiqueta-logo-box">
+                        <img class="etiqueta-logo" src="./public/favicon-96x96.png" alt="Mundo Kids Logo">
+                        <div class="etiqueta-brand">Mundo Kids</div>
+                    </div>
+                    <div class="etiqueta-time">10/07/2026 09:15</div>
+                </div>
 
-            <!-- RODAPÉ DA ETIQUETA -->
-            <div class="footer-row">
-                <span>Sala 8 a 11 anos</span>
-                <span>09/07/2026 09:15</span>
+                <div class="divider"></div>
+
+                <div class="via2-banner">VIA DO RESPONSÁVEL</div>
+
+                <div class="code-container">
+                    <span class="security-code">001</span>
+                </div>
+
+                <div class="name-container" style="height: 12mm;">
+                    <h2 class="child-name" id="name-via-2" style="font-size: 13pt;">Criança: Gabriel Santos</h2>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="footer-info" style="height: 15mm;">
+                    <div class="via2-instructions" id="instruction-container-2">
+                        <span id="instruction-via-2">APRESENTE ESTA VIA PARA A RETIRADA DO ALUNO</span>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -308,15 +410,19 @@
     <script>
         let demoState = 0;
         function toggleDemoData() {
-            const nameEl = document.querySelector('.child-name');
-            const codeEl = document.querySelector('.security-code');
-            const roomEl = document.querySelector('.footer-row span:first-child');
+            const nameEl = document.getElementById('name-via-1');
+            const nameEl2 = document.getElementById('name-via-2');
+            const codeElList = document.querySelectorAll('.security-code');
+            const classEl = document.getElementById('class-via-1');
+            const allergyEl = document.getElementById('allergy-via-1');
             const indicatorsEl = document.querySelector('.status-indicators');
 
             if (demoState === 0) {
                 nameEl.textContent = 'Melissa Oliveira';
-                codeEl.textContent = '042';
-                roomEl.textContent = 'Maternal';
+                nameEl2.textContent = 'Criança: Melissa Oliveira';
+                codeElList.forEach(c => c.textContent = '042');
+                classEl.textContent = 'TURMA: Maternal';
+                allergyEl.textContent = 'Lactose, Corantes';
                 indicatorsEl.innerHTML = `
                     <!-- Sem Autorização de Imagem -->
                     <div class="status-icon icon-image" title="Sem Autorização de Imagem">
@@ -339,8 +445,10 @@
                 demoState = 1;
             } else if (demoState === 1) {
                 nameEl.textContent = 'Davi Lucas Silva';
-                codeEl.textContent = '108';
-                roomEl.textContent = '2 a 3 anos';
+                nameEl2.textContent = 'Criança: Davi Lucas Silva';
+                codeElList.forEach(c => c.textContent = '108');
+                classEl.textContent = 'TURMA: 2 a 3 anos';
+                allergyEl.textContent = 'Diabetes (Sem Açúcar)';
                 indicatorsEl.innerHTML = `
                     <!-- Restrição Alimentar -->
                     <div class="status-icon icon-allergy" title="Restrição Alimentar">
@@ -350,18 +458,14 @@
                             <line x1="12" y1="17" x2="12.01" y2="17"/>
                         </svg>
                     </div>
-                    <!-- Visitante -->
-                    <div class="status-icon icon-visitor" title="Aluno Visitante">
-                        <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                        </svg>
-                    </div>
                 `;
                 demoState = 2;
             } else {
                 nameEl.textContent = 'Gabriel Santos';
-                codeEl.textContent = '001';
-                roomEl.textContent = 'Sala 8 a 11 anos';
+                nameEl2.textContent = 'Criança: Gabriel Santos';
+                codeElList.forEach(c => c.textContent = '001');
+                classEl.textContent = 'TURMA: 8 a 10 anos';
+                allergyEl.textContent = 'Lactose, Glúten';
                 indicatorsEl.innerHTML = `
                     <!-- Restrição Alimentar -->
                     <div class="status-icon icon-allergy" title="Restrição Alimentar">
@@ -386,20 +490,6 @@
                             <path d="M4 16h16"/>
                             <path d="M12 9V5"/>
                             <path d="M11 3a1 1 0 0 1 2 0v2h-2V3Z"/>
-                        </svg>
-                    </div>
-                    <!-- Necessidade Especial -->
-                    <div class="status-icon icon-special" title="Necessidade Especial / Acessibilidade">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="6" r="3"/>
-                            <path d="M6 12h6a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9a3 3 0 0 1-3-3v-6"/>
-                            <path d="m19 12-4-4"/>
-                        </svg>
-                    </div>
-                    <!-- Visitante -->
-                    <div class="status-icon icon-visitor" title="Aluno Visitante">
-                        <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                         </svg>
                     </div>
                 `;
