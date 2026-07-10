@@ -48,6 +48,15 @@ function generateHTML(job) {
     const timeStr = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
     const codeStr = String(job.security_code).padStart(3, '0');
 
+    // Auto-detect PCD/accessibility text inside allergy description
+    const showSpecial = !!job.allergy_description && (
+        job.allergy_description.toLowerCase().includes('pcd') || 
+        job.allergy_description.toLowerCase().includes('autis') || 
+        job.allergy_description.toLowerCase().includes('cadeir') ||
+        job.allergy_description.toLowerCase().includes('defic') ||
+        job.allergy_description.toLowerCase().includes('especial')
+    );
+
     return `
     <!DOCTYPE html>
     <html>
@@ -73,7 +82,8 @@ function generateHTML(job) {
             .code-container { display: flex; align-items: center; justify-content: center; height: 24mm; }
             .security-code { font-size: 52pt; font-weight: 950; line-height: 1; }
             .status-indicators { display: flex; align-items: center; justify-content: center; gap: 3mm; height: 8mm; }
-            .status-icon { width: 7.5mm; height: 7.5mm; font-size: 18pt; display: flex; align-items: center; justify-content: center; }
+            .status-icon { width: 7.5mm; height: 7.5mm; color: #000; display: flex; align-items: center; justify-content: center; }
+            .status-icon svg { width: 100%; height: 100%; }
             .footer-info { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; height: 20mm; }
             .info-class { font-size: 11pt; font-weight: 800; text-transform: uppercase; }
             .info-allergy-desc { font-size: 7.5pt; font-weight: 750; text-transform: uppercase; border: 1.5px solid #000; padding: 1mm; border-radius: 4px; width: 100%; box-sizing: border-box; }
@@ -98,10 +108,54 @@ function generateHTML(job) {
                 <span class="security-code">${codeStr}</span>
             </div>
             <div class="status-indicators">
-                ${job.has_allergy ? '<span class="status-icon">⚠️</span>' : ''}
-                ${!job.image_use_allowed ? '<span class="status-icon">🚫📷</span>' : ''}
-                ${job.is_birthday ? '<span class="status-icon">🎂</span>' : ''}
-                ${job.student_type === 'Visitante' ? '<span class="status-icon">★</span>' : ''}
+                <!-- Restrição Alimentar -->
+                ${job.has_allergy ? `
+                <div class="status-icon" title="Restrição Alimentar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                        <line x1="12" y1="9" x2="12" y2="13"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                </div>` : ''}
+
+                <!-- Sem Autorização de Imagem -->
+                ${!job.image_use_allowed ? `
+                <div class="status-icon" title="Sem Autorização de Imagem">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="2" y1="2" x2="22" y2="22"/>
+                        <path d="M7 21h10a2 2 0 0 0 2-2V9.4a2 2 0 0 0-.58-1.42l-2.42-2.4A2 2 0 0 0 14.58 5H13m-3.42.58L8.4 6.8H7a2 2 0 0 0-2 2v10.2A2 2 0 0 0 7 21Z"/>
+                        <circle cx="12" cy="13" r="3"/>
+                    </svg>
+                </div>` : ''}
+
+                <!-- Aniversariante -->
+                ${job.is_birthday ? `
+                <div class="status-icon" title="Aniversariante da Semana">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"/>
+                        <path d="M4 16h16"/>
+                        <path d="M12 9V5"/>
+                        <path d="M11 3a1 1 0 0 1 2 0v2h-2V3Z"/>
+                    </svg>
+                </div>` : ''}
+
+                <!-- Necessidade Especial -->
+                ${showSpecial ? `
+                <div class="status-icon" title="Necessidade Especial / PCD">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="6" r="3"/>
+                        <path d="M6 12h6a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H9a3 3 0 0 1-3-3v-6"/>
+                        <path d="m19 12-4-4"/>
+                    </svg>
+                </div>` : ''}
+
+                <!-- Visitante -->
+                ${job.student_type === 'Visitante' ? `
+                <div class="status-icon" title="Visitante">
+                    <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                </div>` : ''}
             </div>
             <div class="divider"></div>
             <div class="footer-info">
