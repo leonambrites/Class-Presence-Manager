@@ -55,6 +55,7 @@ const Attendance: React.FC<AttendanceProps> = ({
     const [date, setDate] = useState(todayStr);
     const [historyModalOpen, setHistoryModalOpen] = useState(false);
     const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
+    const [isAddingVisitor, setIsAddingVisitor] = useState(false);
 
     // Modal state for releasing student
     const [releasingStudent, setReleasingStudent] = useState<Student | null>(null);
@@ -500,20 +501,28 @@ const Attendance: React.FC<AttendanceProps> = ({
                 {activeTab === 'Visitante' && (
                     <div>
                         {userRole !== 'Ministra' && (
-                            <>
-                                <h3 className="text-xl font-semibold text-brand-dark mb-4">Cadastrar Novo Aluno (Visitante)</h3>
-                                {!selectedDay.name ? (
-                                    <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg text-gray-500 mb-6 text-sm">
-                                        O cadastro de novos visitantes está desabilitado hoje pois não é um dia de aula (Domingo ou Quarta-feira).
-                                    </div>
+                            <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                                <div>
+                                    <h4 className="font-bold text-gray-800">Visitantes</h4>
+                                    <p className="text-xs text-gray-500 font-semibold">Cadastre e controle a presença de visitantes na sala.</p>
+                                </div>
+                                {selectedDay.name ? (
+                                    <button
+                                        onClick={() => setIsAddingVisitor(true)}
+                                        className="bg-brand-blue text-white px-4 py-2.5 rounded-xl font-bold hover:bg-blue-700 transition flex items-center gap-2 shadow-sm text-sm self-start sm:self-center"
+                                    >
+                                        <span>➕</span> Cadastrar Visitante
+                                    </button>
                                 ) : (
-                                    <StudentForm onSubmit={handleAddVisitorSubmit} onCancel={() => setActiveTab('Membro')} students={students} />
+                                    <div className="text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-100 rounded-lg p-2.5 max-w-md">
+                                        ⚠️ O cadastro de novos visitantes está desabilitado hoje pois não é um dia de aula (Domingo ou Quarta-feira).
+                                    </div>
                                 )}
-                            </>
+                            </div>
                         )}
 
                         <div className="mt-8">
-                            <h3 className="text-xl font-semibold text-brand-dark mb-4 border-t pt-6">Visitantes Atuais</h3>
+                            <h3 className="text-xl font-semibold text-brand-dark mb-4">Visitantes Atuais</h3>
                             {visitors.length > 0 ? (
                                 <ul className="divide-y divide-gray-200 max-h-60 overflow-y-auto pr-1 custom-scrollbar">
                                     {visitors.map(visitor => {
@@ -657,6 +666,18 @@ const Attendance: React.FC<AttendanceProps> = ({
             {/* IN-PLACE HISTORY MODAL */}
             <Modal isOpen={historyModalOpen} onClose={handleCloseHistoryModal} title={`Histórico de ${selectedStudentForHistory?.name}`}>
                 {selectedStudentForHistory && <AttendanceHistory student={selectedStudentForHistory} allStudents={students} />}
+            </Modal>
+
+            {/* REGISTER VISITOR MODAL */}
+            <Modal isOpen={isAddingVisitor} onClose={() => setIsAddingVisitor(false)} title="Cadastrar Novo Aluno (Visitante)" maxWidth="max-w-2xl">
+                <StudentForm
+                    onSubmit={(data) => {
+                        handleAddVisitorSubmit(data);
+                        setIsAddingVisitor(false);
+                    }}
+                    onCancel={() => setIsAddingVisitor(false)}
+                    students={students}
+                />
             </Modal>
 
             {/* CONFIRM DISMISSAL/RELEASE MODAL */}
