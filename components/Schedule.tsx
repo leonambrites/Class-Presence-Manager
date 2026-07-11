@@ -50,7 +50,34 @@ const ScheduleForm: React.FC<{
     const [selectedTeam, setSelectedTeam] = useState(initialData?.team || '');
     const [formDate, setFormDate] = useState(initialData?.date ? initialData.date.split('T')[0] : date);
 
+    const [escadaId, setEscadaId] = useState<string | null>(initialData?.escadaId || null);
+    const [corredorId, setCorredorId] = useState<string | null>(initialData?.corredorId || null);
+
+    const [escadaSearch, setEscadaSearch] = useState('');
+    const [corredorSearch, setCorredorSearch] = useState('');
+
     const uniqueTeams = Array.from(new Set(volunteers.map(v => v.team).filter(Boolean) as string[])).sort();
+
+    const escadaSuggestions = React.useMemo(() => {
+        if (!escadaSearch.trim()) return [];
+        const cleanQuery = escadaSearch.toLowerCase();
+        return volunteers.filter(v => {
+            const isMinister = !v.type || v.type.toLowerCase().includes('ministra') || v.type.toLowerCase().includes('prof');
+            return isMinister && v.name.toLowerCase().includes(cleanQuery) && v.id !== corredorId;
+        });
+    }, [escadaSearch, volunteers, corredorId]);
+
+    const corredorSuggestions = React.useMemo(() => {
+        if (!corredorSearch.trim()) return [];
+        const cleanQuery = corredorSearch.toLowerCase();
+        return volunteers.filter(v => {
+            const isMinister = !v.type || v.type.toLowerCase().includes('ministra') || v.type.toLowerCase().includes('prof');
+            return isMinister && v.name.toLowerCase().includes(cleanQuery) && v.id !== escadaId;
+        });
+    }, [corredorSearch, volunteers, escadaId]);
+
+    const selectedEscada = volunteers.find(v => v.id === escadaId);
+    const selectedCorredor = volunteers.find(v => v.id === corredorId);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -59,11 +86,13 @@ const ScheduleForm: React.FC<{
             date: formDate,
             className,
             team: selectedTeam,
+            escadaId,
+            corredorId,
             // Fallback empty values to match API
-            supervisorId: null,
-            coordinatorId: null,
-            deskId: null,
-            ministerIds: []
+            supervisorId: initialData?.supervisorId || null,
+            coordinatorId: initialData?.coordinatorId || null,
+            deskId: initialData?.deskId || null,
+            ministerIds: initialData?.ministerIds || []
         });
     };
 
@@ -101,6 +130,124 @@ const ScheduleForm: React.FC<{
                 >
                     {CLASS_NAMES.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
+            </div>
+
+            {/* Posição Escada */}
+            <div className="border-t border-gray-100 pt-3">
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Escada</label>
+                {escadaId ? (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 flex justify-between items-center">
+                        <div>
+                            <p className="text-xs font-bold text-blue-950">✓ Selecionada: {selectedEscada?.name}</p>
+                            <p className="text-[10px] text-blue-700/80 font-semibold">Turma: {selectedEscada?.class || 'Não informada'}</p>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setEscadaId(null);
+                                setEscadaSearch('');
+                            }}
+                            className="text-xs font-bold text-red-600 hover:text-red-700 bg-white border border-red-200 rounded px-2.5 py-1 shadow-sm transition"
+                        >
+                            Remover
+                        </button>
+                    </div>
+                ) : (
+                    <div className="relative">
+                        <input
+                            type="text"
+                            value={escadaSearch}
+                            onChange={(e) => setEscadaSearch(e.target.value)}
+                            placeholder="Digite o nome da ministra da Escada..."
+                            className="w-full p-2.5 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-brand-blue focus:border-brand-blue text-sm"
+                        />
+                        {escadaSuggestions.length > 0 && (
+                            <ul className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 divide-y divide-gray-100 max-h-48 overflow-y-auto">
+                                {escadaSuggestions.map(volunteer => (
+                                    <li key={volunteer.id}>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setEscadaId(volunteer.id);
+                                                setEscadaSearch('');
+                                            }}
+                                            className="w-full text-left p-2.5 hover:bg-blue-50/50 transition flex flex-col gap-0.5"
+                                        >
+                                            <span className="text-xs font-bold text-gray-900">{volunteer.name}</span>
+                                            <span className="text-[10px] text-gray-500 font-semibold">
+                                                Turma: {volunteer.class || 'Não cadastrada'} {volunteer.type ? `| Função: ${volunteer.type}` : ''}
+                                            </span>
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                        {escadaSearch.trim() && escadaSuggestions.length === 0 && (
+                            <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-3 text-xs text-gray-500 font-semibold">
+                                Nenhuma ministra encontrada com o nome "{escadaSearch}".
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+
+            {/* Posição Corredor */}
+            <div className="border-t border-gray-100 pt-3">
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Corredor</label>
+                {corredorId ? (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 flex justify-between items-center">
+                        <div>
+                            <p className="text-xs font-bold text-blue-950">✓ Selecionada: {selectedCorredor?.name}</p>
+                            <p className="text-[10px] text-blue-700/80 font-semibold">Turma: {selectedCorredor?.class || 'Não informada'}</p>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setCorredorId(null);
+                                setCorredorSearch('');
+                            }}
+                            className="text-xs font-bold text-red-600 hover:text-red-700 bg-white border border-red-200 rounded px-2.5 py-1 shadow-sm transition"
+                        >
+                            Remover
+                        </button>
+                    </div>
+                ) : (
+                    <div className="relative">
+                        <input
+                            type="text"
+                            value={corredorSearch}
+                            onChange={(e) => setCorredorSearch(e.target.value)}
+                            placeholder="Digite o nome da ministra do Corredor..."
+                            className="w-full p-2.5 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-brand-blue focus:border-brand-blue text-sm"
+                        />
+                        {corredorSuggestions.length > 0 && (
+                            <ul className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 divide-y divide-gray-100 max-h-48 overflow-y-auto">
+                                {corredorSuggestions.map(volunteer => (
+                                    <li key={volunteer.id}>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setCorredorId(volunteer.id);
+                                                setCorredorSearch('');
+                                            }}
+                                            className="w-full text-left p-2.5 hover:bg-blue-50/50 transition flex flex-col gap-0.5"
+                                        >
+                                            <span className="text-xs font-bold text-gray-900">{volunteer.name}</span>
+                                            <span className="text-[10px] text-gray-500 font-semibold">
+                                                Turma: {volunteer.class || 'Não cadastrada'} {volunteer.type ? `| Função: ${volunteer.type}` : ''}
+                                            </span>
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                        {corredorSearch.trim() && corredorSuggestions.length === 0 && (
+                            <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-3 text-xs text-gray-500 font-semibold">
+                                Nenhuma ministra encontrada com o nome "{corredorSearch}".
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
 
             <div className="flex gap-3 pt-4 border-t border-gray-100">
@@ -522,6 +669,18 @@ const Schedule: React.FC<ScheduleProps> = ({
                                         ? (volunteers.find(v => v.team === selectedEntry.team && v.type?.toLowerCase() === 'supervisora')?.name || 'N/A')
                                         : (selectedEntry.deskId ? volunteers.find(v => v.id === selectedEntry.deskId)?.name || '?' : 'N/A')
                                     }
+                                </span>
+                            </div>
+                            <div className="flex justify-between py-2 border-b border-gray-50">
+                                <span className="font-semibold text-gray-600 text-sm">Escada:</span>
+                                <span className="text-gray-800 font-bold text-sm">
+                                    {selectedEntry.escadaId ? volunteers.find(v => v.id === selectedEntry.escadaId)?.name || '?' : 'N/A'}
+                                </span>
+                            </div>
+                            <div className="flex justify-between py-2 border-b border-gray-50">
+                                <span className="font-semibold text-gray-600 text-sm">Corredor:</span>
+                                <span className="text-gray-800 font-bold text-sm">
+                                    {selectedEntry.corredorId ? volunteers.find(v => v.id === selectedEntry.corredorId)?.name || '?' : 'N/A'}
                                 </span>
                             </div>
                             <div className="py-2">

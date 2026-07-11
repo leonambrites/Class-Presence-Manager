@@ -61,7 +61,7 @@ export const googleSheetsService = {
             "Students!A2:I", // Updated range to include Birthday
             "Attendance!A2:F",
             "Volunteers!A2:C",
-            "Schedule!A2:G",
+            "Schedule!A2:I",
             "Topics!A2:D"
         ];
 
@@ -84,7 +84,7 @@ export const googleSheetsService = {
         const students = rowsToObjects(rawStudents, ['id', 'name', 'class', 'age', 'motherName', 'phone', 'type', 'birthday', 'updated_at']);
         const attendance = rowsToObjects(rawAttendance, ['id', 'studentId', 'date', 'present', 'day', 'dismissedBy']);
         const volunteers = rowsToObjects(rawVolunteers, ['id', 'name', 'updated_at']);
-        const schedule = rowsToObjects(rawSchedule, ['id', 'date', 'className', 'supervisorId', 'deskId', 'coordinatorId', 'ministerIds']);
+        const schedule = rowsToObjects(rawSchedule, ['id', 'date', 'className', 'supervisorId', 'deskId', 'coordinatorId', 'escadaId', 'corredorId', 'ministerIds']);
         const topics = rowsToObjects(rawTopics, ['id', 'date', 'title', 'description']);
 
         // Aninhar attendance dentro de students (Requisito do Frontend)
@@ -286,7 +286,7 @@ export const googleSheetsService = {
             Students: ['id', 'name', 'class', 'age', 'motherName', 'phone', 'type', 'birthday', 'updated_at'], // Added birthday
             Attendance: ['id', 'studentId', 'date', 'present', 'day', 'dismissedBy'],
             Volunteers: ['id', 'name', 'updated_at'],
-            Schedule: ['id', 'date', 'className', 'supervisorId', 'deskId', 'coordinatorId', 'ministerIds'],
+            Schedule: ['id', 'date', 'className', 'supervisorId', 'deskId', 'coordinatorId', 'escadaId', 'corredorId', 'ministerIds'],
             Topics: ['id', 'date', 'title', 'description']
         };
 
@@ -362,13 +362,15 @@ export const googleSheetsService = {
 
         // 4. Schedule
         const scheduleValues = data.schedule.map((s: any) => [
-            Math.random().toString(36).substr(2, 9),
+            s.id || Math.random().toString(36).substr(2, 9),
             s.date,
             s.className,
-            s.supervisorId,
-            s.deskId,
-            s.coordinatorId,
-            Array.isArray(s.ministerIds) ? s.ministerIds.join(',') : s.ministerIds
+            s.supervisorId || "",
+            s.deskId || "",
+            s.coordinatorId || "",
+            s.escadaId || "",
+            s.corredorId || "",
+            Array.isArray(s.ministerIds) ? s.ministerIds.join(',') : (s.ministerIds || "")
         ]);
 
         // 5. Topics

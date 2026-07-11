@@ -85,6 +85,11 @@ export const dbService = {
             id: String(s.id),
             className: s.classname || s.className || '',
             team: s.team || '',
+            supervisorId: s.supervisorid || s.supervisorId || null,
+            deskId: s.deskid || s.deskId || null,
+            coordinatorId: s.coordinatorid || s.coordinatorId || null,
+            escadaId: s.escadaid || s.escadaId || null,
+            corredorId: s.corredorid || s.corredorId || null,
             ministerIds: s.ministerids ? s.ministerids.split(',') : (s.ministerIds ? s.ministerIds.split(',') : [])
         }));
 
@@ -261,10 +266,10 @@ export const dbService = {
         const sql = getSql();
         const ministerIdsStr = Array.isArray(schedule.ministerIds) ? schedule.ministerIds.join(',') : (schedule.ministerIds || '');
         await sql`
-            INSERT INTO schedule (id, date, className, team, supervisorId, deskId, coordinatorId, ministerIds, created_at)
+            INSERT INTO schedule (id, date, className, team, supervisorId, deskId, coordinatorId, escadaId, corredorId, ministerIds, created_at)
             VALUES (
                 ${String(Date.now())}, ${schedule.date}, ${schedule.className}, ${schedule.team || ''}, ${schedule.supervisorId || null}, 
-                ${schedule.deskId || null}, ${schedule.coordinatorId || null}, ${ministerIdsStr}, ${getTimestamp()}
+                ${schedule.deskId || null}, ${schedule.coordinatorId || null}, ${schedule.escadaId || null}, ${schedule.corredorId || null}, ${ministerIdsStr}, ${getTimestamp()}
             )
         `;
     },
@@ -275,7 +280,8 @@ export const dbService = {
         const result = await sql`
             UPDATE schedule
             SET date = ${schedule.date}, className = ${schedule.className}, team = ${schedule.team || ''}, supervisorId = ${schedule.supervisorId || null}, 
-                deskId = ${schedule.deskId || null}, coordinatorId = ${schedule.coordinatorId || null}, ministerIds = ${ministerIdsStr}
+                deskId = ${schedule.deskId || null}, coordinatorId = ${schedule.coordinatorId || null}, escadaId = ${schedule.escadaId || null},
+                corredorId = ${schedule.corredorId || null}, ministerIds = ${ministerIdsStr}
             WHERE id = ${String(id)}
             RETURNING id
         `;
@@ -338,10 +344,10 @@ export const dbService = {
             for (const sch of payload.schedule) {
                 const ministerIdsStr = Array.isArray(sch.ministerIds) ? sch.ministerIds.join(',') : (sch.ministerIds || '');
                 await sql`
-                    INSERT INTO schedule (id, date, className, team, supervisorId, deskId, coordinatorId, ministerIds, created_at)
+                    INSERT INTO schedule (id, date, className, team, supervisorId, deskId, coordinatorId, escadaId, corredorId, ministerIds, created_at)
                     VALUES (
                         ${String(sch.id || Date.now())}, ${sch.date}, ${sch.className}, ${sch.team || ''}, ${sch.supervisorId || null}, 
-                        ${sch.deskId || null}, ${sch.coordinatorId || null}, ${ministerIdsStr}, ${getTimestamp()}
+                        ${sch.deskId || null}, ${sch.coordinatorId || null}, ${sch.escadaId || null}, ${sch.corredorId || null}, ${ministerIdsStr}, ${getTimestamp()}
                     )
                 `;
             }
