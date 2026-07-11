@@ -56,6 +56,8 @@ export interface ScheduleEntry {
   ministerIds?: string[];
   deskId?: string | null;
   coordinatorId?: string | null;
+  escadaId?: string | null;
+  corredorId?: string | null;
 }
 
 export interface Topic {

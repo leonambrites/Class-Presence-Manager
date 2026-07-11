@@ -140,6 +140,8 @@ export const initDb = async () => {
                 supervisorId VARCHAR(255),
                 deskId VARCHAR(255),
                 coordinatorId VARCHAR(255),
+                escadaId VARCHAR(255),
+                corredorId VARCHAR(255),
                 ministerIds TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
@@ -147,6 +149,16 @@ export const initDb = async () => {
 
         try {
             await sql`ALTER TABLE schedule ADD COLUMN team TEXT`;
+        } catch (e) {
+            // Column likely already exists
+        }
+        try {
+            await sql`ALTER TABLE schedule ADD COLUMN escadaId VARCHAR(255)`;
+        } catch (e) {
+            // Column likely already exists
+        }
+        try {
+            await sql`ALTER TABLE schedule ADD COLUMN corredorId VARCHAR(255)`;
         } catch (e) {
             // Column likely already exists
         }
