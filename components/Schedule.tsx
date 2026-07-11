@@ -3,6 +3,8 @@ import { ScheduleEntry, Volunteer, UserRole } from '../types';
 import { CLASS_NAMES } from '../constants';
 import Modal from './Modal';
 
+const SCHEDULE_CLASS_NAMES = [...CLASS_NAMES, 'Apoio'];
+
 interface ScheduleProps {
     schedule: ScheduleEntry[];
     volunteers: Volunteer[];
@@ -46,7 +48,7 @@ const ScheduleForm: React.FC<{
     onSave: (data: any) => void,
     onCancel: () => void
 }> = ({ initialData, date, volunteers, onSave, onCancel }) => {
-    const [className, setClassName] = useState(initialData?.className || CLASS_NAMES[0]);
+    const [className, setClassName] = useState(initialData?.className || SCHEDULE_CLASS_NAMES[0]);
     const [selectedTeam, setSelectedTeam] = useState(initialData?.team || '');
     const [formDate, setFormDate] = useState(initialData?.date ? initialData.date.split('T')[0] : date);
 
@@ -81,18 +83,19 @@ const ScheduleForm: React.FC<{
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        const isApoio = className === 'Apoio';
         onSave({
             ...(initialData ? { id: initialData.id } : {}),
             date: formDate,
             className,
-            team: selectedTeam,
-            escadaId,
-            corredorId,
+            team: isApoio ? '' : selectedTeam,
+            escadaId: isApoio ? escadaId : null,
+            corredorId: isApoio ? corredorId : null,
             // Fallback empty values to match API
-            supervisorId: initialData?.supervisorId || null,
-            coordinatorId: initialData?.coordinatorId || null,
-            deskId: initialData?.deskId || null,
-            ministerIds: initialData?.ministerIds || []
+            supervisorId: isApoio ? null : (initialData?.supervisorId || null),
+            coordinatorId: isApoio ? null : (initialData?.coordinatorId || null),
+            deskId: isApoio ? null : (initialData?.deskId || null),
+            ministerIds: isApoio ? [] : (initialData?.ministerIds || [])
         });
     };
 
@@ -108,27 +111,29 @@ const ScheduleForm: React.FC<{
                     className="w-full p-2.5 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-brand-blue focus:border-brand-blue" 
                 />
             </div>
+            {className !== 'Apoio' && (
+                <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">Equipe Responsável</label>
+                    <select 
+                        required 
+                        value={selectedTeam} 
+                        onChange={e => setSelectedTeam(e.target.value)} 
+                        className="w-full p-2.5 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-brand-blue focus:border-brand-blue"
+                    >
+                        <option value="">Selecione a equipe de voluntários...</option>
+                        {uniqueTeams.map(t => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                </div>
+            )}
             <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Equipe Responsável</label>
-                <select 
-                    required 
-                    value={selectedTeam} 
-                    onChange={e => setSelectedTeam(e.target.value)} 
-                    className="w-full p-2.5 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-brand-blue focus:border-brand-blue"
-                >
-                    <option value="">Selecione a equipe de voluntários...</option>
-                    {uniqueTeams.map(t => <option key={t} value={t}>{t}</option>)}
-                </select>
-            </div>
-            <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Turma</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Turma / Escala</label>
                 <select 
                     required 
                     value={className} 
                     onChange={e => setClassName(e.target.value)} 
                     className="w-full p-2.5 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-brand-blue"
                 >
-                    {CLASS_NAMES.map(c => <option key={c} value={c}>{c}</option>)}
+                    {SCHEDULE_CLASS_NAMES.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
             </div>
 
@@ -479,8 +484,8 @@ const Schedule: React.FC<ScheduleProps> = ({
                             onChange={(e) => onClassChange(e.target.value)}
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand-blue focus:border-brand-blue block w-full p-2.5"
                         >
-                            <option value="All">Todas as Turmas</option>
-                            {CLASS_NAMES.map(name => <option key={name} value={name}>{name}</option>)}
+                            <option value="All">Todas as Turmas / Escalas</option>
+                            {SCHEDULE_CLASS_NAMES.map(name => <option key={name} value={name}>{name}</option>)}
                         </select>
                     </div>
                 </div>
@@ -508,8 +513,8 @@ const Schedule: React.FC<ScheduleProps> = ({
                             }
                             return matchesDate && matchesClass;
                         }).sort((a, b) => {
-                            const indexA = CLASS_NAMES.indexOf(a.className);
-                            const indexB = CLASS_NAMES.indexOf(b.className);
+                            const indexA = SCHEDULE_CLASS_NAMES.indexOf(a.className);
+                            const indexB = SCHEDULE_CLASS_NAMES.indexOf(b.className);
                             return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
                         });
 
@@ -644,56 +649,63 @@ const Schedule: React.FC<ScheduleProps> = ({
                         )}
 
                         <div className="border-t border-gray-100 my-4 pt-3 space-y-2.5">
-                            <div className="flex justify-between py-2 border-b border-gray-50">
-                                <span className="font-semibold text-gray-600 text-sm">Coordenadora:</span>
-                                <span className="text-gray-800 font-bold text-sm">
-                                    {selectedEntry.team 
-                                        ? (volunteers.find(v => v.class === selectedEntry.className && v.type?.toLowerCase() === 'coordenadora')?.name || 'N/A')
-                                        : (selectedEntry.coordinatorId ? volunteers.find(v => v.id === selectedEntry.coordinatorId)?.name || '?' : 'N/A')
-                                    }
-                                </span>
-                            </div>
-                            <div className="flex justify-between py-2 border-b border-gray-50">
-                                <span className="font-semibold text-gray-600 text-sm">Supervisora:</span>
-                                <span className="text-gray-800 font-bold text-sm">
-                                    {selectedEntry.team 
-                                        ? (volunteers.find(v => v.team === selectedEntry.team && v.type?.toLowerCase() === 'supervisora')?.name || 'N/A')
-                                        : (selectedEntry.supervisorId ? volunteers.find(v => v.id === selectedEntry.supervisorId)?.name || '?' : 'N/A')
-                                    }
-                                </span>
-                            </div>
-                            <div className="flex justify-between py-2 border-b border-gray-50">
-                                <span className="font-semibold text-gray-600 text-sm">Mesa:</span>
-                                <span className="text-gray-800 font-bold text-sm">
-                                    {selectedEntry.team 
-                                        ? (volunteers.find(v => v.team === selectedEntry.team && v.type?.toLowerCase() === 'supervisora')?.name || 'N/A')
-                                        : (selectedEntry.deskId ? volunteers.find(v => v.id === selectedEntry.deskId)?.name || '?' : 'N/A')
-                                    }
-                                </span>
-                            </div>
-                            <div className="flex justify-between py-2 border-b border-gray-50">
-                                <span className="font-semibold text-gray-600 text-sm">Escada:</span>
-                                <span className="text-gray-800 font-bold text-sm">
-                                    {selectedEntry.escadaId ? volunteers.find(v => v.id === selectedEntry.escadaId)?.name || '?' : 'N/A'}
-                                </span>
-                            </div>
-                            <div className="flex justify-between py-2 border-b border-gray-50">
-                                <span className="font-semibold text-gray-600 text-sm">Corredor:</span>
-                                <span className="text-gray-800 font-bold text-sm">
-                                    {selectedEntry.corredorId ? volunteers.find(v => v.id === selectedEntry.corredorId)?.name || '?' : 'N/A'}
-                                </span>
-                            </div>
-                            <div className="py-2">
-                                <span className="block font-semibold text-gray-600 mb-1 text-sm">Ministras:</span>
-                                <div className="bg-gray-50 p-2.5 rounded-lg text-xs text-gray-800 font-bold border border-gray-100">
-                                    {selectedEntry.team 
-                                        ? (volunteers.filter(v => v.team === selectedEntry.team && v.type?.toLowerCase() === 'ministra').map(m => m.name).join(', ') || 'N/A')
-                                        : (selectedEntry.ministerIds && selectedEntry.ministerIds.length > 0 
-                                            ? selectedEntry.ministerIds.map(id => volunteers.find(v => v.id === id)?.name || '?').join(', ') 
-                                            : 'N/A')
-                                    }
-                                </div>
-                            </div>
+                            {selectedEntry.className === 'Apoio' ? (
+                                <>
+                                    <div className="flex justify-between py-2 border-b border-gray-50">
+                                        <span className="font-semibold text-gray-600 text-sm">Escada:</span>
+                                        <span className="text-gray-800 font-bold text-sm">
+                                            {selectedEntry.escadaId ? volunteers.find(v => v.id === selectedEntry.escadaId)?.name || '?' : 'N/A'}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between py-2 border-b border-gray-50">
+                                        <span className="font-semibold text-gray-600 text-sm">Corredor:</span>
+                                        <span className="text-gray-800 font-bold text-sm">
+                                            {selectedEntry.corredorId ? volunteers.find(v => v.id === selectedEntry.corredorId)?.name || '?' : 'N/A'}
+                                        </span>
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <div className="flex justify-between py-2 border-b border-gray-50">
+                                        <span className="font-semibold text-gray-600 text-sm">Coordenadora:</span>
+                                        <span className="text-gray-800 font-bold text-sm">
+                                            {selectedEntry.team 
+                                                ? (volunteers.find(v => v.class === selectedEntry.className && v.type?.toLowerCase() === 'coordenadora')?.name || 'N/A')
+                                                : (selectedEntry.coordinatorId ? volunteers.find(v => v.id === selectedEntry.coordinatorId)?.name || '?' : 'N/A')
+                                            }
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between py-2 border-b border-gray-50">
+                                        <span className="font-semibold text-gray-600 text-sm">Supervisora:</span>
+                                        <span className="text-gray-800 font-bold text-sm">
+                                            {selectedEntry.team 
+                                                ? (volunteers.find(v => v.team === selectedEntry.team && v.type?.toLowerCase() === 'supervisora')?.name || 'N/A')
+                                                : (selectedEntry.supervisorId ? volunteers.find(v => v.id === selectedEntry.supervisorId)?.name || '?' : 'N/A')
+                                            }
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between py-2 border-b border-gray-50">
+                                        <span className="font-semibold text-gray-600 text-sm">Mesa:</span>
+                                        <span className="text-gray-800 font-bold text-sm">
+                                            {selectedEntry.team 
+                                                ? (volunteers.find(v => v.team === selectedEntry.team && v.type?.toLowerCase() === 'supervisora')?.name || 'N/A')
+                                                : (selectedEntry.deskId ? volunteers.find(v => v.id === selectedEntry.deskId)?.name || '?' : 'N/A')
+                                            }
+                                        </span>
+                                    </div>
+                                    <div className="py-2">
+                                        <span className="block font-semibold text-gray-600 mb-1 text-sm">Ministras:</span>
+                                        <div className="bg-gray-50 p-2.5 rounded-lg text-xs text-gray-800 font-bold border border-gray-100">
+                                            {selectedEntry.team 
+                                                ? (volunteers.filter(v => v.team === selectedEntry.team && v.type?.toLowerCase() === 'ministra').map(m => m.name).join(', ') || 'N/A')
+                                                : (selectedEntry.ministerIds && selectedEntry.ministerIds.length > 0 
+                                                    ? selectedEntry.ministerIds.map(id => volunteers.find(v => v.id === id)?.name || '?').join(', ') 
+                                                    : 'N/A')
+                                            }
+                                        </div>
+                                    </div>
+                                </>
+                            )}
                         </div>
 
                         <div className="flex gap-3 justify-end pt-4 border-t border-gray-100">
@@ -758,8 +770,8 @@ const Schedule: React.FC<ScheduleProps> = ({
                                     return true;
                                 })
                                 .sort((a, b) => {
-                                    const indexA = CLASS_NAMES.indexOf(a.className);
-                                    const indexB = CLASS_NAMES.indexOf(b.className);
+                                    const indexA = SCHEDULE_CLASS_NAMES.indexOf(a.className);
+                                    const indexB = SCHEDULE_CLASS_NAMES.indexOf(b.className);
                                     return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
                                 })
                                 .map(entry => (
