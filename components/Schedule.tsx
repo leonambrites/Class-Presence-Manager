@@ -3,7 +3,7 @@ import { ScheduleEntry, Volunteer, UserRole } from '../types';
 import { CLASS_NAMES } from '../constants';
 import Modal from './Modal';
 
-const SCHEDULE_CLASS_NAMES = [...CLASS_NAMES, 'Apoio'];
+const SCHEDULE_CLASS_NAMES = ['Apoio', ...CLASS_NAMES];
 
 interface ScheduleProps {
     schedule: ScheduleEntry[];
@@ -524,7 +524,7 @@ const Schedule: React.FC<ScheduleProps> = ({
                             <div
                                 key={index}
                                 onClick={() => handleCellClick(cell.dateString)}
-                                className={`min-h-[85px] md:min-h-[110px] p-1.5 md:p-2 rounded-lg border flex flex-col justify-between transition cursor-pointer relative group ${
+                                className={`min-h-[110px] md:min-h-[140px] p-1.5 md:p-2 rounded-lg border flex flex-col justify-between transition cursor-pointer relative group ${
                                     cell.isCurrentMonth 
                                         ? 'bg-white border-gray-100 hover:border-brand-blue hover:shadow-sm' 
                                         : 'bg-gray-50 border-gray-100 text-gray-400 opacity-60'
@@ -553,7 +553,7 @@ const Schedule: React.FC<ScheduleProps> = ({
                                 </div>
 
                                 {/* Desktop Badges View */}
-                                <div className="hidden md:block space-y-1 overflow-y-auto max-h-[60px] md:max-h-[75px] pr-0.5 custom-scrollbar">
+                                <div className="hidden md:block space-y-1 overflow-y-auto max-h-[85px] md:max-h-[105px] pr-0.5 custom-scrollbar">
                                     {dayEntries.map(entry => (
                                         <div
                                             key={entry.id}
