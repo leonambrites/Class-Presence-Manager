@@ -875,26 +875,51 @@ app.get('/api/download-lesson', checkRole(['Pastor', 'Coordenadora', 'Supervisor
         const dataPathCapitalized = path.join(process.cwd(), 'data', 'Topics');
         const dataPathLowercase = path.join(process.cwd(), 'data', 'topics');
         
-        let filePath = path.join(dataPathCapitalized, String(fileName));
-        console.log(`[DOWNLOAD] Checking path: ${filePath}`);
+        const resolvedCapitalized = path.resolve(dataPathCapitalized);
+        const resolvedLowercase = path.resolve(dataPathLowercase);
 
+        const safeFileName = path.basename(String(fileName));
+
+        // Create an allowlist dynamically from the directory contents
+        let allowedFiles: string[] = [];
+        try {
+            if (fs.existsSync(resolvedCapitalized)) {
+                allowedFiles = allowedFiles.concat(fs.readdirSync(resolvedCapitalized).map(f => path.basename(f)));
+            }
+            if (fs.existsSync(resolvedLowercase)) {
+                allowedFiles = allowedFiles.concat(fs.readdirSync(resolvedLowercase).map(f => path.basename(f)));
+            }
+        } catch (dirErr) {
+            console.error('[DOWNLOAD] Failed to build allowed files list:', dirErr);
+        }
+
+        // Validate safeFileName exists in the allowlist
+        if (!allowedFiles.includes(safeFileName)) {
+            console.log(`[DOWNLOAD] File name "${safeFileName}" not in allowlist of directories.`);
+            return res.status(403).json({ error: 'Acesso negado: Arquivo não permitido.' });
+        }
+
+        let filePath = path.resolve(resolvedCapitalized, safeFileName);
         let fileExists = fs.existsSync(filePath);
+
         if (!fileExists) {
-            const fallbackPath = path.join(dataPathLowercase, String(fileName));
-            console.log(`[DOWNLOAD] Capitalized path not found. Checking lowercase path: ${fallbackPath}`);
+            const fallbackPath = path.resolve(resolvedLowercase, safeFileName);
             if (fs.existsSync(fallbackPath)) {
                 filePath = fallbackPath;
                 fileExists = true;
-                console.log(`[DOWNLOAD] File found at lowercase path: ${filePath}`);
-            } else {
-                console.log(`[DOWNLOAD] File not found anywhere. Falling back to dynamic doc generation.`);
             }
-        } else {
-            console.log(`[DOWNLOAD] File found at capitalized path: ${filePath}`);
+        }
+
+        // Verify the resolved path starts with one of the allowed basepaths
+        if (fileExists) {
+            const isInsideAllowedDir = filePath.startsWith(resolvedCapitalized) || filePath.startsWith(resolvedLowercase);
+            if (!isInsideAllowedDir) {
+                return res.status(403).json({ error: 'Acesso negado: Tentativa de path traversal.' });
+            }
         }
 
         if (fileExists) {
-            res.download(filePath, String(fileName));
+            res.download(filePath, safeFileName);
         } else {
             const tTitle = title ? String(title) : 'Assunto da Aula';
             const tDesc = description ? String(description) : '';
