@@ -76,7 +76,7 @@ interface DailyViewProps {
 
 const DailyView: React.FC<DailyViewProps> = ({ students, selectedClass, onClassChange, startDate, setStartDate, endDate, setEndDate, setDownloadFn }) => {
     const studentsToDisplay = selectedClass === 'All'
-        ? students
+        ? students.filter(s => s.class !== 'Seeds')
         : students.filter(s => s.class === selectedClass);
 
     const presentStudents = useMemo(() => {
@@ -397,7 +397,7 @@ const MonthlyView: React.FC<MonthlyViewProps> = ({ students, selectedClass, onCl
     }, [students]);
 
     const monthlyStats = useMemo(() => {
-        const studentsToDisplay = selectedClass === 'All' ? students : students.filter(s => s.class === selectedClass);
+        const studentsToDisplay = selectedClass === 'All' ? students.filter(s => s.class !== 'Seeds') : students.filter(s => s.class === selectedClass);
         const stats = {
             totalPresences: 0,
             serviceDays: new Set<string>(),

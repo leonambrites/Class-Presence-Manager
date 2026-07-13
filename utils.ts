@@ -20,7 +20,8 @@ export const getClassNameByAge = (age: number): string => {
     if (age <= 3) return '2 a 3 anos';
     if (age <= 5) return '4 a 5 anos';
     if (age <= 7) return '6 a 7 anos';
-    return '8 a 10 anos';
+    if (age <= 10) return '8 a 10 anos';
+    return 'Seeds';
 };
 
 export const getStudentClass = (birthday?: string, fallbackAge?: number): string => {

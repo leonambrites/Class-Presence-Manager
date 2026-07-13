@@ -67,13 +67,13 @@ const Attendance: React.FC<AttendanceProps> = ({
         , [students, selectedStudentId]);
 
     const studentsForClass = selectedClass === 'All'
-        ? students
+        ? students.filter(s => s.class !== 'Seeds')
         : students.filter(s => s.class === selectedClass);
 
     // Filter active queue (Ready to leave, present today, not yet dismissed)
     const awaitingReleaseStudents = useMemo(() => {
         return students.filter(s => {
-            const classMatch = selectedClass === 'All' || s.class === selectedClass;
+            const classMatch = selectedClass === 'All' ? s.class !== 'Seeds' : s.class === selectedClass;
             const todayAtt = s.attendance.find(a => a.date === date);
             return classMatch && todayAtt && todayAtt.present && todayAtt.readyToLeave && !todayAtt.dismissedBy;
         });
