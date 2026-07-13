@@ -202,16 +202,49 @@ app.get('/api/users', checkRole(['Pastor', 'Coordenadora']) as any, async (req, 
 });
 
 // PATCH Clerk User Metadata (Role, Classroom, Active Status)
+// PATCH Clerk User Metadata (Role, Classroom, Active Status)
 app.patch('/api/users/:id/metadata', checkRole(['Pastor', 'Coordenadora']) as any, async (req, res) => {
     try {
         if (!CLERK_SECRET_KEY) throw new Error('Missing CLERK_SECRET_KEY');
         const { id } = req.params;
         const { role, classroom, active } = req.body;
 
-        // Enforce: Coordenadora cannot edit classroom
         const callerRole = (req as any).userRole;
+        const VALID_ROLES = ['Pastor', 'Coordenadora', 'Supervisora', 'Ministra', 'Visitante'];
+        const ROLE_HIERARCHY: Record<string, number> = {
+            'Pastor': 5,
+            'Coordenadora': 4,
+            'Supervisora': 3,
+            'Ministra': 2,
+            'Visitante': 1
+        };
+
+        // Validate role input if provided
+        if (role !== undefined && !VALID_ROLES.includes(role)) {
+            return res.status(400).json({ error: 'Invalid role specified.' });
+        }
+
+        // Get target user's current role
+        const targetUser = await getUserStatus(id);
+        const targetRole = targetUser.role;
+
+        // Enforce: Coordenadora cannot edit classroom
         if (callerRole === 'Coordenadora' && classroom !== undefined) {
             return res.status(403).json({ error: 'Forbidden: Coordenadoras cannot alter user classrooms.' });
+        }
+
+        // Enforce: Only Pastor can change roles
+        if (role !== undefined && callerRole !== 'Pastor') {
+            return res.status(403).json({ error: 'Forbidden: Only Pastor can alter user roles.' });
+        }
+
+        // Enforce: Coordenadora cannot modify users of equal or higher level
+        if (callerRole !== 'Pastor') {
+            const callerLevel = ROLE_HIERARCHY[callerRole] || 0;
+            const targetLevel = ROLE_HIERARCHY[targetRole] || 0;
+            if (targetLevel >= callerLevel) {
+                return res.status(403).json({ error: 'Forbidden: You cannot modify accounts of equal or higher level.' });
+            }
         }
 
         const metadataUpdate: any = {};
@@ -262,6 +295,28 @@ app.delete('/api/users/:id', checkRole(['Pastor', 'Coordenadora']) as any, async
             return res.status(400).json({ error: "Você não pode excluir seu próprio acesso." });
         }
 
+        const callerRole = (req as any).userRole;
+        const ROLE_HIERARCHY: Record<string, number> = {
+            'Pastor': 5,
+            'Coordenadora': 4,
+            'Supervisora': 3,
+            'Ministra': 2,
+            'Visitante': 1
+        };
+
+        // Get target user's current role
+        const targetUser = await getUserStatus(id);
+        const targetRole = targetUser.role;
+
+        // Enforce: Coordenadora cannot delete users of equal or higher level
+        if (callerRole !== 'Pastor') {
+            const callerLevel = ROLE_HIERARCHY[callerRole] || 0;
+            const targetLevel = ROLE_HIERARCHY[targetRole] || 0;
+            if (targetLevel >= callerLevel) {
+                return res.status(403).json({ error: 'Forbidden: You cannot delete accounts of equal or higher level.' });
+            }
+        }
+
         const response = await fetch(`https://api.clerk.com/v1/users/${id}`, {
             method: 'DELETE',
             headers: {
@@ -286,11 +341,16 @@ app.delete('/api/users/:id', checkRole(['Pastor', 'Coordenadora']) as any, async
 });
 
 // PATCH Clerk User Role (Deprecated fallback)
-app.patch('/api/users/:id/role', checkRole(['Pastor', 'Coordenadora']) as any, async (req, res) => {
+app.patch('/api/users/:id/role', checkRole(['Pastor']) as any, async (req, res) => {
     try {
         if (!CLERK_SECRET_KEY) throw new Error('Missing CLERK_SECRET_KEY');
         const { id } = req.params;
         const { role } = req.body;
+
+        const VALID_ROLES = ['Pastor', 'Coordenadora', 'Supervisora', 'Ministra', 'Visitante'];
+        if (role !== undefined && !VALID_ROLES.includes(role)) {
+            return res.status(400).json({ error: 'Invalid role specified.' });
+        }
 
         const metadataUpdate: any = { role };
         if (role === 'Pastor') {
