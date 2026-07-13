@@ -176,9 +176,29 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !studentClass || !motherName || !fatherName || !phone || !birthday) {
-      setError('Campos obrigatórios: Nome do aluno, Turma, Data de nascimento, Nome da mãe, Nome do pai e Telefone.');
+    if (!name || !studentClass || !phone || !birthday) {
+      setError('Campos obrigatórios: Nome do aluno, Turma, Data de nascimento e Telefone.');
       return;
+    }
+    
+    if (hasOtherGuardian) {
+      if (!otherGuardianName) {
+        setError('O nome do outro responsável é obrigatório.');
+        return;
+      }
+      if (!otherGuardianRelationship) {
+        setError('O grau de parentesco do outro responsável é obrigatório.');
+        return;
+      }
+      if (otherGuardianRelationship === 'Outro' && !customRelationship) {
+        setError('Por favor, especifique o grau de parentesco.');
+        return;
+      }
+    } else {
+      if (!motherName && !fatherName) {
+        setError('Pelo menos um responsável deve ser preenchido: Nome da mãe ou Nome do pai.');
+        return;
+      }
     }
     
     if (hasOtherGuardian) {
@@ -410,11 +430,11 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700">Nome da Mãe</label>
-          <input type="text" value={motherName} onChange={(e) => setMotherName(e.target.value)} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-blue focus:border-brand-blue sm:text-sm" />
+          <input type="text" value={motherName} onChange={(e) => setMotherName(e.target.value)} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-blue focus:border-brand-blue sm:text-sm" />
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">Nome do Pai</label>
-          <input type="text" value={fatherName} onChange={(e) => setFatherName(e.target.value)} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-blue focus:border-brand-blue sm:text-sm" />
+          <input type="text" value={fatherName} onChange={(e) => setFatherName(e.target.value)} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-blue focus:border-brand-blue sm:text-sm" />
         </div>
       </div>
 
