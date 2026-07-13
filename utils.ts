@@ -15,6 +15,20 @@ export const calculateAge = (birthday?: string, fallbackAge?: number): number | 
     return computedAge;
 };
 
+export const getClassNameByAge = (age: number): string => {
+    if (age < 2) return 'Maternal';
+    if (age <= 3) return '2 a 3 anos';
+    if (age <= 5) return '4 a 5 anos';
+    if (age <= 7) return '6 a 7 anos';
+    return '8 a 10 anos';
+};
+
+export const getStudentClass = (birthday?: string, fallbackAge?: number): string => {
+    const ageVal = calculateAge(birthday, fallbackAge);
+    const parsedAge = typeof ageVal === 'number' ? ageVal : Number(fallbackAge || 0);
+    return getClassNameByAge(parsedAge);
+};
+
 export const resizeImageToBase64 = (file: File, maxWidth = 180, maxHeight = 180): Promise<string> => {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();

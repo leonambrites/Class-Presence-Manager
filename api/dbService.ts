@@ -13,6 +13,32 @@ import { DataPayload } from './googleSheetsService';
 
 const getTimestamp = () => new Date().toISOString();
 
+function calculateAge(birthday?: string, fallbackAge?: number): number {
+    if (!birthday) return fallbackAge || 0;
+    const birthDate = new Date(birthday + 'T00:00:00');
+    if (isNaN(birthDate.getTime())) return fallbackAge || 0;
+    const today = new Date();
+    let computedAge = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        computedAge--;
+    }
+    return computedAge;
+}
+
+function getClassNameByAge(age: number): string {
+    if (age < 2) return 'Maternal';
+    if (age <= 3) return '2 a 3 anos';
+    if (age <= 5) return '4 a 5 anos';
+    if (age <= 7) return '6 a 7 anos';
+    return '8 a 10 anos';
+}
+
+function getStudentClass(birthday?: string, fallbackAge?: number): string {
+    const ageVal = calculateAge(birthday, fallbackAge);
+    return getClassNameByAge(ageVal);
+}
+
 export const dbService = {
     // Ler todos os dados
     async getAllData(): Promise<DataPayload> {
@@ -43,6 +69,7 @@ export const dbService = {
 
             return {
                 ...s,
+                class: getStudentClass(s.birthday, s.age ? Number(s.age) : 0),
                 guardianName,
                 motherName,
                 fatherName,
@@ -471,7 +498,42 @@ export const dbService = {
     async getStudentById(id: string) {
         const sql = getSql();
         const rows = await sql`SELECT * FROM students WHERE id = ${String(id)}`;
-        return rows[0] || null;
+        const s = rows[0];
+        if (!s) return null;
+
+        const hasOtherGuardian = s.has_other_guardian || false;
+        const otherName = s.other_guardian_name || '';
+        const motherName = s.mother_name || s.mothername || '';
+        const fatherName = s.father_name || s.fathername || '';
+        
+        let guardianName = s.guardianname || s.guardianName || '';
+        if (!guardianName) {
+            if (hasOtherGuardian && otherName) {
+                guardianName = `${otherName} (${s.other_guardian_relationship || 'Responsável'})`;
+            } else if (motherName) {
+                guardianName = motherName;
+            } else if (fatherName) {
+                guardianName = fatherName;
+            }
+        }
+
+        return {
+            ...s,
+            class: getStudentClass(s.birthday, s.age ? Number(s.age) : 0),
+            guardianName,
+            motherName,
+            fatherName,
+            hasOtherGuardian,
+            otherGuardianName: otherName,
+            otherGuardianRelationship: s.other_guardian_relationship || '',
+            age: s.age ? Number(s.age) : 0,
+            hasAllergy: s.has_allergy,
+            allergyDescription: s.allergy_description || '',
+            photo: s.photo || '',
+            imageUseAllowed: s.image_use_allowed || false,
+            imageUseDocument: s.image_use_document || '',
+            familyId: s.family_id || ''
+        };
     },
 
     async completePrintJob(jobId: string) {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { CLASS_NAMES } from '../constants';
 import { Student } from '../types';
-import { calculateAge, resizeImageToBase64 } from '../utils';
+import { calculateAge, resizeImageToBase64, getStudentClass } from '../utils';
 
 interface StudentFormProps {
   onSubmit: (formData: { 
@@ -33,7 +33,7 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [name, setName] = useState('');
-  const [studentClass, setStudentClass] = useState(CLASS_NAMES[0]);
+  const studentClass = getStudentClass(birthday, initialData?.age);
   const [phone, setPhone] = useState('');
   const [birthday, setBirthday] = useState('');
   const [hasAllergy, setHasAllergy] = useState(false);
@@ -108,7 +108,6 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
   useEffect(() => {
     if (initialData) {
       setName(initialData.name || '');
-      setStudentClass(initialData.class || CLASS_NAMES[0]);
       setPhone(initialData.phone || '');
       setBirthday(initialData.birthday || '');
       setHasAllergy(initialData.hasAllergy || false);
@@ -152,7 +151,6 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
       }
     } else {
       setName('');
-      setStudentClass(CLASS_NAMES[0]);
       setPhone('');
       setBirthday('');
       setHasAllergy(false);
@@ -414,12 +412,14 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
       
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700">Turma</label>
-          <select value={studentClass} onChange={(e) => setStudentClass(e.target.value)} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-blue focus:border-brand-blue sm:text-sm">
-            {CLASS_NAMES.map(className => (
-              <option key={className} value={className}>{className}</option>
-            ))}
-          </select>
+          <label className="block text-sm font-medium text-gray-700">Turma (Definida pela Idade)</label>
+          <input
+            type="text"
+            readOnly
+            value={studentClass}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500 font-bold sm:text-sm select-none"
+            title="A turma é calculada automaticamente baseada na idade do aluno."
+          />
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">Data de Nascimento</label>
