@@ -1,5 +1,4 @@
 const fetch = require('node-fetch');
-const puppeteer = require('puppeteer');
 const ptp = require('pdf-to-printer');
 const fs = require('fs');
 const path = require('path');
@@ -198,39 +197,48 @@ async function processPrintJobs() {
 
     console.log(`Encontrados ${jobs.length} trabalho(s) de impressão pendente(s).`);
 
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
+    let browser;
+    try {
+        const puppeteerModule = await import('puppeteer');
+        const puppeteer = puppeteerModule.default || puppeteerModule;
+        browser = await puppeteer.launch();
+        const page = await browser.newPage();
 
-    for (const job of jobs) {
-        try {
-            console.log(`Gerando etiqueta para: ${job.student_name} (Code: ${job.security_code})...`);
-            
-            const htmlContent = generateHTML(job);
-            await page.setContent(htmlContent);
+        for (const job of jobs) {
+            try {
+                console.log(`Gerando etiqueta para: ${job.student_name} (Code: ${job.security_code})...`);
+                
+                const htmlContent = generateHTML(job);
+                await page.setContent(htmlContent);
 
-            const tempPdfPath = path.join(__dirname, `temp_job_${job.id}.pdf`);
-            await page.pdf({
-                path: tempPdfPath,
-                width: '62mm',
-                height: '100mm',
-                margin: { top: 0, bottom: 0, left: 0, right: 0 },
-                printBackground: true
-            });
+                const tempPdfPath = path.join(__dirname, `temp_job_${job.id}.pdf`);
+                await page.pdf({
+                    path: tempPdfPath,
+                    width: '62mm',
+                    height: '100mm',
+                    margin: { top: 0, bottom: 0, left: 0, right: 0 },
+                    printBackground: true
+                });
 
-            console.log("Enviando para a impressora...");
-            await ptp.print(tempPdfPath, {
-                printer: PRINTER_NAME
-            });
+                console.log("Enviando para a impressora...");
+                await ptp.print(tempPdfPath, {
+                    printer: PRINTER_NAME
+                });
 
-            fs.unlinkSync(tempPdfPath);
-            await markAsPrinted(job.id);
-            console.log(`Trabalho ${job.id} impresso com sucesso!`);
-        } catch (err) {
-            console.error(`Erro ao processar trabalho ${job.id}:`, err.message);
+                fs.unlinkSync(tempPdfPath);
+                await markAsPrinted(job.id);
+                console.log(`Trabalho ${job.id} impresso com sucesso!`);
+            } catch (err) {
+                console.error(`Erro ao processar trabalho ${job.id}:`, err.message);
+            }
+        }
+    } catch (launchErr) {
+        console.error("Erro ao iniciar o Puppeteer:", launchErr.message);
+    } finally {
+        if (browser) {
+            await browser.close();
         }
     }
-
-    await browser.close();
 }
 
 console.log("Serviço de impressão Mundo Kids iniciado.");
