@@ -195,25 +195,34 @@ async function processPrintJobs() {
     const jobs = await getPendingJobs();
     if (jobs.length === 0) return;
 
-    console.log(`Encontrados ${jobs.length} trabalho(s) de impressão pendente(s).`);
+    console.log(`\n[FILA] Encontrados ${jobs.length} trabalho(s) de impressão pendente(s).`);
 
     let browser;
     try {
+        console.log("[PUPPETEER] Importando biblioteca...");
         const puppeteerModule = await import('puppeteer');
         const puppeteer = puppeteerModule.default || puppeteerModule;
+        
+        console.log("[PUPPETEER] Iniciando navegador Chrome...");
         browser = await puppeteer.launch({
-            executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+            executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+            headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu']
         });
+        
+        console.log("[PUPPETEER] Abrindo nova aba...");
         const page = await browser.newPage();
 
         for (const job of jobs) {
             try {
-                console.log(`Gerando etiqueta para: ${job.student_name} (Code: ${job.security_code})...`);
-
+                console.log(`\n[JOB ${job.id}] Iniciando processamento para: ${job.student_name}`);
+                
                 const htmlContent = generateHTML(job);
+                console.log(`[JOB ${job.id}] Renderizando HTML...`);
                 await page.setContent(htmlContent);
 
                 const tempPdfPath = path.join(__dirname, `temp_job_${job.id}.pdf`);
+                console.log(`[JOB ${job.id}] Salvando PDF temporário em: ${tempPdfPath}`);
                 await page.pdf({
                     path: tempPdfPath,
                     width: '62mm',
@@ -222,22 +231,27 @@ async function processPrintJobs() {
                     printBackground: true
                 });
 
-                console.log("Enviando para a impressora...");
+                console.log(`[JOB ${job.id}] Enviando para a impressora '${PRINTER_NAME}'...`);
                 await ptp.print(tempPdfPath, {
                     printer: PRINTER_NAME
                 });
+                console.log(`[JOB ${job.id}] Impressão disparada com sucesso.`);
 
+                console.log(`[JOB ${job.id}] Excluindo arquivo PDF temporário...`);
                 fs.unlinkSync(tempPdfPath);
+                
+                console.log(`[JOB ${job.id}] Confirmando conclusão do trabalho na API...`);
                 await markAsPrinted(job.id);
-                console.log(`Trabalho ${job.id} impresso com sucesso!`);
+                console.log(`[JOB ${job.id}] Trabalho concluído!`);
             } catch (err) {
-                console.error(`Erro ao processar trabalho ${job.id}:`, err.message);
+                console.error(`[JOB ${job.id}] Erro no processamento:`, err.message);
             }
         }
     } catch (launchErr) {
-        console.error("Erro ao iniciar o Puppeteer:", launchErr.message);
+        console.error("[PUPPETEER] Erro ao iniciar o navegador:", launchErr.message);
     } finally {
         if (browser) {
+            console.log("[PUPPETEER] Fechando aba do navegador...");
             await browser.close();
         }
     }
