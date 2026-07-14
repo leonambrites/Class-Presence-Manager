@@ -62,6 +62,10 @@ function generateHTML(job) {
     <head>
         <meta charset="UTF-8">
         <style>
+            @page {
+                size: 62mm 100mm;
+                margin: 0;
+            }
             body {
                 margin: 0; padding: 0; width: 62mm; height: 100mm;
                 font-family: system-ui, -apple-system, sans-serif;
@@ -191,68 +195,58 @@ function generateHTML(job) {
     `;
 }
 
+const { execSync } = require('child_process');
+
 async function processPrintJobs() {
     const jobs = await getPendingJobs();
     if (jobs.length === 0) return;
 
     console.log(`\n[FILA] Encontrados ${jobs.length} trabalho(s) de impressão pendente(s).`);
 
-    let browser;
-    try {
-        console.log("[PUPPETEER] Importando biblioteca...");
-        const puppeteerModule = await import('puppeteer');
-        const puppeteer = puppeteerModule.default || puppeteerModule;
+    const chromePath = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
+    if (!fs.existsSync(chromePath)) {
+        console.error(`[ERRO] Google Chrome não encontrado em: ${chromePath}`);
+        return;
+    }
+
+    for (const job of jobs) {
+        const tempHtmlPath = path.join(__dirname, `temp_job_${job.id}.html`);
+        const tempPdfPath = path.join(__dirname, `temp_job_${job.id}.pdf`);
         
-        console.log("[PUPPETEER] Iniciando navegador Chrome...");
-        browser = await puppeteer.launch({
-            executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-            headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu']
-        });
-        
-        console.log("[PUPPETEER] Abrindo nova aba...");
-        const page = await browser.newPage();
+        try {
+            console.log(`\n[JOB ${job.id}] Processando: ${job.student_name}`);
+            
+            const htmlContent = generateHTML(job);
+            fs.writeFileSync(tempHtmlPath, htmlContent, 'utf8');
 
-        for (const job of jobs) {
-            try {
-                console.log(`\n[JOB ${job.id}] Iniciando processamento para: ${job.student_name}`);
-                
-                const htmlContent = generateHTML(job);
-                console.log(`[JOB ${job.id}] Renderizando HTML...`);
-                await page.setContent(htmlContent);
+            console.log(`[JOB ${job.id}] Convertendo HTML para PDF via Chrome Headless...`);
+            const cmd = `"${chromePath}" --headless --disable-gpu --print-to-pdf="${tempPdfPath}" "file:///${tempHtmlPath.replace(/\\/g, '/')}"`;
+            execSync(cmd, { stdio: 'ignore' });
 
-                const tempPdfPath = path.join(__dirname, `temp_job_${job.id}.pdf`);
-                console.log(`[JOB ${job.id}] Salvando PDF temporário em: ${tempPdfPath}`);
-                await page.pdf({
-                    path: tempPdfPath,
-                    width: '62mm',
-                    height: '100mm',
-                    margin: { top: 0, bottom: 0, left: 0, right: 0 },
-                    printBackground: true
-                });
-
+            if (fs.existsSync(tempPdfPath)) {
                 console.log(`[JOB ${job.id}] Enviando para a impressora '${PRINTER_NAME}'...`);
                 await ptp.print(tempPdfPath, {
                     printer: PRINTER_NAME
                 });
                 console.log(`[JOB ${job.id}] Impressão disparada com sucesso.`);
-
-                console.log(`[JOB ${job.id}] Excluindo arquivo PDF temporário...`);
-                fs.unlinkSync(tempPdfPath);
-                
-                console.log(`[JOB ${job.id}] Confirmando conclusão do trabalho na API...`);
-                await markAsPrinted(job.id);
-                console.log(`[JOB ${job.id}] Trabalho concluído!`);
-            } catch (err) {
-                console.error(`[JOB ${job.id}] Erro no processamento:`, err.message);
+            } else {
+                throw new Error("Arquivo PDF não foi gerado pelo Chrome.");
             }
+
+        } catch (err) {
+            console.error(`[JOB ${job.id}] Erro no processamento:`, err.message);
+        } finally {
+            // Clean up files
+            if (fs.existsSync(tempHtmlPath)) fs.unlinkSync(tempHtmlPath);
+            if (fs.existsSync(tempPdfPath)) fs.unlinkSync(tempPdfPath);
         }
-    } catch (launchErr) {
-        console.error("[PUPPETEER] Erro ao iniciar o navegador:", launchErr.message);
-    } finally {
-        if (browser) {
-            console.log("[PUPPETEER] Fechando aba do navegador...");
-            await browser.close();
+        
+        try {
+            console.log(`[JOB ${job.id}] Confirmando conclusão do trabalho na API...`);
+            await markAsPrinted(job.id);
+            console.log(`[JOB ${job.id}] Trabalho concluído!`);
+        } catch (apiErr) {
+            console.error(`[JOB ${job.id}] Erro ao confirmar na API:`, apiErr.message);
         }
     }
 }
