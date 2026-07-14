@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
-const API_URL = process.env.API_URL || 'http://localhost:3000/api';
+const API_URL = process.env.API_URL || 'https://gestao-mundo-kids.vercel.app/api';
 const AGENT_TOKEN = process.env.AGENT_TOKEN || 'sua_chave_secreta_aqui';
 const PRINTER_NAME = process.env.PRINTER_NAME || 'Brother QL-700';
 const POLLING_INTERVAL = 2000; // 2 segundos
@@ -49,8 +49,8 @@ function generateHTML(job) {
 
     // Auto-detect PCD/accessibility text inside allergy description
     const showSpecial = !!job.allergy_description && (
-        job.allergy_description.toLowerCase().includes('pcd') || 
-        job.allergy_description.toLowerCase().includes('autis') || 
+        job.allergy_description.toLowerCase().includes('pcd') ||
+        job.allergy_description.toLowerCase().includes('autis') ||
         job.allergy_description.toLowerCase().includes('cadeir') ||
         job.allergy_description.toLowerCase().includes('defic') ||
         job.allergy_description.toLowerCase().includes('especial')
@@ -201,13 +201,15 @@ async function processPrintJobs() {
     try {
         const puppeteerModule = await import('puppeteer');
         const puppeteer = puppeteerModule.default || puppeteerModule;
-        browser = await puppeteer.launch();
+        browser = await puppeteer.launch({
+            executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+        });
         const page = await browser.newPage();
 
         for (const job of jobs) {
             try {
                 console.log(`Gerando etiqueta para: ${job.student_name} (Code: ${job.security_code})...`);
-                
+
                 const htmlContent = generateHTML(job);
                 await page.setContent(htmlContent);
 
