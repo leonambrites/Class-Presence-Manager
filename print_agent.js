@@ -220,13 +220,14 @@ async function processPrintJobs() {
             fs.writeFileSync(tempHtmlPath, htmlContent, 'utf8');
 
             console.log(`[JOB ${job.id}] Convertendo HTML para PDF via Chrome Headless...`);
-            const cmd = `"${chromePath}" --headless --disable-gpu --print-to-pdf="${tempPdfPath}" "file:///${tempHtmlPath.replace(/\\/g, '/')}"`;
+            const cmd = `"${chromePath}" --headless --disable-gpu --no-pdf-header-footer --print-to-pdf="${tempPdfPath}" "file:///${tempHtmlPath.replace(/\\/g, '/')}"`;
             execSync(cmd, { stdio: 'ignore' });
 
             if (fs.existsSync(tempPdfPath)) {
                 console.log(`[JOB ${job.id}] Enviando para a impressora '${PRINTER_NAME}'...`);
                 await ptp.print(tempPdfPath, {
-                    printer: PRINTER_NAME
+                    printer: PRINTER_NAME,
+                    scale: "noscale"
                 });
                 console.log(`[JOB ${job.id}] Impressão disparada com sucesso.`);
             } else {
