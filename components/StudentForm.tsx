@@ -33,10 +33,10 @@ const StudentForm: React.FC<StudentFormProps> = ({ onSubmit, onCancel, initialDa
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [name, setName] = useState('');
-  const studentClass = getStudentClass(birthday, initialData?.age);
   const [phone, setPhone] = useState('');
   const [birthday, setBirthday] = useState('');
   const [hasAllergy, setHasAllergy] = useState(false);
+  const studentClass = getStudentClass(birthday, initialData?.age);
   const [allergyDescription, setAllergyDescription] = useState('');
   
   // Guardian inputs

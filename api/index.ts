@@ -290,7 +290,7 @@ app.delete('/api/users/:id', checkRole(['Pastor', 'Coordenadora']) as any, async
         const { id } = req.params;
 
         // Prevent self deletion
-        const callerId = req.auth?.userId;
+        const callerId = (req as any).auth?.userId;
         if (callerId === id) {
             return res.status(400).json({ error: "Você não pode excluir seu próprio acesso." });
         }
@@ -441,7 +441,7 @@ app.post('/api/attendance', checkRole(['Pastor', 'Coordenadora', 'Supervisora', 
         // If presence is marked, add print job to queue
         if (present) {
             try {
-                const student = await dbService.getStudentById(studentId);
+                const student = await dbService.getStudentById(studentId) as any;
                 if (student) {
                     const isBirthdayThisWeek = (birthdayStr: string) => {
                         if (!birthdayStr) return false;
@@ -497,7 +497,7 @@ app.post('/api/print/enqueue', checkRole(['Pastor', 'Coordenadora', 'Supervisora
         return res.status(400).json({ error: "ID do aluno é obrigatório" });
     }
     try {
-        const student = await dbService.getStudentById(studentId);
+        const student = await dbService.getStudentById(studentId) as any;
         if (!student) {
             return res.status(404).json({ error: "Aluno não encontrado" });
         }
