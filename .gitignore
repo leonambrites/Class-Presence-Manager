@@ -8,8 +8,13 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+# Build outputs
+build
 dist
 dist-ssr
+
+# Temporary git artifacts
+.git-rewrite
 *.local
 
 # Editor directories and files
