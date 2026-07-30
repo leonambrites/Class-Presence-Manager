@@ -1,11 +1,10 @@
 const fetch = require('node-fetch');
-const puppeteer = require('puppeteer');
 const ptp = require('pdf-to-printer');
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
-const API_URL = process.env.API_URL || 'http://localhost:3000/api';
+const API_URL = process.env.API_URL || 'https://gestao-mundo-kids.vercel.app/api';
 const AGENT_TOKEN = process.env.AGENT_TOKEN || 'sua_chave_secreta_aqui';
 const PRINTER_NAME = process.env.PRINTER_NAME || 'Brother QL-700';
 const POLLING_INTERVAL = 2000; // 2 segundos
@@ -50,8 +49,8 @@ function generateHTML(job) {
 
     // Auto-detect PCD/accessibility text inside allergy description
     const showSpecial = !!job.allergy_description && (
-        job.allergy_description.toLowerCase().includes('pcd') || 
-        job.allergy_description.toLowerCase().includes('autis') || 
+        job.allergy_description.toLowerCase().includes('pcd') ||
+        job.allergy_description.toLowerCase().includes('autis') ||
         job.allergy_description.toLowerCase().includes('cadeir') ||
         job.allergy_description.toLowerCase().includes('defic') ||
         job.allergy_description.toLowerCase().includes('especial')
@@ -63,6 +62,10 @@ function generateHTML(job) {
     <head>
         <meta charset="UTF-8">
         <style>
+            @page {
+                size: 62mm 100mm;
+                margin: 0;
+            }
             body {
                 margin: 0; padding: 0; width: 62mm; height: 100mm;
                 font-family: system-ui, -apple-system, sans-serif;
@@ -192,45 +195,61 @@ function generateHTML(job) {
     `;
 }
 
+const { execSync } = require('child_process');
+
 async function processPrintJobs() {
     const jobs = await getPendingJobs();
     if (jobs.length === 0) return;
 
-    console.log(`Encontrados ${jobs.length} trabalho(s) de impressão pendente(s).`);
+    console.log(`\n[FILA] Encontrados ${jobs.length} trabalho(s) de impressão pendente(s).`);
 
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
-
-    for (const job of jobs) {
-        try {
-            console.log(`Gerando etiqueta para: ${job.student_name} (Code: ${job.security_code})...`);
-            
-            const htmlContent = generateHTML(job);
-            await page.setContent(htmlContent);
-
-            const tempPdfPath = path.join(__dirname, `temp_job_${job.id}.pdf`);
-            await page.pdf({
-                path: tempPdfPath,
-                width: '62mm',
-                height: '100mm',
-                margin: { top: 0, bottom: 0, left: 0, right: 0 },
-                printBackground: true
-            });
-
-            console.log("Enviando para a impressora...");
-            await ptp.print(tempPdfPath, {
-                printer: PRINTER_NAME
-            });
-
-            fs.unlinkSync(tempPdfPath);
-            await markAsPrinted(job.id);
-            console.log(`Trabalho ${job.id} impresso com sucesso!`);
-        } catch (err) {
-            console.error(`Erro ao processar trabalho ${job.id}:`, err.message);
-        }
+    const chromePath = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
+    if (!fs.existsSync(chromePath)) {
+        console.error(`[ERRO] Google Chrome não encontrado em: ${chromePath}`);
+        return;
     }
 
-    await browser.close();
+    for (const job of jobs) {
+        const tempHtmlPath = path.join(__dirname, `temp_job_${job.id}.html`);
+        const tempPdfPath = path.join(__dirname, `temp_job_${job.id}.pdf`);
+        
+        try {
+            console.log(`\n[JOB ${job.id}] Processando: ${job.student_name}`);
+            
+            const htmlContent = generateHTML(job);
+            fs.writeFileSync(tempHtmlPath, htmlContent, 'utf8');
+
+            console.log(`[JOB ${job.id}] Convertendo HTML para PDF via Chrome Headless...`);
+            const cmd = `"${chromePath}" --headless --disable-gpu --no-pdf-header-footer --print-to-pdf="${tempPdfPath}" "file:///${tempHtmlPath.replace(/\\/g, '/')}"`;
+            execSync(cmd, { stdio: 'ignore' });
+
+            if (fs.existsSync(tempPdfPath)) {
+                console.log(`[JOB ${job.id}] Enviando para a impressora '${PRINTER_NAME}'...`);
+                await ptp.print(tempPdfPath, {
+                    printer: PRINTER_NAME,
+                    scale: "noscale"
+                });
+                console.log(`[JOB ${job.id}] Impressão disparada com sucesso.`);
+            } else {
+                throw new Error("Arquivo PDF não foi gerado pelo Chrome.");
+            }
+
+        } catch (err) {
+            console.error(`[JOB ${job.id}] Erro no processamento:`, err.message);
+        } finally {
+            // Clean up files
+            if (fs.existsSync(tempHtmlPath)) fs.unlinkSync(tempHtmlPath);
+            if (fs.existsSync(tempPdfPath)) fs.unlinkSync(tempPdfPath);
+        }
+        
+        try {
+            console.log(`[JOB ${job.id}] Confirmando conclusão do trabalho na API...`);
+            await markAsPrinted(job.id);
+            console.log(`[JOB ${job.id}] Trabalho concluído!`);
+        } catch (apiErr) {
+            console.error(`[JOB ${job.id}] Erro ao confirmar na API:`, apiErr.message);
+        }
+    }
 }
 
 console.log("Serviço de impressão Mundo Kids iniciado.");
